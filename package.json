@@ -1,0 +1,19 @@
+{
+  "name": "competitive-debugging-system",
+  "version": "0.0.1",
+  "private": true,
+  "description": "",
+  "scripts": {
+    "start": "node ./backend/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chariguanaCode/competitive-debugging-system.git"
+  },
+  "author": "Adam Jeliński & Kajetan Lewandowski",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/chariguanaCode/competitive-debugging-system/issues"
+  },
+  "homepage": "https://github.com/chariguanaCode/competitive-debugging-system#readme"
+}
