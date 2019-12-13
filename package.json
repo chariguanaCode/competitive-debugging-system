@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/chariguanaCode/competitive-debugging-system/issues"
   },
-  "homepage": "https://github.com/chariguanaCode/competitive-debugging-system#readme"
+  "homepage": "https://github.com/chariguanaCode/competitive-debugging-system#readme",
+  "dependencies": {
+    "md5": "^2.2.1"
+  }
 }
