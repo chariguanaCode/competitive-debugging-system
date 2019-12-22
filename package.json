@@ -4,7 +4,7 @@
   "private": true,
   "description": "",
   "scripts": {
-    "start": "node ./backend/main.js"
+    "run": "node ./backend/main.js"
   },
   "repository": {
     "type": "git",
