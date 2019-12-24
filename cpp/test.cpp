@@ -2,14 +2,19 @@
 //#include <unistd.h>
 using namespace std;
 int main() {
-    int a, b;
-    cout << "Hello World!" << endl;
+    for (int i = 0; i < 500000000; ++i) { }
+    long long a, b;
     cin >> a >> b;
     //usleep(500000);
-    cout << a + b << '\n';
+    cout << a / b << endl;
+    while (a >= b) {
+        a -= b;
+    }
+
+    cout << a << '\n';
     //usleep(500000);
-    cout.flush();
-    while(true) { };
+    //cout.flush();
+    //while(true) { };
     /*for(int i = 0; i < 1e2; ++i) {
         cout << i << '\n';
         cout.flush();

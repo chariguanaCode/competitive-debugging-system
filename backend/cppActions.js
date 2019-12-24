@@ -5,7 +5,8 @@ const spawn = require('child_process').spawn
 
 exports.compileCpp = async (filename) => {
     try {
-        await execFile('g++', ['-std=c++17', '-O3', '-static', '-o./cpp/test.bin', `${filename}`]);
+        //await execFile('g++', ['-std=c++17', '-O3', '-static', '-o./cpp/test.bin', `${filename}`]);
+        await execFile('g++', ['-std=c++17', '-static', '-o./cpp/test.bin', `${filename}`]);
         return "./cpp/test.bin"
     } catch (err) {
         throw err.stderr
@@ -40,21 +41,23 @@ exports.executeTest = (binaryName, input, pushStdout) => {
     let promise = new Promise((resolve, reject) => {
         child.on('error', reject)
 
-        child.on('close', code => {
+        child.on('close', (code, signal) => {
             clearInterval(stdoutUpdateInterval)
             if (code === 0) {
                 pushStdout(stdout)
                 resolve()
             } else {
-                const err = new Error(`child exited with code ${code}`)
+                const err = new Error(`child exited with code ${code} and signal ${signal}`)
                 err.stderr = stderr
+                err.code = code
+                err.signal = signal
                 pushStdout(stdout)
                 reject(err)
             }
         })
     })
 
-    promise.child = child
+    promise.childProcess = child
 
     return promise
 }

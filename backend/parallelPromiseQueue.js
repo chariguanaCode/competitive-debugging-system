@@ -35,7 +35,7 @@ module.exports = class PromiseQueue {
 
             const itemPromise = item.promise()
             
-            item.dequeueNotify(itemPromise.child)
+            item.dequeueNotify(itemPromise.childProcess)
 
             itemPromise
                 .then((value) => {
