@@ -1,12 +1,12 @@
 const fs  = require('fs')
 const md5 = require('md5')
 
-exports.default = (filename, callback, error) => {
+exports.track = (filename, callback, error) => {
     let md5Previous = null
     let fsWait = false
-    callback()
+    //callback()
     try {
-        fs.watch(filename, (event, file) => {
+        return fs.watch(filename, (event, file) => {
             if (file) {
                 if (fsWait) return
 

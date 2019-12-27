@@ -4,7 +4,7 @@
   "private": true,
   "description": "",
   "scripts": {
-    "start": "node ./backend/main.js"
+    "run": "node ./backend/main.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/chariguanaCode/competitive-debugging-system#readme",
   "dependencies": {
-    "md5": "^2.2.1"
+    "express": "^4.17.1",
+    "http": "0.0.0",
+    "md5": "^2.2.1",
+    "ws": "^7.2.1"
   }
 }
