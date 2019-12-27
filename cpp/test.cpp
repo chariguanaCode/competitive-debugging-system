@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-#include <iostream>
 #include "universal_print_17.h"
-=======
 #include "bits/stdc++.h"
 //#include <unistd.h>
->>>>>>> 000aa412959a8148e7f7b6f08ec652dc86ff3f0a
 using namespace std;
 int main() {
     for (int i = 0; i < 500000000; ++i) { }
