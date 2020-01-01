@@ -19,10 +19,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface Props {
-    
+    socket: any,
 }
 
-export default function Header({}: Props): ReactElement {
+export default function Header({socket}: Props): ReactElement {
     const classes = useStyles()
     const [ menuOpen, setMenuOpen ] = useState(false);
     return (
@@ -51,7 +51,8 @@ export default function Header({}: Props): ReactElement {
                     </IconButton>
                 </Toolbar>
             </AppBar>
-            <MainMenu 
+            <MainMenu
+                socket={socket} 
                 open={menuOpen}
                 handleClose={() => setMenuOpen(false)}
             />

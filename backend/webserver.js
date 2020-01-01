@@ -37,7 +37,6 @@ wss.on('connection', (ws) => {
         } else if (type === "loadDirectory") {
             executeTask.loadDirectory(data.data.directory)
         } else if (type === "loadTests") {
-            console.log("xd")
             executeTask.loadTests(data.data)
         } else if (type === "loadTestsCANCEL") {
             executeTask.loadTestsCANCEL()

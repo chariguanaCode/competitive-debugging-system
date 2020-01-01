@@ -161,7 +161,6 @@ export const TestManager: React.FunctionComponent<Props> = ({ socket }) => {
     }, [socket]);
 
     return (<>
-        <span style={{position: "absolute", left: "20px"}}>
         <span style = {isLoadButtonDisabled ? {pointerEvents: "none", opacity: "0.4"} : {}}>
             <Dialog fullWidth={true} maxWidth="lg" className={useStyles().folderManager} open={folderManagerOpen} >
                 <IconButton style = {{position: "absolute", color: "red", right: "10px", top: "10px", width: "5%"}} onClick = {()=>{updateFolderManagerOpen(false)}}><CloseIcon/></IconButton>
@@ -182,7 +181,6 @@ export const TestManager: React.FunctionComponent<Props> = ({ socket }) => {
         </> ) : null}
         <br/>
         <TestsLoadingStatus tests = {tests} isLoadingTestsRunning = {isLoadButtonDisabled} socket = {socket}/>
-        </span>
     </>)
 
 };

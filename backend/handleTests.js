@@ -84,7 +84,7 @@ showDirectory = (directory, regex) => {
     });    
 }
 
-exports.loadTests = ({directory, regex}) => {
+exports.loadTests = ({directory, regex},addTestFiles) => {
     if(started) exports.loadTestsCANCEL();
     const mainInterval = setInterval(()=>{
         if(!started){
@@ -125,7 +125,8 @@ exports.loadTests = ({directory, regex}) => {
                         //console.log("fin", timeEnded-timeStarted);
                         if(!cancelTestLoading){
                             webserver.sendTests(null,null,{filesLoaded: `Loaded ${files_to_send_g.length} files in ${timeEnded-timeStarted-200}ms`,filesScanned: `Scanned ${totalFilesScanned} files in ${timeEnded-timeStarted-200}ms`});
-                            webserver.sendTests(files_to_send_g);
+                            webserver.sendTests(["/"]);
+                            addTestFiles(files_to_send_g);
                         }else{
                             webserver.sendTests(null,null,{filesLoaded: '',filesScanned: ''});
                         }

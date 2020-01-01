@@ -98,14 +98,17 @@ runTasks = () => {
 }
 
 addTestFiles = async (testPaths) => {
-    const newTests = testPaths.map((path) => ({ [path]: { filePath: path } })).reduce((prev, curr) => ({ ...prev, ...curr }), { })
-
+   let newTests = {};
+   testPaths.forEach((val)=>{
+       newTests[val] = {filePath: val};
+   })
     config.tests = {
         ...config.tests,
         ...newTests
     }
-
+    console.log("xd")
     const projectFile = config.sourceFile.replace(/\.cpp$/, ".json")
+    console.log("h");
     await asyncFileActions.saveFile(projectFile, JSON.stringify(config))
 
     loadConfig(config.sourceFile)
@@ -170,12 +173,16 @@ loadProject = async (sourceFile) => {
     runTasks()
 }
 
+const loadTestsMain = (obj) => {
+    loadTests(obj, addTestFiles)
+}
+
 webserver.setExecuteTask({
     loadProject,
     runTasks,
     killTest,
     loadDirectory,
-    loadTests,
+    loadTests: loadTestsMain,
     loadTestsCANCEL
 })
 

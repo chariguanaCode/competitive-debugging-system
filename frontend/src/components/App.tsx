@@ -145,7 +145,7 @@ const App: React.FC = () => {
     const loadProject = () => {
         socket.send(JSON.stringify({
             type: "loadProject",
-            filename: "./cpp/test.cpp"
+            filename: "F:/CPP/OI-2019/nwwu/nww_brut/main.cpp"
         }))
     }
 
@@ -171,7 +171,7 @@ const App: React.FC = () => {
             width: "50%"
         } : {pointerEvents: "none"}}>
             <CssBaseline />
-            <Header />
+            <Header socket = {socket}/>
             <LeftSidebar>
                 <Table>
                     <TableBody>
@@ -183,7 +183,14 @@ const App: React.FC = () => {
                     </TableBody>
                 </Table>
             </LeftSidebar>
+            <Button onClick={loadProject}>
+                    Load project
+            </Button>
+            <Button onClick={runTests}>
+                    Run Tests
+                </Button>
             <Content />
+           
             <RightSidebar>
                 <div style={{ margin: 8 }}>
                     {[ ...Array(100)].map(() => <p>Testing</p>)}
