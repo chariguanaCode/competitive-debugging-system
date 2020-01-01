@@ -89,16 +89,16 @@ namespace cupl{
     int watchblock_open (std::string name, int line);
     int watchblock_close(std::string name          );
 
-    const std::string variable_start = {(char)230}
-    const std::string variable_end   = {(char)231}
+    const std::string variable_start = {(char)230};
+    const std::string variable_end   = {(char)231};
 
-    const std::string array_start   = {(char)225}
-    const std::string array_end     = {(char)227}
-    const std::string array_divisor = {(char)226}
+    const std::string array_start   = {(char)225};
+    const std::string array_end     = {(char)227};
+    const std::string array_divisor = {(char)226};
 
-    const std::string pair_start    = {(char)240}
-    const std::string pair_end      = {(char)241}
-    const std::string pair_divisor  = {(char)242}
+    const std::string pair_start    = {(char)240};
+    const std::string pair_end      = {(char)241};
+    const std::string pair_divisor  = {(char)242};
 
     const std::string watchblock_open_start   = {(char)200,(char)201,(char)200};
     const std::string watchblock_open_divisor = {(char)199                    };
@@ -178,18 +178,22 @@ namespace cupl{
 
     template<typename T,size_t N>
     void print_array(T (&a)[N]){
-        for(int i=0; i<(int)N; ++i)
+        cout << array_start;
+        for(int i=0; i<(int)N; ++i) {
             print_process(a[i]);
+            cout << array_divisor;
+        }
+        cout << array_end;
     }
 
     template <typename T>
     void print_arithmetic(T &x) {
-        cout << x;
+        cout << variable_start << x << variable_end;
     }
 
     template <size_t T>
     void print_bitset(bitset<T> &x) {
-        cout << x;
+        cout << variable_start << x << variable_end;
     }
 
     template <typename T>
@@ -206,13 +210,16 @@ namespace cupl{
     }
 
     void print_string(string &x) {
-        cout << x;
+        cout << variable_start << x << variable_end;
     }
 
     template <typename U, typename H>
     void print_pair(pair<U, H> &x) {
+        cout << pair_start;
         print_process(x.first);
+        cout << pair_divisor;
         print_process(x.second);
+        cout << pair_end;
     }
 
     template <typename T>

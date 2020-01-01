@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Button from '@material-ui/core/Button'
 import Paper from './Paper'
+import Fade from '@material-ui/core/Fade'
 import ProgramTestComponent from './ProgramTest'
-
+import { TestManager }  from './TestManager'
+import CircularProgress from '@material-ui/core/CircularProgress';
 interface ProgramTestData {
     [testName: string]: {
         state: string,
@@ -21,12 +23,33 @@ enum ExecutionState {
     Finished,
 }
 
+interface ConnectionErrorProps {
+
+}
+
+export const ConnectionError: React.FunctionComponent<ConnectionErrorProps> = () => {
+   /* let connectionTimeout = Math.min(4000, 2 * connectionTimeout.current) 
+
+    console.log(
+        `Socket is closed. Reconnect will be attempted in ${connectionTimeout.current / 1000} second.`,
+        e.reason
+    )*/
+
+    return <Fade in = {true} style={{
+                transitionDelay: '500ms',
+        }}><div style = {{width: "100%", height: "100%", zIndex: 10000, position: "absolute",backgroundColor: "rgba(22, 22, 22, 0.5)"}}>
+                <div style = {{zIndex: 10001 ,position: "absolute", left: "calc(50% - 60px)", top: "calc(50% - 30px)", width: "140px", height: "60px", backgroundColor: "rgba(255, 77, 77, 0.5)"}}><span style = {{position: "absolute", top: "calc(50% - 26px)", margin: "10px"}}>Loading</span><CircularProgress style = {{position: "absolute", left: "70px", margin: "10px"}} /></div>
+            </div></Fade>
+}
+
 const App: React.FC = () => {
     const [ tests, setTests ] = useState<ProgramTestData>({ })
     const [ filename, setFilename ] = useState("")
     const [ executionState, setExecutionState ] = useState<ExecutionState>(ExecutionState.NoProject)
     const [ socket, setSocket ] = useState()
     const connectionTimeout = useRef(250)
+    const lastServerPing = useRef(0);
+    const isServerConnected = useRef(false)
 
     const check = () => {
         if (!socket || socket.readyState === WebSocket.CLOSED) connect() 
@@ -34,19 +57,29 @@ const App: React.FC = () => {
 
     const connect = () => {
         var ws = new WebSocket("ws://localhost:8000")
-        var connectInterval: NodeJS.Timeout
+        var connectInterval: number ///inaczej nie działa
+
+        
 
         ws.onopen = () => {
             console.log("connected websocket main component")
-
+            isServerConnected.current = true;
             setSocket(ws)
-
             connectionTimeout.current = 250 
             clearTimeout(connectInterval) 
         }
-
+        /*setInterval(()=>{
+            if(isServerConnected.current && Date.now() - lastServerPing.current > 2000){
+                console.error("xd");
+                //@ts-ignore
+                if(isServerConnected.current) ws.onclose({reason: "idk"});
+                isServerConnected.current = false;
+            }
+        },2000)*/
         ws.onclose = e => {
-            connectionTimeout.current = Math.min(10000, 2 * connectionTimeout.current) 
+            // isServerConnected.current = false;
+            setSocket(null);
+            connectionTimeout.current = Math.min(4000, 2 * connectionTimeout.current) 
 
             console.log(
                 `Socket is closed. Reconnect will be attempted in ${connectionTimeout.current / 1000} second.`,
@@ -63,17 +96,18 @@ const App: React.FC = () => {
 
             ws.close()
         }
-
+        
         ws.onmessage = (msg) => {
+            //console.log(msg)
             const message = JSON.parse(msg.data)
-            console.log(message)
             const type = message.type
             const data = message.data
-            if (type === "newConfig") {
+            if(type === "serverPING"){
+                lastServerPing.current = Date.now();
+            } else if (type === "newConfig") {
                 setFilename(data.filename)
                 setTests(data.tests)
-            }
-            if (type === "testUpdate") {
+            } else if (type === "testUpdate") {
                 const newTest: ProgramTestData = {
                     [data.id]: {
                         state: data.state,
@@ -84,21 +118,20 @@ const App: React.FC = () => {
                     }
                 }
                 setTests((prevTests) => ({ ...prevTests, ...newTest }))
-            }
-            if (type === "compilationBegin") {
+            } else if (type === "compilationBegin") {
                 setExecutionState(ExecutionState.Compiling)
-            }
-            if (type === "compilationSuccess") {
+            } else if (type === "compilationSuccess") {
                 setExecutionState(ExecutionState.Running)
-            }
-            if (type === "compilationError") {
+            } else if (type === "compilationError") {
                 setExecutionState(ExecutionState.CompilationError)
             }
+            
         }
     }
 
     useEffect(() => {
         connect()
+        
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ ])
 
@@ -118,17 +151,23 @@ const App: React.FC = () => {
     const killTest = (testName: string) => {
         socket.send(JSON.stringify({
             type: "killTest",
-            testName
+            
         }))
     }
 
+    
+
     return (
         <div 
-            style={{
+        
+            style={socket ? {
                 width: "50%"
-            }}
+            } : {pointerEvents: "none"}}
         >
-            <Paper>
+            <TestManager socket = {socket}/>
+            {socket ? null : <ConnectionError/>}
+            {/*<Paper>
+                
                 <Button onClick={loadProject}>
                     Load project
                 </Button>
@@ -152,7 +191,7 @@ const App: React.FC = () => {
                     />
                 ))}
             </Paper>}
-            {(executionState === ExecutionState.Compiling) && <Paper>Compiling...</Paper>}
+                {(executionState === ExecutionState.Compiling) && <Paper>Compiling...</Paper>}*/}
         </div>
     )
 }

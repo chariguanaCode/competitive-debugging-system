@@ -1,7 +1,9 @@
 const fileChangeTracking = require('./fileChangeTracking')
 const compilationAndExecution = require('./cppCompilationAndExecution')
 const webserver = require('./webserver')
-
+const loadDirectory = require('./handleTests').loadDirectory
+const loadTests = require('./handleTests').loadTests
+const loadTestsCANCEL = require('./handleTests').loadTestsCANCEL
 var hrstart
 let config
 let fileTracking
@@ -117,4 +119,7 @@ webserver.setExecuteTask({
     loadProject,
     runTasks,
     killTest,
+    loadDirectory,
+    loadTests,
+    loadTestsCANCEL
 })

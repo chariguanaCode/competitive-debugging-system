@@ -24,22 +24,25 @@ wss.on('connection', (ws) => {
     })
 
     ws.on('message', (message) => {
+        console.log("Xd")
         data = JSON.parse(message)
         type = data.type
         if (type === "runTasks") {
             executeTask.runTasks()
-        }
-
-        if (type === "loadProject") {
+        } else if (type === "loadProject") {
             executeTask.loadProject(data.filename)
-        }
-
-        if (type === "killTest") {
+        } else if (type === "killTest") {
             console.log("killed", data.testName)
             executeTask.killTest(data.testName)()
+        } else if (type === "loadDirectory") {
+            executeTask.loadDirectory(data.data.directory)
+        } else if (type === "loadTests") {
+            console.log("xd")
+            executeTask.loadTests(data.data)
+        } else if (type === "loadTestsCANCEL") {
+            executeTask.loadTestsCANCEL()
         }
     })
-
     ws.send(JSON.stringify({ state: "success" }))
 })
 
@@ -76,6 +79,56 @@ exports.sendConfig = (config) => {
     })
 }
 
+exports.sendTests = (tests_to_send, error = null, status = null) => {
+    console.log("g");
+    if (status){
+        data_to_send = JSON.stringify({ 
+            type: "loadTestsSTATUS", 
+            data: { status }
+        })
+    } else if(error) {
+        data_to_send = JSON.stringify({ 
+            type: "loadTestsERROR", 
+            data: { error }
+        })
+    } else {
+        data_to_send = JSON.stringify({ 
+            type: "loadTests", 
+            data: {
+                    tests: tests_to_send
+                }
+        })
+    }
+    wss.clients.forEach((ws) => {
+        ws.send(data_to_send);
+    })
+}
+
+exports.sendDirectory = (path, files, error = null) => {
+    let data_to_send;
+    if(error){
+        data_to_send = JSON.stringify({ 
+            type: "loadDirectoryERROR", 
+            data: {
+                    error, 
+                    path
+                }
+        })
+    }else{
+        data_to_send = JSON.stringify({ 
+            type: "loadDirectory", 
+            data: {
+                path,
+                files
+            }
+        })
+    }
+    wss.clients.forEach((ws) => {
+        ws.send(data_to_send);
+    })
+   
+}
+
 exports.updateTest = (id, test) => {
     let { childProcess, startTime, ...data } = test
     wss.clients.forEach((ws) => {
@@ -100,7 +153,16 @@ setInterval(() => {
         ws.isAlive = false
         ws.ping(null, false, true)
     })
-}, 10000)
+}, 1000)
+
+setInterval(() => {
+    wss.clients.forEach((ws) => {
+        ws.send(JSON.stringify({ 
+            type: "serverPING", 
+            data: null
+        }))    
+    })
+}, 1000)
 
 server.listen(process.env.PORT || 8000, () => {
     console.log(`Server started on port ${server.address().port} :)`)

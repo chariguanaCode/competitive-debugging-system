@@ -1,6 +1,5 @@
+#include <iostream>
 #include "universal_print_17.h"
-#include "bits/stdc++.h"
-//#include <unistd.h>
 using namespace std;
 int main() {
     for (int i = 0; i < 500000000; ++i) { }
