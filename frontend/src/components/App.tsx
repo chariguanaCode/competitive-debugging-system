@@ -2,6 +2,12 @@ import React, { useState, useEffect, useRef } from 'react'
 import Button from '@material-ui/core/Button'
 import Paper from './Paper'
 import ProgramTestComponent from './ProgramTest'
+import { CssBaseline, Table, TableContainer, TableRow, TableCell, TableBody } from '@material-ui/core'
+import Header from './Header'
+import Content from './Content'
+import LeftSidebar from './LeftSidebar'
+import RightSidebar from './RightSidebar'
+import { grey, red, yellow, lightGreen, lightBlue, purple } from '@material-ui/core/colors';
 
 interface ProgramTestData {
     [testName: string]: {
@@ -123,6 +129,29 @@ const App: React.FC = () => {
     }
 
     return (
+        <div>
+            <CssBaseline />
+            <Header />
+            <LeftSidebar>
+                <Table>
+                    <TableBody>
+                    {[ ...Array(100)].map((val) => Math.floor(Math.random() * 6)).map((val, index) => (
+                        <TableRow key={index}>
+                            <TableCell style={{ backgroundColor: [ red, yellow, lightGreen, purple, lightBlue, grey ][2][400] }}></TableCell>
+                        </TableRow>
+                    ))}
+                    </TableBody>
+                </Table>
+            </LeftSidebar>
+            <Content />
+            <RightSidebar>
+                <div style={{ margin: 8 }}>
+                    {[ ...Array(100)].map(() => <p>Testing</p>)}
+                </div>
+            </RightSidebar>
+        </div>
+    )
+    /*return (
         <div 
             style={{
                 width: "50%"
@@ -154,7 +183,7 @@ const App: React.FC = () => {
             </Paper>}
             {(executionState === ExecutionState.Compiling) && <Paper>Compiling...</Paper>}
         </div>
-    )
+    )*/
 }
 
 export default App
