@@ -1,7 +1,6 @@
 const cppActions = require('./cppActions')
 const PromiseQueue = require('./parallelPromiseQueue')
 
-
 module.exports = async (filename, tests, updateExecutionState, beginTest, updateStdout, finishTest, testError) => {
     try {
         updateExecutionState("compilationBegin", "")

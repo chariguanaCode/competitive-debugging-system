@@ -4,6 +4,8 @@ const webserver = require('./webserver')
 const loadDirectory = require('./handleTests').loadDirectory
 const loadTests = require('./handleTests').loadTests
 const loadTestsCANCEL = require('./handleTests').loadTestsCANCEL
+const asyncFileActions = require('./asyncFileActions')
+
 var hrstart
 let config
 let fileTracking
@@ -81,11 +83,11 @@ runTasks = () => {
         }
     })
 
-    loadConfig(config.filename)
+    loadConfig(config.sourceFile)
     hrstart = process.hrtime()
 
     compilationAndExecution(
-        config.filename,
+        config.sourceFile,
         config.tests,
         updateExecutionState,
         beginTest,
@@ -95,23 +97,76 @@ runTasks = () => {
     )
 }
 
-loadConfig = (filename) => {
+addTestFiles = async (testPaths) => {
+    const newTests = testPaths.map((path) => ({ [path]: { filePath: path } })).reduce((prev, curr) => ({ ...prev, ...curr }), { })
+
+    config.tests = {
+        ...config.tests,
+        ...newTests
+    }
+
+    const projectFile = config.sourceFile.replace(/\.cpp$/, ".json")
+    await asyncFileActions.saveFile(projectFile, JSON.stringify(config))
+
+    loadConfig(config.sourceFile)
+}
+
+loadConfig = async (sourceFile) => {
+    if (!await asyncFileActions.fileExist(sourceFile)) {
+        webserver.sendError("The file you provided doesn't exist", "")
+        return
+    }
+
+    if (!sourceFile.match(/.*\.cpp/)) {
+        webserver.sendError("Invalid source file", "")
+        return
+    }
+
+    const projectFile = sourceFile.replace(/\.cpp$/, ".json")
+    if (!await asyncFileActions.fileExist(projectFile)) {
+        config = {
+            tests: { },
+            sourceFile,
+        }
+
+        await asyncFileActions.saveFile(projectFile, JSON.stringify(config))
+    } else {
+        config = JSON.parse(await asyncFileActions.readFile(projectFile))
+    }
+
+    const tests = { }
+    for (const key in config.tests) {
+        if (config.tests.hasOwnProperty(key)) {
+            const element = config.tests[key];
+            
+            if (element.stdin) {
+                tests[key] = {
+                    stdin: element.stdin,
+                    state: "pending"
+                }
+            } else {
+                tests[key] = {
+                    stdin: await asyncFileActions.readFile(element.filePath),
+                    state: "pending"
+                }
+            }
+        }
+    }
+
     config = {  
-        tests: ["2000000000 2", "3 3", "1200000000 3", "5102028381 10", "60 7", "13 37", "10 0"]
-            .map((input) => ({ stdin: input, state: "pending" }))
-            .reduce((obj, curr, index) => ({ ...obj, [index]: curr }), { }),
-       filename,
+        tests,
+        sourceFile,
     }
     webserver.sendConfig(config)
 }
 
-loadProject = (filename) => {
+loadProject = async (sourceFile) => {
     if (fileTracking) {
         fileTracking.close()
     }
 
-    loadConfig(filename)
-    fileTracking = fileChangeTracking.track(config.filename, runTasks, (err) => console.log(err))
+    await loadConfig(sourceFile)
+    fileTracking = fileChangeTracking.track(config.sourceFile, runTasks, (err) => console.log(err))
     runTasks()
 }
 
@@ -123,3 +178,9 @@ webserver.setExecuteTask({
     loadTests,
     loadTestsCANCEL
 })
+
+
+
+exports.loadConfig = loadConfig
+exports.loadProject = loadProject
+exports.addTestFiles = addTestFiles

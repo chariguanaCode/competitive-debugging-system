@@ -1,5 +1,5 @@
 #include <iostream>
-#include "universal_print_17.h"
+//#include "universal_print_17.h"
 using namespace std;
 int main() {
     for (int i = 0; i < 500000000; ++i) { }
