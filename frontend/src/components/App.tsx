@@ -168,7 +168,6 @@ const App: React.FC = () => {
         <>
         {socket ? null : <ConnectionError/>}
         <div style={socket ? {
-            width: "50%"
         } : {pointerEvents: "none"}}>
             <CssBaseline />
             <Header socket = {socket}/>

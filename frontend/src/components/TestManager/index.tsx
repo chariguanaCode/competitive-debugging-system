@@ -160,7 +160,7 @@ export const TestManager: React.FunctionComponent<Props> = ({ socket }) => {
         }
     }, [socket]);
 
-    return (<>
+    return (<div style={{padding: "20px"}}>
         <span style = {isLoadButtonDisabled ? {pointerEvents: "none", opacity: "0.4"} : {}}>
             <Dialog fullWidth={true} maxWidth="lg" className={useStyles().folderManager} open={folderManagerOpen} >
                 <IconButton style = {{position: "absolute", color: "red", right: "10px", top: "10px", width: "5%"}} onClick = {()=>{updateFolderManagerOpen(false)}}><CloseIcon/></IconButton>
@@ -176,11 +176,11 @@ export const TestManager: React.FunctionComponent<Props> = ({ socket }) => {
             <TextField error = {formError.regexError ? true : false} helperText = {formError.regexError} value = {regex} inputProps={{ style: { fontSize: "15px", width: "400px" } }} label = "Regex condition for tests (leave empty for all)" onChange={HandleChangeRegex} />
             <br/><Button onClick = {LoadTests} style = {{fontWeight: "bold",fontSize: "16px", paddingLeft: "0px", paddingTop: "15px"}}>{isLoadButtonDisabled ? "Loading tests..." : "Load tests"} </Button>
         </span>
-        {isLoadButtonDisabled ? ( <>
-        <IconButton onClick = {CancelTestsLoading}><CancelIcon style = {{color: "red"}} /></IconButton>
-        </> ) : null}
-        <br/>
+            {isLoadButtonDisabled ? ( <>
+                <IconButton onClick = {CancelTestsLoading}><CancelIcon style = {{color: "red", width: "100%"}} /></IconButton>
+                </> ) : null}
+        <br/>   
         <TestsLoadingStatus tests = {tests} isLoadingTestsRunning = {isLoadButtonDisabled} socket = {socket}/>
-    </>)
+    </div>)
 
 };
