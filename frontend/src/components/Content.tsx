@@ -4,10 +4,10 @@ import { useState } from 'react'
 
 const useStyle = makeStyles((theme) => ({
     root: {
-        marginLeft: theme.spacing(8) + 24,
+        marginLeft: theme.spacing(6) + 24,
     },
     appBar: {
-        backgroundColor: "white"
+        backgroundColor: theme.palette.background.default
     }
 }))
 

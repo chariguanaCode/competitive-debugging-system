@@ -23,14 +23,14 @@ wss.on('connection', (ws) => {
         ws.isAlive = true
     })
 
-    ws.on('message', (message) => {
-        console.log("Xd")
+    ws.on('message', async (message) => {
         data = JSON.parse(message)
         type = data.type
+        console.log(data)
         if (type === "runTasks") {
             executeTask.runTasks()
         } else if (type === "loadProject") {
-            executeTask.loadProject(data.filename)
+            await executeTask.loadProject(data.filename)
         } else if (type === "killTest") {
             console.log("killed", data.testName)
             executeTask.killTest(data.testName)()
@@ -46,6 +46,7 @@ wss.on('connection', (ws) => {
 })
 
 exports.sendError = (title, description) => {
+    console.log('error:', title, description)
     wss.clients.forEach((ws) => {
         ws.send(JSON.stringify({ 
             type: "error", 
@@ -128,15 +129,17 @@ exports.sendDirectory = (path, files, error = null) => {
    
 }
 
-exports.updateTest = (id, test) => {
-    let { childProcess, startTime, ...data } = test
+exports.updateTestOverview = (testChanges) => {
+    let testChangesArray = [ ];
+    for(const [ id, val ] of Object.entries(testChanges)) {
+        val.id = id
+        testChangesArray.push(val)
+    }
+
     wss.clients.forEach((ws) => {
         ws.send(JSON.stringify({ 
-            type: "testUpdate", 
-            data: {
-                id,
-                ...data
-            }
+            type: "testOverviewUpdate", 
+            data: testChangesArray
         }))
     })
 }
