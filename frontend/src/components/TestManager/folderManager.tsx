@@ -1,26 +1,26 @@
-import React, { memo } from "react";
+import React, { memo }                from "react";
 import { useState, useEffect, useRef} from "react"
-import TextField from '@material-ui/core/TextField';
-import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton'
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+import createFragment                 from "react-addons-create-fragment";
+
+import   TextField                      from '@material-ui/core/TextField';
+import { makeStyles                   } from '@material-ui/core/styles';
+import { Button, IconButton           } from '@material-ui/core';
 import { DialogActions, DialogContent } from "@material-ui/core";
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import HomeIcon from '@material-ui/icons/Home';
-import createFragment from "react-addons-create-fragment";
-import EditIcon from '@material-ui/icons/Edit';
+import   Breadcrumbs                    from '@material-ui/core/Breadcrumbs';
+
+import HomeIcon         from '@material-ui/icons/Home';
+import EditIcon         from '@material-ui/icons/Edit';
+import ArrowBackIcon    from '@material-ui/icons/ArrowBack';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 //import { useRef } from "@storybook/addons";
 
 interface State {
     folders: Array<string>,
     currentPath: string,
     newPath: any,
-    undoStack: Array<string>,
-    redoStack: Array<string>,
     managerError: any,
     selectedFolder: any,
+    historyList: Array<string>
 }
 
 interface Folders {
@@ -85,13 +85,13 @@ export const FoldersTable: React.FunctionComponent<Table> = ({ selectPath, socke
         folders: [],
         currentPath: "",
         newPath: null,
-        undoStack: [],
-        redoStack: [],
+        historyList: [],
         managerError: null,
         selectedFolder: null,
     })
     const [fieldMode, updateFieldMode] = useState<boolean>(false)
     const [textFieldRef, setTextFieldFocus] = UseFocus();
+    let historyListIndex = useRef<number>(-1)
     /*const [selectedFolder, updateSelectedFolder] = useState<any>(null)
     const [folders, updateFolders] = useState([])
     const [currentPath, updateCurrentPath] = useState("/")
@@ -100,43 +100,32 @@ export const FoldersTable: React.FunctionComponent<Table> = ({ selectPath, socke
     const [redoStack, updateRedoStack] = useState<Array<string>>([])
     const [managerError, updateManagerError] = useState<any>(null)*/
 
-    let { selectedFolder, folders, currentPath, newPath, undoStack, redoStack, managerError } = state;
+    let { selectedFolder, folders, currentPath, newPath, managerError, historyList } = state;
+
+    const selectText = () => {
+
+    }
+
+    const UpdateFieldMode = (val: boolean) => {
+        updateFieldMode(val);
+        setState(prevState=>({
+            ...prevState,
+            newPath: null
+        }));
+    }
 
     const Undo = () => {
-        
-        if (undoStack.length) {
-            // @ts-ignore
-            let val: string = undoStack.pop();
-            if((!redoStack.length || redoStack[redoStack.length-1]!==currentPath)){
-                redoStack.push(currentPath)
-                setState(prevState => (
-                    { ...prevState, redoStack: redoStack }
-                ))
-            }
-            
-            //updateRedoStack(redoStack);
-            loadDirectory(val, false);
-        }
+        historyListIndex.current = Math.max(0, historyListIndex.current-1);
+        loadDirectory(historyList[historyListIndex.current])
     }
 
     const Redo = () => {
-        if (redoStack.length) {
-            // @ts-ignore
-            let val: string = redoStack.pop();
-            if(!undoStack.length || undoStack[undoStack.length-1]!==currentPath){
-                undoStack.push(currentPath)
-                setState(prevState => (
-                    { ...prevState, undoStack: undoStack }
-                ))
-            }
-          
-            //updateUndoStack(undoStack)
-            loadDirectory(val, false);
-        }
+        historyListIndex.current = Math.min(historyList.length-1, historyListIndex.current+1);
+        loadDirectory(historyList[historyListIndex.current])
     }
 
     useEffect(() => {
-        loadDirectory(loadDirectoryOnStart, false);
+        loadDirectory(loadDirectoryOnStart);
     }, [loadDirectoryOnStart]);
 
     useEffect(() => {
@@ -146,9 +135,15 @@ export const FoldersTable: React.FunctionComponent<Table> = ({ selectPath, socke
                 const type = message.type
                 const data = message.data
                 if (type === "loadDirectory") {
+                    if(historyList[historyListIndex.current+1]===data.path) ++historyListIndex.current;
+                    else if(historyList[historyListIndex.current]!==data.path){
+                        historyList.splice(historyListIndex.current+1,0,data.path);
+                        ++historyListIndex.current;
+                    }
                     setState(prevState => (
                         {
                             ...prevState,
+                            historyList: historyList,
                             currentPath: data.path,
                             newPath: null,
                             managerError: null,
@@ -156,11 +151,6 @@ export const FoldersTable: React.FunctionComponent<Table> = ({ selectPath, socke
                             selectedFolder: "",
                         }
                     ))
-                    /*updateCurrentPath(data.path);
-                    updateNewPath("");
-                    updateManagerError(null);
-                    updateFolders(data.files);
-                    updateSelectedFolder("");*/
                 } else if (type === "loadDirectoryERROR") {
                     setState(prevState => (
                         {
@@ -172,11 +162,6 @@ export const FoldersTable: React.FunctionComponent<Table> = ({ selectPath, socke
                             selectedFolder: "",
                         }
                     ))
-                    /*updateCurrentPath(data.path);
-                    updateNewPath("");
-                    updateFolders([]);
-                    updateManagerError(data.error);
-                    updateSelectedFolder("");*/
                 }
             })
         }
@@ -185,24 +170,14 @@ export const FoldersTable: React.FunctionComponent<Table> = ({ selectPath, socke
         //@ts-ignore
         if(fieldMode) setTextFieldFocus();
     }, [fieldMode]);
-    const loadDirectory = (path: string, updateStack: boolean = true) => {
+    const loadDirectory = (path: string/*, updateStack: boolean = true*/) => {
         if(socket){
-        if (updateStack) {
-            if((!undoStack.length || undoStack[undoStack.length-1]!==currentPath)&& path!==currentPath ){
-                console.error(undoStack[undoStack.length-1],currentPath,undoStack)
-                    undoStack.push(currentPath)
-                    setState(prevState => (
-                        { ...prevState, undoStack: undoStack, }
-                    ))
-            }
-            //updateUndoStack(undoStack);
-        }
-        socket.send(JSON.stringify({
-            type: "loadDirectory",
-            data: {
-                directory: path,
-            }
-        }))
+            socket.send(JSON.stringify({
+                type: "loadDirectory",
+                data: {
+                    directory: path,
+                }
+            }))
         } else console.log("connection error")
     }
 
@@ -231,28 +206,36 @@ export const FoldersTable: React.FunctionComponent<Table> = ({ selectPath, socke
         setState(prevState => ({ ...prevState, newPath: val, }))
     }
     return (
-        <>
+        <div>
+            {console.warn(historyList.length)}
             <div className={useStyles().navigation}>
                 <IconButton onClick={()=>{loadDirectory('/')}} style={{ width: "48px" }}><HomeIcon /></IconButton>
-                <IconButton onClick={Undo} disabled={undoStack.length ? false : true} style={{ width: "48px" }}><ArrowBackIcon /></IconButton>
+                <IconButton onClick={Undo} disabled={historyListIndex.current > 0 ? false : true} style={{ width: "48px" }}><ArrowBackIcon /></IconButton>
                
                 {fieldMode ? 
-                <TextField inputRef={textFieldRef} onKeyDown={PathTextFieldKeyDown} onBlur={()=>{updateFieldMode(false)/*setState(prevState => ({ ...prevState, newPath: null, }))*/}} inputProps={{ style: { fontSize: "15px", width: "350px" } }} value={newPath !== null ? newPath : currentPath} onChange={updateTextOnTextField}/*updateNewPath(e.target.value);*/ />
+                <TextField inputRef    = { textFieldRef } 
+                            onKeyDown  = { PathTextFieldKeyDown } 
+                            onBlur     = { ()=>{UpdateFieldMode(false)} } 
+                            inputProps = { { style: { fontSize: "15px", width: "350px" } } } 
+                            value      = { newPath !== null ? newPath : currentPath } 
+                            onChange   = { updateTextOnTextField }
+                            onFocus    = { e => { e.target.select() } }
+                />
                 :
                 <Breadcrumbs style = {{display: "inline-block"}} aria-label="breadcrumb">
                     {/* 
                         // @ts-ignore */}
-                     {currentPath === '/' ? <Button style={{pointerEvents: "none"}}>/</Button> : currentPath.split('/').reduce((valIn,val,it)=>{
+                    { currentPath === '/' ? <Button style={{pointerEvents: "none"}}>/</Button> : currentPath.split('/').reduce((valIn,val,it)=>{
                         let onPath = valIn[0]
-                        console.log(onPath,valIn)
-                        if(val) return [onPath+val+'/',createFragment({a: valIn[1],b: <Button onClick={()=>{loadDirectory(onPath+val+'/')}}>{val}</Button>})]
-                        else return [onPath+val+'/',valIn[1]];
+                        //console.log(onPath,valIn)
+                        if(val) return [onPath+val+'/',createFragment( { a: valIn[1], b: <Button onClick={()=>{loadDirectory(onPath+val+'/')}}>{val}</Button> })]
+                        else return [onPath+val+'/', valIn[1]];
                     },["",null])}
                 </Breadcrumbs>}
                  {/* 
                         // @ts-ignore */}
-                <IconButton onClick = {()=>{updateFieldMode(true);}} style={{ width: "48px  " }}><EditIcon/></IconButton>
-                <IconButton onClick={Redo} disabled={redoStack.length ? false : true} style={{ width: "48px" }}><ArrowForwardIcon /></IconButton>
+                <IconButton onClick = {()=>{UpdateFieldMode(true);}} style={{ width: "48px  " }}><EditIcon/></IconButton>
+                <IconButton onClick={Redo} disabled={(historyListIndex.current < historyList.length - 1) ? false : true} style={{ width: "48px" }}><ArrowForwardIcon /></IconButton>
             </div>
             <DialogContent style={{ padding: "0px" }}>
                 {managerError ?
@@ -267,5 +250,5 @@ export const FoldersTable: React.FunctionComponent<Table> = ({ selectPath, socke
             <DialogActions>
                 <Button disabled={(currentPath + selectedFolder === "null" || managerError) ? true : false} onClick = {() => {selectPath(currentPath + selectedFolder);dialogClose();}}>Select <b>{currentPath + selectedFolder}</b></Button>
             </DialogActions>
-        </>)
+        </div>)
 }
