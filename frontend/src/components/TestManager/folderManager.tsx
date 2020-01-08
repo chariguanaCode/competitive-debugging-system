@@ -101,11 +101,7 @@ export const FoldersTable: React.FunctionComponent<Table> = ({ selectPath, socke
     const [managerError, updateManagerError] = useState<any>(null)*/
 
     let { selectedFolder, folders, currentPath, newPath, managerError, historyList } = state;
-
-    const selectText = () => {
-
-    }
-
+    
     const UpdateFieldMode = (val: boolean) => {
         updateFieldMode(val);
         setState(prevState=>({

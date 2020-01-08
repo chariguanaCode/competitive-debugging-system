@@ -2,6 +2,7 @@ const fileChangeTracking = require('./fileChangeTracking')
 const compilationAndExecution = require('./cppCompilationAndExecution')
 const webserver = require('./webserver')
 const loadDirectory = require('./handleTests').loadDirectory
+const loadFilesOnDirectory = require('./handleTests').loadFilesOnDirectory
 const loadTests = require('./handleTests').loadTests
 const loadTestsCANCEL = require('./handleTests').loadTestsCANCEL
 const asyncFileActions = require('./asyncFileActions')
@@ -183,6 +184,7 @@ webserver.setExecuteTask({
     killTest,
     loadDirectory,
     loadTests: loadTestsMain,
+    loadFilesOnDirectory,
     loadTestsCANCEL
 })
 

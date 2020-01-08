@@ -34,6 +34,37 @@ exports.loadDirectory = (directory = "C:/") => {
     });    
 } 
 
+exports.loadFilesOnDirectory = ({filetypes,directory}) => {
+    let files_to_send = [];
+    
+    directory = parsePath(directory)
+    fs.readdir(directory, (err, files) => {
+        if(err){
+            webserver.sendDirectory(directory, null, {message: err.message, code: err.code, number: err.errno});
+        } else {
+            types = new Set();
+            if(filetypes) types.add(filetypes);
+            let loadDirectories = false;
+            if(filetypes && types.has("DIRECTORY")){
+                loadDirectories = true;
+            }
+            if(files){
+                files.forEach((file) =>{
+                    if(!filetypes || (filetypes && types.has(path.extname(directory + file)) || (isDir(directory + file) && loadDirectories))) files_to_send.push({
+                        name: file,
+                        type: isDir(directory + file) ? "DIRECTORY" : path.extname(directory + file),
+                        path: directory + file
+                    });
+                })
+            }
+            webserver.sendDirectory(directory, files_to_send);
+            console.log(files_to_send)
+
+        }   
+    });    
+} 
+
+
 isDir = (directory) => {
     try {
         return fs.lstatSync(directory).isDirectory();

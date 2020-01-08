@@ -10,6 +10,8 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import { DialogTitle, Dialog } from "@material-ui/core";
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import {FoldersTable} from "./folderManager"
+import { FileManager } from "./fileManager"
+
 import CircularProgress from '@material-ui/core/CircularProgress';
 import InputAdornment from '@material-ui/core/InputAdornment';
 interface Props {
@@ -165,7 +167,8 @@ export const TestManager: React.FunctionComponent<Props> = ({ socket }) => {
             <Dialog fullWidth={true} maxWidth="lg" className={useStyles().folderManager} open={folderManagerOpen} >
                 <IconButton style = {{position: "absolute", color: "red", right: "10px", top: "10px", width: "5%"}} onClick = {()=>{updateFolderManagerOpen(false)}}><CloseIcon/></IconButton>
                 <DialogTitle style={{ textAlign: "center" }}>Select directory</DialogTitle>
-                <FoldersTable dialogClose = {() => {updateFolderManagerOpen(false)}} socket={socket} selectPath={updateSelectedPath} loadDirectoryOnStart={selectedPath} />
+                <FileManager dialogClose = {() => {updateFolderManagerOpen(false)}} socket={socket} availableFilesTypes = {["."]} selectFiles = {updateSelectedPath} loadDirectoryOnStart= {selectedPath} />
+                {/*<FoldersTable dialogClose = {() => {updateFolderManagerOpen(false)}} socket={socket} selectPath={updateSelectedPath} loadDirectoryOnStart={selectedPath} />*/}
             </Dialog>
             <TextField error = {formError.pathError ? true : false} helperText = {formError.pathError} value = {selectedPath} InputProps={{ style: { fontSize: "15px", width: "400px" }, endAdornment: <InputAdornment position="end">
                <IconButton onClick={() => { updateFolderManagerOpen(true) }}>
@@ -183,4 +186,4 @@ export const TestManager: React.FunctionComponent<Props> = ({ socket }) => {
         <TestsLoadingStatus tests = {tests} isLoadingTestsRunning = {isLoadButtonDisabled} socket = {socket}/>
     </div>)
 
-};
+}; 

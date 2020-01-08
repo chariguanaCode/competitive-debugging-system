@@ -40,6 +40,8 @@ wss.on('connection', (ws) => {
             executeTask.loadTests(data.data)
         } else if (type === "loadTestsCANCEL") {
             executeTask.loadTestsCANCEL()
+        } else if (type === "loadFilesOnDirectory") { 
+            executeTask.loadFilesOnDirectory(data.data)
         }
     })
     ws.send(JSON.stringify({ state: "success" }))
