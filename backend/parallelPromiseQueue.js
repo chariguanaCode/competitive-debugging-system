@@ -20,7 +20,6 @@ module.exports = class PromiseQueue {
     }
 
     dequeue = () => {
-        console.log(this.pendingPromises)
         if (this.pendingPromises >= this.promisesLimit) {
             return false
         }

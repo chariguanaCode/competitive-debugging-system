@@ -1,8 +1,8 @@
 const fs = require('fs');
-const dirTree = require("directory-tree");
+//const dirTree = require("directory-tree");
 const path = require('path');
 const webserver = require('./webserver');
-const  os 	= require('os-utils');
+//const  os 	= require('os-utils');
 
 parsePath = (directory) => {
     if(directory[directory.length-1]!='/' && directory[directory.length-1]!='\\') directory += '/'

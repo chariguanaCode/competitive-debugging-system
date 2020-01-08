@@ -3,24 +3,14 @@ import Button from '@material-ui/core/Button'
 import Paper from './Paper'
 import Fade from '@material-ui/core/Fade'
 import ProgramTestComponent from './ProgramTest'
-import { TestManager }  from './TestManager'
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { CssBaseline, Table, TableContainer, TableRow, TableCell, TableBody } from '@material-ui/core'
+import { CssBaseline, createMuiTheme, Switch, FormControlLabel } from '@material-ui/core'
 import Header from './Header'
 import Content from './Content'
-import LeftSidebar from './LeftSidebar'
-import RightSidebar from './RightSidebar'
-import { grey, red, yellow, lightGreen, lightBlue, purple } from '@material-ui/core/colors';
-
-interface ProgramTestData {
-    [testName: string]: {
-        state: string,
-        stdout: string,
-        stdin: string,
-        error: any,
-        executionTime: string,
-    }
-}
+import Sidebar from './Sidebar'
+import { amber, } from '@material-ui/core/colors';
+import { ThemeProvider } from '@material-ui/core/styles'
+import TestProgress from './TestProgress'
 
 enum ExecutionState {
     NoProject,
@@ -49,11 +39,26 @@ export const ConnectionError: React.FunctionComponent<ConnectionErrorProps> = ()
             </div></Fade>
 }
 
+const lightTheme = createMuiTheme({
+    palette: {
+        type: "light",
+        primary: amber
+    }
+})
+
+const darkTheme = createMuiTheme({
+    palette: {
+        type: "dark",
+        primary: amber
+    }
+})
+
 const App: React.FC = () => {
-    const [ tests, setTests ] = useState<ProgramTestData>({ })
     const [ filename, setFilename ] = useState("")
     const [ executionState, setExecutionState ] = useState<ExecutionState>(ExecutionState.NoProject)
     const [ socket, setSocket ] = useState()
+    const [ filePath, setFilePath ] = useState("/home/charodziej/Documents/OIG/OI27/nww.cpp")
+    const [ theme, setTheme ] = useState(darkTheme)
     const connectionTimeout = useRef(250)
     const lastServerPing = useRef(0);
     const isServerConnected = useRef(false)
@@ -65,8 +70,6 @@ const App: React.FC = () => {
     const connect = () => {
         var ws = new WebSocket("ws://localhost:8000")
         var connectInterval: number ///inaczej nie działa
-
-        
 
         ws.onopen = () => {
             console.log("connected websocket main component")
@@ -105,26 +108,15 @@ const App: React.FC = () => {
         }
         
         ws.onmessage = (msg) => {
-            //console.log(msg)
             const message = JSON.parse(msg.data)
             const type = message.type
             const data = message.data
+            //console.log(message)
             if(type === "serverPING"){
                 lastServerPing.current = Date.now();
             } else if (type === "newConfig") {
                 setFilename(data.filename)
-                setTests(data.tests)
-            } else if (type === "testUpdate") {
-                const newTest: ProgramTestData = {
-                    [data.id]: {
-                        state: data.state,
-                        stdin: data.stdin,
-                        stdout: data.stdout,
-                        executionTime: data.executionTime,
-                        error: data.error
-                    }
-                }
-                setTests((prevTests) => ({ ...prevTests, ...newTest }))
+                //setTests(data.tests)
             } else if (type === "compilationBegin") {
                 setExecutionState(ExecutionState.Compiling)
             } else if (type === "compilationSuccess") {
@@ -132,7 +124,6 @@ const App: React.FC = () => {
             } else if (type === "compilationError") {
                 setExecutionState(ExecutionState.CompilationError)
             }
-            
         }
     }
 
@@ -145,7 +136,7 @@ const App: React.FC = () => {
     const loadProject = () => {
         socket.send(JSON.stringify({
             type: "loadProject",
-            filename: "F:/CPP/OI-2019/nwwu/nww_brut/main.cpp"
+            filename: filePath
         }))
     }
 
@@ -162,41 +153,42 @@ const App: React.FC = () => {
         }))
     }
 
-    
-
     return (
+        <ThemeProvider theme={theme}>
         <>
         {socket ? null : <ConnectionError/>}
         <div style={socket ? {
         } : {pointerEvents: "none"}}>
             <CssBaseline />
-            <Header socket = {socket}/>
-            <LeftSidebar>
-                <Table>
-                    <TableBody>
-                    {[ ...Array(100)].map((val) => Math.floor(Math.random() * 6)).map((val, index) => (
-                        <TableRow key={index}>
-                            <TableCell style={{ backgroundColor: [ red, yellow, lightGreen, purple, lightBlue, grey ][2][400] }}></TableCell>
-                        </TableRow>
-                    ))}
-                    </TableBody>
-                </Table>
-            </LeftSidebar>
-            <Button onClick={loadProject}>
-                    Load project
-            </Button>
-            <Button onClick={runTests}>
-                    Run Tests
-                </Button>
+            <Header 
+                socket = {socket}
+                filePath = {filePath}
+                loadProject = {loadProject}
+            />
+            <Sidebar variant="left">
+                <TestProgress 
+                    socket={socket}
+                />
+            </Sidebar>
             <Content />
            
-            <RightSidebar>
+            <Sidebar variant="right">
                 <div style={{ margin: 8 }}>
-                    {[ ...Array(100)].map(() => <p>Testing</p>)}
+                    <FormControlLabel 
+                        label="Dark mode" 
+                        control={
+                            <Switch 
+                                checked={(theme.palette.type === "dark")}
+                                onChange={(evt) => setTheme((evt.target.checked) ? darkTheme : lightTheme)}
+                            />
+                        } 
+                    />
+                    {[ ...Array(100)].map((val, index) => <p key={index}>Testing</p>)}
                 </div>
-            </RightSidebar>
+            </Sidebar>
         </div>
         </>
+        </ThemeProvider>
     )
     /*return (
         <div 

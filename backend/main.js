@@ -10,12 +10,17 @@ const asyncFileActions = require('./asyncFileActions')
 var hrstart
 let config
 let fileTracking
+let testChanges = { }
 
-logTest = (id) => {
-    let { childProcess, ...output } = config.tests[id]
-    console.log(process.hrtime(hrstart), { [id]: output })
-    webserver.updateTest(id, config.tests[id])
+logTest = () => {
+    if (Object.entries(testChanges).length === 0) return
+    console.log(testChanges)
+    //console.log(process.hrtime(hrstart), { [id]: output })
+    webserver.updateTestOverview(testChanges)
+    testChanges = { }
 }
+
+setInterval(logTest, 500)
 
 updateExecutionState = (type, details) => {
     switch (type) { 
@@ -39,37 +44,49 @@ updateStdout = (id) => (stdout) => {
 }
 
 beginTest = (id) => (childProcess) => {
+    if (!testChanges[id]) testChanges[id] = { }
     config.tests[id].stdout = ""
     config.tests[id].childProcess = childProcess
     config.tests[id].state = "running"
     config.tests[id].startTime = process.hrtime()
+    testChanges[id].state = "running"
+    testChanges[id].startTime = process.hrtime()
     //setTimeout(killTest(id), 5000)
-    logTest(id)
+    //logTest(id)
 }
 
 finishTest = (id) => () => {
+    if (!testChanges[id]) testChanges[id] = { }
     config.tests[id].childProcess = null
     config.tests[id].state = "success"
+    testChanges[id].state = "success"
     execTime = process.hrtime(config.tests[id].startTime)
     config.tests[id].executionTime = `${execTime[0]}s ${execTime[1] / 1000000}ms`
-    logTest(id)
+    testChanges[id].executionTime = `${execTime[0]}s ${execTime[1] / 1000000}ms`
+    //logTest(id)
 }
 
 killTest = (id) => () => {
+    if (!testChanges[id]) testChanges[id] = { }
     console.log(process.hrtime(hrstart), "killed", id); 
     config.tests[id].state = "killed"
+    testChanges[id].state = "killed"
     config.tests[id].childProcess.kill()
 }
 
 testError = (id) => (err) => {
+    if (!testChanges[id]) testChanges[id] = { }
     if (config.tests[id].state === "running") {
+        testChanges[id].state = "crashed"
+        testChanges[id].error = { code: err.code, signal: err.signal, stderr: err.stderr }
         config.tests[id].state = "crashed"
         config.tests[id].error = { code: err.code, signal: err.signal, stderr: err.stderr }
     }
 
     execTime = process.hrtime(config.tests[id].startTime)
     config.tests[id].executionTime = `${execTime[0]}s ${execTime[1] / 1000000}ms`
-    logTest(id)
+    testChanges[id].executionTime = `${execTime[0]}s ${execTime[1] / 1000000}ms`
+    //logTest(id)
 }
 
 runTasks = () => {
@@ -82,9 +99,16 @@ runTasks = () => {
         if (test.childProcess) {
             test.childProcess.kill()
         }
+
+        delete test.childProcess
+        delete test.stdout 
+        delete test.startTime
+        delete test.executionTime
+        test.state = "pending"
     })
 
-    loadConfig(config.sourceFile)
+    webserver.sendConfig(config)
+
     hrstart = process.hrtime()
 
     compilationAndExecution(
@@ -99,10 +123,10 @@ runTasks = () => {
 }
 
 addTestFiles = async (testPaths) => {
-   let newTests = {};
-   testPaths.forEach((val)=>{
-       newTests[val] = {filePath: val};
-   })
+    let newTests = {};
+    testPaths.forEach((val)=>{
+        newTests[val] = {filePath: val};
+    })
     config.tests = {
         ...config.tests,
         ...newTests
@@ -116,7 +140,8 @@ addTestFiles = async (testPaths) => {
 }
 
 loadConfig = async (sourceFile) => {
-    if (!await asyncFileActions.fileExist(sourceFile)) {
+    console.log('loading config', sourceFile)
+    if (!(await asyncFileActions.fileExist(sourceFile))) {
         webserver.sendError("The file you provided doesn't exist", "")
         return
     }
@@ -127,7 +152,7 @@ loadConfig = async (sourceFile) => {
     }
 
     const projectFile = sourceFile.replace(/\.cpp$/, ".json")
-    if (!await asyncFileActions.fileExist(projectFile)) {
+    if (!(await asyncFileActions.fileExist(projectFile))) {
         config = {
             tests: { },
             sourceFile,
@@ -137,6 +162,7 @@ loadConfig = async (sourceFile) => {
     } else {
         config = JSON.parse(await asyncFileActions.readFile(projectFile))
     }
+    console.log('read config')
 
     const tests = { }
     for (const key in config.tests) {
@@ -149,8 +175,9 @@ loadConfig = async (sourceFile) => {
                     state: "pending"
                 }
             } else {
+                const stdin = await asyncFileActions.readFile(element.filePath)
                 tests[key] = {
-                    stdin: await asyncFileActions.readFile(element.filePath),
+                    stdin,
                     state: "pending"
                 }
             }
@@ -161,6 +188,7 @@ loadConfig = async (sourceFile) => {
         tests,
         sourceFile,
     }
+    console.log('loaded config')
     webserver.sendConfig(config)
 }
 

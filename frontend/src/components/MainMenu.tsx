@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react'
-import { Dialog, DialogTitle } from '@material-ui/core'
+import { Dialog, } from '@material-ui/core'
 import { TestManager } from './TestManager/index'
 interface Props {
     handleClose: (event: Event) => void,

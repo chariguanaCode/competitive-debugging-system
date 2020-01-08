@@ -18,7 +18,7 @@ module.exports = async (filename, tests, updateExecutionState, beginTest, update
 
         console.log("Running tests...")
 
-        const testPromises = new PromiseQueue(1)
+        const testPromises = new PromiseQueue(3)
         await Promise.all(Object.entries(tests).map(([ id, test ]) => (
             testPromises.enqueue(() => cppActions.executeTest(binaryName, test.stdin, updateStdout(id)), beginTest(id))
                 .then(
