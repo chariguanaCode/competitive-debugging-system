@@ -57,7 +57,7 @@ export default function TestProgress({ socket }: Props): ReactElement {
         const message = JSON.parse(msg.data)
         const { type, data } = message
 
-        if (type !== "serverPING") console.log(message)
+        if (type !== "serverPING") console.log("Message:", message)
         if (type === "newConfig") {
             tests.current = data.tests
             updateMessageCount((prev) => prev + 1)

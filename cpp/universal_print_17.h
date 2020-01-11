@@ -75,50 +75,73 @@ namespace cupl {
 }
 
 /** =============================================================================
+  *                              Support for structs                             
+  * ============================================================================= **/
+
+#define declare_struct(name, ...) \
+    void print_process(name x) {  \
+        std::cout << cupl::struct_start; \
+        std::cout << cupl::struct_end; \
+    }
+    
+
+/** =============================================================================
   *                                 Declarations
   * ============================================================================= **/
 
 #define watch(x, ...) cupl::print_main(x, __LINE__, #x);
-#define watchblock(x) for(int psPDNaVCRHn5ABqHHaXL2vCxw5sgraKSH4GeAcD9D7e5UgTw8Z=cupl::watchblock_open(x, __LINE__, cupl::watchblock_id); psPDNaVCRHn5ABqHHaXL2vCxw5sgraKSH4GeAcD9D7e5UgTw8Z; psPDNaVCRHn5ABqHHaXL2vCxw5sgraKSH4GeAcD9D7e5UgTw8Z=cupl::watchblock_close(cupl::watchblock_id))
+#define watchblock(x) for(int psPDNaVCRHn5ABqHHaXL2vCxw5sgraKSH4GeAcD9D7e5UgTw8Z=cupl::watchblock_open(x, __LINE__); psPDNaVCRHn5ABqHHaXL2vCxw5sgraKSH4GeAcD9D7e5UgTw8Z; psPDNaVCRHn5ABqHHaXL2vCxw5sgraKSH4GeAcD9D7e5UgTw8Z=cupl::watchblock_close(x))
 #define debug if (1)
 
-namespace cupl{
+namespace cupl {
 
-    int watchblock_id = 1;
+    int cupl_element_id = 1;
 
     int watchblock_open (std::string name, int line);
     int watchblock_close(std::string name          );
 
-    const std::string variable_start = {(char)230};
-    const std::string variable_end   = {(char)231};
+    const char cupl_start   = 240;
+    const char cupl_end     = 246;
+    const char divisor      = 244;
+    const char variable_end = 245;
 
-    const std::string array_start   = {(char)225};
-    const std::string array_end     = {(char)227};
-    const std::string array_divisor = {(char)226};
+    const char string_start  = 's';
+    const char bitset_start  = 'b';
+    const char number_start  = 'n';
+    const char pointer_start = '*';
 
-    const std::string pair_start    = {(char)240};
-    const std::string pair_end      = {(char)241};
-    const std::string pair_divisor  = {(char)242};
+    const char array_start   = 'a';
+    const char array_end     = 'A';
 
-    const std::string watchblock_open_start   = {(char)200,(char)201,(char)200};
-    const std::string watchblock_open_divisor = {(char)199                    };
-    const std::string watchblock_open_end     = {(char)198                    };
+    const char pair_start    = 'p';
+    const char pair_end      = 'P';
 
-    const std::string watch_start             = {(char)210,(char)211,(char)210};
-    const std::string watch_divisor           = {(char)213                    };
-    const std::string watch_end               = {(char)212                    };
+    const char struct_start  = 'o';
+    const char struct_end    = 'O';
 
-    const std::string watchblock_close_start  = {(char)180,(char)181,(char)180};
-    const std::string watchblock_close_end    = {(char)182                    };
+    const std::string watchblock_open_start  = {cupl_start, (char)241};
+
+    const std::string watch_start            = {cupl_start, (char)242};
+
+    const std::string watchblock_close_start = {cupl_start, (char)243};
 
     template <typename T> using is_iterable = decltype(cupl::detail::is_iterable_impl<T>(0));
 
-    template<typename T           >  void print_main (T x      , int line, std::string name);
-    template<typename T, size_t N >  void print_main (T (&x)[N], int line, std::string name);
+    template <typename T           >  void print_main (T x      , int line, std::string name);
+    template <typename T, size_t N >  void print_main (T (&x)[N], int line, std::string name);
 
-    template<typename T, typename U = int, typename H = int ,size_t S = 10> void print_process(T &x);
+    template <typename T> void print_process(T &x);
+
+    // Temporary fix to compilation issues 
+    template <size_t   S> void print_process(std::bitset<S> &x);
+    template <typename U, typename H> void print_process(std::pair<U, H> &x);
+    template <typename T> void print_process(std::stack<T> &x);
+    template <typename T> void print_process(std::queue<T> &x);
+    template <typename T> void print_process(std::priority_queue<T> &x);
+    //
 
     template <typename T, size_t   N > void print_array         (T                    (&x)[N]);
+    template <typename T             > void print_iterable      (T                         &x);
     template <typename T             > void print_arithmetic    (T                         &x);
     template <typename T             > void print_class_struct  (T                         &x);
     template <typename T             > void print_pointer       (T                         &x);
@@ -134,66 +157,138 @@ namespace cupl{
   *                                 Definitions
   * ============================================================================= **/
 
-namespace cupl{
+namespace cupl {
 
     using namespace std;
 
-    int watchblock_open(string name, int line, int id){
-        ++watchblock_id;
-        cout << watchblock_open_start << to_string(id) << watchblock_open_divisor << name << watchblock_open_divisor << to_string(line) << watchblock_open_end;
+    class main_wrapper {
+        public:
+            main_wrapper() {
+                watchblock_open("main", 0);
+            };
+
+            ~main_wrapper() {
+                watchblock_close("main");
+            };
+    };
+
+    main_wrapper wrapper;
+
+    int watchblock_open(string name, int line) {
+        cout << watchblock_open_start
+             << cupl_element_id++ << divisor 
+             << name << divisor 
+             << line
+             << cupl_end
+             << flush;
         return 1;
     }
-    int watchblock_close(int id){
-        cout << watchblock_close_start << to_string(id) << watchblock_close_end;
+
+    int watchblock_close(string name){
+        cout << watchblock_close_start
+             << name
+             << cupl_end
+             << flush;
         return 0;
     }
 
-    template<typename T>
+    template <typename T>
     void print_main(T x, int line, string name){
-        cout << watch_start << name << watch_divisor << type_name<T>() << watch_divisor << to_string(line) << watch_divisor << "config" << watch_divisor;
+        cout << watch_start 
+             << cupl_element_id++ << divisor
+             << name << divisor 
+             << line << divisor 
+             << type_name<T>() << divisor 
+             << "config" << divisor
+             << flush;
         print_process(x);
-        cout << watch_end;
+        cout << divisor << cupl_end
+             << flush;
     }
 
-    template<typename T, size_t N>
+    template <typename T, size_t N>
     void print_main(T (&x)[N],  int line, string name) {
-        cout << watch_start << name << watch_divisor << type_name<T>() << watch_divisor << to_string(line) << watch_divisor << "config" << watch_divisor;
-        print_process(x);
-        cout << watch_end;
+        cout << watch_start 
+             << cupl_element_id++ << divisor
+             << name << divisor 
+             << line << divisor 
+             << type_name<T>() << divisor 
+             << "config" << divisor
+             << flush;
+        print_array(x);
+        cout << divisor << cupl_end
+             << flush;
     }
 
-    template<typename T,typename U = int, typename H = int,size_t S = 10>
+    template <typename T>
     void print_process(T &x){
              if constexpr(is_arithmetic_v <T                     >       ) print_arithmetic    (x);
-        else if constexpr(is_class_v      <T> && !(is_iterable<T>::value)) print_class_struct  (x);
         else if constexpr(is_pointer_v    <T                     >       ) print_pointer       (x);
-        else if constexpr(is_same         <T,bitset        <S  > >::value) print_bitset        (x);
         else if constexpr(is_same         <T,string              >::value) print_string        (x);
+        /*
+        else if constexpr(is_same         <T,bitset        <S  > >::value) print_bitset        (x);
         else if constexpr(is_same         <T,pair          <U,H> >::value) print_pair          (x);
         else if constexpr(is_same         <T,stack         <U  > >::value) print_stack         (x);
         else if constexpr(is_same         <T,queue         <U  > >::value) print_queue         (x);
         else if constexpr(is_same         <T,priority_queue<U  > >::value) print_priority_queue(x);
-        else if constexpr(is_iterable     <T                     >::value) print_array         (x);
+        */
+        else if constexpr(is_iterable     <T                     >::value) print_iterable      (x);
+        else if constexpr(is_class_v      <T> && !(is_iterable<T>::value)) print_class_struct  (x);
     }
 
-    template<typename T,size_t N>
+    // Temporary fix to compilation issues 
+    template <size_t S>
+    void print_process(bitset<S> &x) {
+        print_bitset(x);
+    }
+
+    template <typename U, typename H>
+    void print_process(pair<U, H> &x) {
+        print_pair(x);
+    }
+
+    template <typename T>
+    void print_process(stack<T> &x) {
+        print_stack(x);
+    }
+
+    template <typename T>
+    void print_process(queue<T> &x) {
+        print_queue(x);
+    }
+
+    template <typename T>
+    void print_process(priority_queue<T> &x) {
+        print_priority_queue(x);
+    }
+    //
+
+    template <typename T, size_t N>
     void print_array(T (&a)[N]){
         cout << array_start;
-        for(int i=0; i<(int)N; ++i) {
+        for(int i = 0; i < (int)N; ++i) {
             print_process(a[i]);
-            cout << array_divisor;
+        }
+        cout << array_end;
+    }
+
+    template <typename T>
+    void print_iterable(T &x){
+        cout << array_start;
+        for (auto e: x) {
+            print_process(e);
         }
         cout << array_end;
     }
 
     template <typename T>
     void print_arithmetic(T &x) {
-        cout << variable_start << x << variable_end;
+        cout << number_start << x << variable_end;
     }
 
     template <size_t T>
     void print_bitset(bitset<T> &x) {
-        cout << variable_start << x << variable_end;
+        cout << bitset_start << x << variable_end;
     }
 
     template <typename T>
@@ -203,6 +298,7 @@ namespace cupl{
 
     template <typename T>
     void print_pointer(T &x) {
+        cout << pointer_start;
         if (x != nullptr)
             print_process(*x);
         else
@@ -210,14 +306,13 @@ namespace cupl{
     }
 
     void print_string(string &x) {
-        cout << variable_start << x << variable_end;
+        cout << string_start << x << variable_end;
     }
 
     template <typename U, typename H>
     void print_pair(pair<U, H> &x) {
         cout << pair_start;
         print_process(x.first);
-        cout << pair_divisor;
         print_process(x.second);
         cout << pair_end;
     }

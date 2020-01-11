@@ -144,6 +144,15 @@ exports.updateTestOverview = (testChanges) => {
     })
 }
 
+exports.updateDetailedTest = (testChanges) => {
+    wss.clients.forEach((ws) => {
+        ws.send(JSON.stringify({ 
+            type: "detailedTestUpdate", 
+            data: testChanges
+        }))
+    })
+}
+
 setInterval(() => {
     console.log("Connections alive:", wss.clients.size)
     wss.clients.forEach((ws) => {
