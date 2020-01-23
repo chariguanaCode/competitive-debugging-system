@@ -17,49 +17,73 @@ parsePath = (directory) => {
     return directory;
 }
 
-exports.loadDirectory = (directory = "C:/") => {
+exports.loadDirectory = (directory = "C:/", key = "") => {
+    if(!key) key = "";
     let files_to_send = [];
     directory = parsePath(directory)
     fs.readdir(directory, (err, files) => {
         if(err){
-            webserver.sendDirectory(directory, null, {message: err.message, code: err.code, number: err.errno});
+            webserver.sendDirectory(directory, null, {message: err.message, code: err.code, number: err.errno}, key);
         } else {
             if(files){
                 files.forEach((file) =>{
                     if(!path.extname(directory + file)) files_to_send.push(file);
                 })
             }
-            webserver.sendDirectory(directory, files_to_send);
+            webserver.sendDirectory(directory, files_to_send, null, key);
         }   
     });    
 } 
 
-exports.loadFilesOnDirectory = ({filetypes,directory}) => {
+selectFileType = (fileType) => {
+    if([".img", ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".PNG"].includes(fileType))
+        return "IMAGE"
+    else if([".avi", ".wmv", ".mp4", ".mov", ".ogg", ".flv", ".wav", ".m4a"].includes(fileType))
+        return "MOVIE"
+    else if([".txt", ".doc", ".docx", ".odt", ".pdf", ".wpd", ".tex", ".wps"].includes(fileType))
+        return "DOCUMENT"
+    else if([".exe", ".bat", ".bin", ".apk", ".jar", ".py", ".wsf", ".com"].includes(fileType))
+        return "EXECUTABLE"
+    else
+        return "UNDEFINED"
+}
+
+exports.loadFilesOnDirectory = ({filetypes,directory,key,regex}) => {
+    if(!key) key = "";
+    let regexExp;
+    if(regex){
+        try {
+            regexExp = new RegExp(regex)
+        } catch(err) {
+            webserver.sendDirectory(directory, null, {message: err.message, code: err.code, number: err.errno}, key);
+            return 0;
+        } 
+    }
     let files_to_send = [];
     
     directory = parsePath(directory)
     fs.readdir(directory, (err, files) => {
         if(err){
-            webserver.sendDirectory(directory, null, {message: err.message, code: err.code, number: err.errno});
+            webserver.sendDirectory(directory, null, {message: err.message, code: err.code, number: err.errno}, key);
         } else {
             types = new Set();
-            if(filetypes) types.add(filetypes);
+            if(filetypes) filetypes.forEach(types.add, types)
             let loadDirectories = false;
-            if(filetypes && types.has("DIRECTORY")){
+            if(filetypes && types.has('DIRECTORY')){
                 loadDirectories = true;
             }
             if(files){
                 files.forEach((file) =>{
-                    if(!filetypes || (filetypes && types.has(path.extname(directory + file)) || (isDir(directory + file) && loadDirectories))) files_to_send.push({
+
+                    if( (!regex || (regex && file.match(regexExp))) && (!filetypes || (filetypes && types.has(path.extname(directory + file)) || (isDir(directory + file) && loadDirectories)))) files_to_send.push({
                         name: file,
                         type: isDir(directory + file) ? "DIRECTORY" : path.extname(directory + file),
-                        path: directory + file
+                        path: directory + file,
+                        typeGroup: isDir(directory + file) ? "DIRECTORY" : selectFileType(path.extname(directory + file))
                     });
                 })
             }
-            webserver.sendDirectory(directory, files_to_send);
-            console.log(files_to_send)
-
+            webserver.sendDirectory(directory, files_to_send, null, key);
         }   
     });    
 } 
@@ -141,11 +165,10 @@ exports.loadTests = ({directory, regex},addTestFiles) => {
             /*os.cpuUsage(function(v){
                 console.log( 'CPU Usage (%): ' + v );
             });*/
-            console.log("as");
             setImmediate(async () => {
                 let it = 0;
-                console.log(directory);
-                console.log(regexExp)
+                //console.log(directory);
+                //console.log(regexExp)
                 showDirectory(directory,regexExp);
                 const fileFinderListener = setInterval(()=>{
                     console.log(running,files_to_send_g.length);
@@ -180,8 +203,8 @@ exports.loadTests = ({directory, regex},addTestFiles) => {
                 
                 resolve();
             }).then(()=>{console.log("Xd")}); */
-            console.log("h");
-            console.log("b")
+            //console.log("h");
+            //console.log("b")
         } 
     },200)   
 }

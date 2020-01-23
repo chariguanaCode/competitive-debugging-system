@@ -1,27 +1,18 @@
-import React, {memo} from "react";
-import { useState, useEffect } from "react"
-import Fade from '@material-ui/core/Fade';
-import TextField from '@material-ui/core/TextField';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton'
-import CloseIcon from '@material-ui/icons/Close';
-import CancelIcon from '@material-ui/icons/Cancel';
-import { DialogTitle, Dialog } from "@material-ui/core";
-import FolderOpenIcon from '@material-ui/icons/FolderOpen';
-import {FoldersTable} from "./folderManager"
-import { FileManager } from "./fileManager"
+import React, { memo }          from "react";
+import { useState, useEffect }  from "react"
 
-import CircularProgress from '@material-ui/core/CircularProgress';
-import InputAdornment from '@material-ui/core/InputAdornment';
+import { TextField, Button, IconButton, DialogTitle, Dialog, InputAdornment }    from '@material-ui/core';
+import { makeStyles                                                         }    from '@material-ui/core/styles';
+
+import CancelIcon     from '@material-ui/icons/Cancel';
+import FolderOpenIcon from '@material-ui/icons/FolderOpen';
+
+import { FoldersTable }       from "./folderManager"
+import { FileManager        } from "./fileManager"
+import { FilesLoadingStatus } from "./filesLoadingStatus"
 interface Props {
     socket: any,
-}
-
-interface LoadingStatusProps{
-    socket: any,
-    isLoadingTestsRunning: boolean,
-    tests: Array<string>
+    availableFileTypes?: Array<string>
 }
 
 interface FormError {
@@ -30,82 +21,22 @@ interface FormError {
 }
 
 const useStyles = makeStyles({
-    folderManager: {
-        '& td': {
-            width: "50%",
-            minWidth: "250px",
-            textAlign: "center",
-            border: "1px solid black",
-        },
-        "& table": {
-            width: "100%",
-            borderCollapse: "collapse",
-            marginTop: "10px",
-            minHeight: "600px",
-            //tableLayout: "auto"
-        },
-        "& button:focus": {
-            outline: "none !important",
-            border: "none"
-        },
-        "& button": {
-            width: "100%",
-            fontWeight: "bold",
-            backgroundColor: "white",
-            border: "none",
-            outline: "none",
-            padding: "10px 10px",
-            textDecoration: "none",
-            display: "inline-block",
-            fontSize: "13px",
-            cursor: "pointer",
-        }
-    },
+    
 });
 
-const arePropsEqual = (prevProps: any, nextProps: any) => {
-    return (prevProps.socket === nextProps.socket && prevProps.isLoadingTestsRunning === nextProps.isLoadingTestsRunning)
-}
-
-const TestsLoadingStatus: React.FunctionComponent<LoadingStatusProps> = memo(({ tests, socket, isLoadingTestsRunning }) => {
-    const [testsLoadingStatus, updateTestsLoadingStatus] = useState<any>({
-        filesScanned: "",
-        filesLoaded: "",
-    })
-    useEffect(() => {
-        if (socket) {
-            socket.addEventListener("message", (msg: any) => {
-                const message = JSON.parse(msg.data)
-                const type = message.type
-                const data = message.data
-                if (type === "loadTestsSTATUS") {
-                    updateTestsLoadingStatus(data.status);
-                }
-            })
+export const TestManager: React.FunctionComponent<Props> = ({ socket, availableFileTypes }) => {
+    const [state, setState] = useState({
+        regex: '',
+        selectedPath: "/",
+        folderManagerOpen: false,
+        tests: [],
+        isLoadButtonDisabled: false,
+        formError: {
+            regexError: "",
+            pathError: "",
         }
-    }, [socket]);
-    return(<>
-    <span style = {{marginRight: "20px"}}>{testsLoadingStatus.filesScanned}</span>
-    <Fade
-        in = {isLoadingTestsRunning}
-        style={{
-        position: "fixed",
-        transitionDelay: '200ms',
-        }}
-        unmountOnExit
-    >    
-    <CircularProgress />
-    </Fade>
-    <br/>
-    {testsLoadingStatus.filesLoaded} 
-    <br/>
-    {/*tests.slice(0,10000).map((val)=>(<p>{val}</p>))*/}
-    </>)
-},arePropsEqual)
-
-export const TestManager: React.FunctionComponent<Props> = ({ socket }) => {
-
-    const [regex, changeRegex] = useState('');
+    })
+    /*const [regex, changeRegex] = useState('');
     const [selectedPath, updateSelectedPath] = useState("/")
     const [folderManagerOpen, updateFolderManagerOpen] = useState(false);
     const [tests, updateTests] = useState<Array<string>>([]);
@@ -113,13 +44,23 @@ export const TestManager: React.FunctionComponent<Props> = ({ socket }) => {
     const [formError, updateFormError] = useState<FormError>({
         regexError: "",
         pathError: "",
-    });
+    });*/
+
+    let { regex, selectedPath, folderManagerOpen, tests, isLoadButtonDisabled, formError } = state
     const HandleChangeRegex = (e: any) => {
-        changeRegex(e.target.value);
+        setState(prevState => ({
+            ...prevState,
+            regex: e.target.value,
+        }))
+        //changeRegex(e.target.value);
     }
 
     const LoadTests = () => {
-        updateLoadButtonDisabledStatus(true);
+        setState(prevState => ({
+            ...prevState,
+            isLoadButtonDisabled: true
+        }))
+       // updateLoadButtonDisabledStatus(true);
         socket.send(JSON.stringify({
             type: "loadTests",
             data: {
@@ -134,8 +75,15 @@ export const TestManager: React.FunctionComponent<Props> = ({ socket }) => {
             type: "loadTestsCANCEL",
             data: null
         }))
-        updateFormError({pathError: "", regexError: ""});
-        updateLoadButtonDisabledStatus(false);
+        setState(prevState => ({
+            ...prevState,
+            formError: {
+                pathError: "", regexError: ""
+            },
+            isLoadButtonDisabled: false,
+        }))
+        //updateFormError({pathError: "", regexError: ""});
+        //updateLoadButtonDisabledStatus(false);
     }
 
     useEffect(() => {
@@ -145,16 +93,36 @@ export const TestManager: React.FunctionComponent<Props> = ({ socket }) => {
                 const type = message.type
                 const data = message.data
                 if (type === "loadTests") {
-                    updateFormError({pathError: "", regexError: ""})
+                    setState(prevState => ({
+                        ...prevState,
+                        formError: {
+                            pathError: "", regexError: ""
+                        },
+                        isLoadButtonDisabled: false,
+                        tests: data.tests,
+                    }))
+                    //updateFormError({pathError: "", regexError: ""})
                     //updateTestsLoadingStatus(`Successfully loaded ${data.tests.length} tests`);
-                    updateTests(data.tests);
-                    updateLoadButtonDisabledStatus(false);
+                    //updateTests(data.tests);
+                    //updateLoadButtonDisabledStatus(false);
                 } else if (type === "loadTestsERROR") {
-                    updateLoadButtonDisabledStatus(false);
+                    setState(prevState => ({
+                        ...prevState,
+                        isLoadButtonDisabled: false,
+                    }))
+                    //updateLoadButtonDisabledStatus(false);
                     if(data.error.code === 1000) {
-                        updateFormError({regexError: data.error.message, pathError: ""});
+                        setState(prevState => ({
+                            ...prevState,
+                            formError: { regexError: data.error.message, pathError: "" }
+                        }))
+                        //updateFormError({regexError: data.error.message, pathError: ""});
                     } else if (data.error.code === 2000) {
-                        updateFormError({pathError: data.error.message, regexError: ""});
+                        setState(prevState => ({
+                            ...prevState,
+                            formError: { pathError: data.error.message, regexError: "" }
+                        }))
+                        //updateFormError({pathError: data.error.message, regexError: ""});
 
                     }
                 }
@@ -162,15 +130,24 @@ export const TestManager: React.FunctionComponent<Props> = ({ socket }) => {
         }
     }, [socket]);
 
+    const updateSelectedPath = (val: string) => {
+        setState(prevState => ({
+            ...prevState,
+            selectedPath: val,
+        }))
+    }
+
+    const updateFolderManagerOpen = (val: boolean) => {
+        setState(prevState => ({
+            ...prevState,
+            folderManagerOpen: val,
+        }))
+    }
+
     return (<div style={{padding: "20px"}}>
         <span style = {isLoadButtonDisabled ? {pointerEvents: "none", opacity: "0.4"} : {}}>
-            <Dialog fullWidth={true} maxWidth="lg" className={useStyles().folderManager} open={folderManagerOpen} >
-                <IconButton style = {{position: "absolute", color: "red", right: "10px", top: "10px", width: "5%"}} onClick = {()=>{updateFolderManagerOpen(false)}}><CloseIcon/></IconButton>
-                <DialogTitle style={{ textAlign: "center" }}>Select directory</DialogTitle>
-                <FileManager dialogClose = {() => {updateFolderManagerOpen(false)}} socket={socket} availableFilesTypes = {["."]} selectFiles = {updateSelectedPath} loadDirectoryOnStart= {selectedPath} />
-                {/*<FoldersTable dialogClose = {() => {updateFolderManagerOpen(false)}} socket={socket} selectPath={updateSelectedPath} loadDirectoryOnStart={selectedPath} />*/}
-            </Dialog>
-            <TextField error = {formError.pathError ? true : false} helperText = {formError.pathError} value = {selectedPath} InputProps={{ style: { fontSize: "15px", width: "400px" }, endAdornment: <InputAdornment position="end">
+        <FileManager isFileManagerOpen = {state.folderManagerOpen} dialogClose = {() => {updateFolderManagerOpen(false)}} socket={socket} availableFilesTypes = {["."]} selectFiles = {updateSelectedPath} loadDirectoryOnStart= {selectedPath} />
+           <TextField error = {formError.pathError ? true : false} helperText = {formError.pathError} value = {selectedPath} InputProps={{ style: { fontSize: "15px", width: "400px" }, endAdornment: <InputAdornment position="end">
                <IconButton onClick={() => { updateFolderManagerOpen(true) }}>
                     <FolderOpenIcon/>
                 </IconButton>     
@@ -183,7 +160,7 @@ export const TestManager: React.FunctionComponent<Props> = ({ socket }) => {
                 <IconButton onClick = {CancelTestsLoading}><CancelIcon style = {{color: "red", width: "100%"}} /></IconButton>
                 </> ) : null}
         <br/>   
-        <TestsLoadingStatus tests = {tests} isLoadingTestsRunning = {isLoadButtonDisabled} socket = {socket}/>
+        <FilesLoadingStatus tests = {tests} isLoadingTestsRunning = {isLoadButtonDisabled} socket = {socket}/>
     </div>)
 
 }; 

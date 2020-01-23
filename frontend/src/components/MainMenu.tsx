@@ -11,7 +11,7 @@ export default function MainMenu({ handleClose, open, socket }: Props): ReactEle
     return (
         <div>
             <Dialog onClose={handleClose} open={open}>
-                <TestManager socket = {socket}/>
+                <TestManager socket = {socket} availableFileTypes = {[]}/>
             </Dialog>
         </div>
     )

@@ -26,7 +26,6 @@ wss.on('connection', (ws) => {
     ws.on('message', async (message) => {
         data = JSON.parse(message)
         type = data.type
-        console.log(data)
         if (type === "runTasks") {
             executeTask.runTasks()
         } else if (type === "loadProject") {
@@ -35,7 +34,7 @@ wss.on('connection', (ws) => {
             console.log("killed", data.testName)
             executeTask.killTest(data.testName)()
         } else if (type === "loadDirectory") {
-            executeTask.loadDirectory(data.data.directory)
+            executeTask.loadDirectory(data.data.directory, data.data.key)
         } else if (type === "loadTests") {
             executeTask.loadTests(data.data)
         } else if (type === "loadTestsCANCEL") {
@@ -106,11 +105,11 @@ exports.sendTests = (tests_to_send, error = null, status = null) => {
     })
 }
 
-exports.sendDirectory = (path, files, error = null) => {
+exports.sendDirectory = (path, files, error = null, key = "") => {
     let data_to_send;
     if(error){
         data_to_send = JSON.stringify({ 
-            type: "loadDirectoryERROR", 
+            type: "loadDirectoryERROR" + key, 
             data: {
                     error, 
                     path
@@ -118,7 +117,7 @@ exports.sendDirectory = (path, files, error = null) => {
         })
     }else{
         data_to_send = JSON.stringify({ 
-            type: "loadDirectory", 
+            type: "loadDirectory" + key, 
             data: {
                 path,
                 files

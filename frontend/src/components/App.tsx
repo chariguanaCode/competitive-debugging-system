@@ -11,7 +11,9 @@ import Sidebar from './Sidebar'
 import { amber, } from '@material-ui/core/colors';
 import { ThemeProvider } from '@material-ui/core/styles'
 import TestProgress from './TestProgress'
-
+import { Interface } from 'readline'
+import { connect } from "react-redux";
+import { changeLanguage } from '../redux/actions'
 enum ExecutionState {
     NoProject,
     Compiling,
@@ -53,12 +55,26 @@ const darkTheme = createMuiTheme({
     }
 })
 
-const App: React.FC = () => {
+const mapStateToProps = (state: any) => {
+    return { language: state.language };
+};
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+      changeLanguge: (language: string) => dispatch(changeLanguage(language))
+    };
+}
+
+interface sr {
+    language?: string,
+    changeLanguage?: Function
+}
+
+const App: React.FC<sr> = ({ language, changeLanguage }) => {
     const [ filename, setFilename ] = useState("")
     const [ executionState, setExecutionState ] = useState<ExecutionState>(ExecutionState.NoProject)
     const [ socket, setSocket ] = useState()
     const [ filePath, setFilePath ] = useState("/home/charodziej/Documents/OIG/OI27/nww.cpp")
-    const [ theme, setTheme ] = useState(darkTheme)
+    const [ theme, setTheme ] = useState(lightTheme)
     const connectionTimeout = useRef(250)
     const lastServerPing = useRef(0);
     const isServerConnected = useRef(false)
@@ -170,7 +186,12 @@ const App: React.FC = () => {
                     socket={socket}
                 />
             </Sidebar>
-            <Content />
+            <div>geee</div>
+            {language}
+            {/*
+                //@ts-ignore    */}
+            <button onClick = {()=>{changeLanguage("pl")}}>LOL</button>
+            {/*<Content />*/}
            
             <Sidebar variant="right">
                 <div style={{ margin: 8 }}>
@@ -225,4 +246,4 @@ const App: React.FC = () => {
                 {(executionState === ExecutionState.Compiling) && <Paper>Compiling...</Paper>}*/
 }
 
-export default App
+export default connect(mapStateToProps, mapDispatchToProps)(App);

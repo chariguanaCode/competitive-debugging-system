@@ -203,7 +203,7 @@ export const FoldersTable: React.FunctionComponent<Table> = ({ selectPath, socke
     }
     return (
         <div>
-            {console.warn(historyList.length)}
+            {(historyList.length)}
             <div className={useStyles().navigation}>
                 <IconButton onClick={()=>{loadDirectory('/')}} style={{ width: "48px" }}><HomeIcon /></IconButton>
                 <IconButton onClick={Undo} disabled={historyListIndex.current > 0 ? false : true} style={{ width: "48px" }}><ArrowBackIcon /></IconButton>
@@ -233,7 +233,7 @@ export const FoldersTable: React.FunctionComponent<Table> = ({ selectPath, socke
                 <IconButton onClick = {()=>{UpdateFieldMode(true);}} style={{ width: "48px  " }}><EditIcon/></IconButton>
                 <IconButton onClick={Redo} disabled={(historyListIndex.current < historyList.length - 1) ? false : true} style={{ width: "48px" }}><ArrowForwardIcon /></IconButton>
             </div>
-            <DialogContent style={{ padding: "0px" }}>
+            <DialogContent dividers style={{ padding: "0px" }}>
                 {managerError ?
                     <div style={{ textAlign: "center" }}>
                         <span style={{ color: "red", fontSize: "25px" }}><b>Error</b></span> <br />
