@@ -16,14 +16,15 @@ exports.compileCpp = async (filename) => {
 exports.executeTest = (binaryName, input, pushStdout) => {
     const child = spawn(binaryName, [ ], {
         //shell: true
+        encoding: "buffer"
     })
-    let stdout = ''
+    let stdout = Buffer.from("")
     let stderr = ''
 
     let stdoutUpdateInterval = setInterval(() => {
-        if (stdout) {
+        if (stdout.length) {
             pushStdout(stdout)
-            stdout = ''
+            stdout = Buffer.from("")
         }
     }, 100);
 
@@ -31,7 +32,7 @@ exports.executeTest = (binaryName, input, pushStdout) => {
     child.stdin.end()
 
     child.stdout.on('data', data => {
-        stdout += data
+        stdout = Buffer.concat([ stdout, data ])
     })
 
     child.stderr.on('data', data => {

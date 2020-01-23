@@ -1,11 +1,27 @@
-#include <iostream>
-//#include "universal_print_17.h"
+#include "bits/stdc++.h"
+#include "universal_print_17.h"
 using namespace std;
 int main() {
     for (int i = 0; i < 500000000; ++i) { }
     long long a, b;
     cin >> a >> b;
     //usleep(500000);
+    watchblock("testowańsko") {
+        watch(a);
+        vector<vector<int>> vektorek(100, vector<int> (1, 1337));
+        bitset<30> testing;
+        int n = 30;
+        int tab[n];
+        map<int, string> my_map;
+        my_map[10] = "test";
+        watch(string("se testuje"));
+        watch(testing);
+        watch(my_map);
+        watchblock("testowańsko bardziej") {
+            watch(tab);
+            watch(vektorek);
+        }
+    }
     cout << a / b << endl;
     while (a >= b) {
         a -= b;

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "^4.8.0",
+    "@material-ui/core": "^4.8.3",
     "@material-ui/icons": "^4.5.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",
@@ -14,14 +14,22 @@
     "@types/react-addons-create-fragment": "^0.14.19",
     "@types/react-custom-scrollbars": "^4.0.6",
     "@types/react-dom": "^16.9.4",
+<<<<<<< HEAD
     "rc-tree": "^3.0.0-rc.1",
+=======
+    "@types/react-splitter-layout": "^3.0.0",
+>>>>>>> 2415d05035110c3e958523f8c510315db8a78fa1
     "react": "^16.12.0",
     "react-addons-create-fragment": "^15.6.2",
     "react-custom-scrollbars": "^4.2.1",
     "react-dom": "^16.12.0",
     "react-redux": "^7.1.3",
     "react-scripts": "3.3.0",
+<<<<<<< HEAD
     "redux": "^4.0.5",
+=======
+    "react-splitter-layout": "^4.0.0",
+>>>>>>> 2415d05035110c3e958523f8c510315db8a78fa1
     "styled-components": "^4.4.1",
     "typescript": "^3.7.4",
     "wix-storybook-utils": "^3.0.37"

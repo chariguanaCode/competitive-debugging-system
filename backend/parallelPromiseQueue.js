@@ -7,7 +7,6 @@ module.exports = class PromiseQueue {
     pendingPromises = 0
 
     enqueue = (promise, dequeueNotify) => {
-        //console.log(this.pendingPromises)
         return new Promise((resolve, reject) => {
             this.queue.push({
                 promise,

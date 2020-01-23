@@ -6,21 +6,51 @@ const loadFilesOnDirectory = require('./handleTests').loadFilesOnDirectory
 const loadTests = require('./handleTests').loadTests
 const loadTestsCANCEL = require('./handleTests').loadTestsCANCEL
 const asyncFileActions = require('./asyncFileActions')
+const watchParse = require('./watchParse')
 
 var hrstart
 let config
 let fileTracking
 let testChanges = { }
+let detailedTestChanges = { }
+let currentId = "./cpp/tests/test1.in"
 
 logTest = () => {
-    if (Object.entries(testChanges).length === 0) return
-    console.log(testChanges)
-    //console.log(process.hrtime(hrstart), { [id]: output })
-    webserver.updateTestOverview(testChanges)
-    testChanges = { }
+    if (Object.entries(testChanges).length !== 0) {
+        console.log(testChanges)
+        //console.log(process.hrtime(hrstart), { [id]: output })
+        webserver.updateTestOverview(testChanges)
+        testChanges = { }
+    }
+
+    if (Object.entries(detailedTestChanges).length !== 0) {
+        webserver.updateDetailedTest(detailedTestChanges)
+        detailedTestChanges = { }
+    }
 }
 
 setInterval(logTest, 500)
+
+const overviewStates = [ "state", "startTime", "executionTime", "error" ]
+const detailedStates = [ "state", "startTime", "executionTime", "error", "stdout", "watchblocks" ]
+updateTestState = (id, data) => {
+    for (const propId in data) {
+        if (data.hasOwnProperty(propId)) {
+            const val = data[propId];
+
+            config.tests[id][propId] = val
+
+            if (overviewStates.indexOf(propId) > -1) {
+                if (!testChanges[id]) testChanges[id] = { }
+                testChanges[id][propId] = val
+            }
+
+            if (id === currentId && detailedStates.indexOf(propId) > -1) {
+                detailedTestChanges[propId] = val
+            }
+        }
+    }
+}
 
 updateExecutionState = (type, details) => {
     switch (type) { 
@@ -38,54 +68,59 @@ updateExecutionState = (type, details) => {
 }
 
 updateStdout = (id) => (stdout) => {
-    if (!stdout) return
-    config.tests[id].stdout += stdout
+    if (!stdout.length) return
+
+    config.tests[id].stdout = Buffer.concat([ config.tests[id].stdout, stdout ])
     //console.log(id, ":", `"${stdout}"`)
 }
 
 beginTest = (id) => (childProcess) => {
-    if (!testChanges[id]) testChanges[id] = { }
-    config.tests[id].stdout = ""
-    config.tests[id].childProcess = childProcess
-    config.tests[id].state = "running"
-    config.tests[id].startTime = process.hrtime()
-    testChanges[id].state = "running"
-    testChanges[id].startTime = process.hrtime()
+    updateTestState(id, {
+        state: "running",
+        childProcess,
+        stdout: Buffer.from(""),
+        watchblocks: { },
+        startTime: process.hrtime()
+    })
     //setTimeout(killTest(id), 5000)
     //logTest(id)
 }
 
 finishTest = (id) => () => {
-    if (!testChanges[id]) testChanges[id] = { }
-    config.tests[id].childProcess = null
-    config.tests[id].state = "success"
-    testChanges[id].state = "success"
     execTime = process.hrtime(config.tests[id].startTime)
-    config.tests[id].executionTime = `${execTime[0]}s ${execTime[1] / 1000000}ms`
-    testChanges[id].executionTime = `${execTime[0]}s ${execTime[1] / 1000000}ms`
+    const { watchblocks, stdout } = watchParse.parse(config.tests[id].stdout)
+    updateTestState(id, {
+        state: "success",
+        childProcess: null,
+        watchblocks,
+        stdout,
+        executionTime: `${execTime[0]}s ${execTime[1] / 1000000}ms`
+    })
     //logTest(id)
 }
 
 killTest = (id) => () => {
-    if (!testChanges[id]) testChanges[id] = { }
     console.log(process.hrtime(hrstart), "killed", id); 
-    config.tests[id].state = "killed"
-    testChanges[id].state = "killed"
     config.tests[id].childProcess.kill()
+    updateTestState(id, {
+        state: "killed",
+        childProcess: null,
+    })
 }
 
 testError = (id) => (err) => {
-    if (!testChanges[id]) testChanges[id] = { }
     if (config.tests[id].state === "running") {
-        testChanges[id].state = "crashed"
-        testChanges[id].error = { code: err.code, signal: err.signal, stderr: err.stderr }
-        config.tests[id].state = "crashed"
-        config.tests[id].error = { code: err.code, signal: err.signal, stderr: err.stderr }
+        updateTestState(id, {
+            state: "crashed",
+            childProcess: null,
+            error: { code: err.code, signal: err.signal, stderr: err.stderr }
+        })
     }
 
     execTime = process.hrtime(config.tests[id].startTime)
-    config.tests[id].executionTime = `${execTime[0]}s ${execTime[1] / 1000000}ms`
-    testChanges[id].executionTime = `${execTime[0]}s ${execTime[1] / 1000000}ms`
+    updateTestState(id, {
+        executionTime: `${execTime[0]}s ${execTime[1] / 1000000}ms`
+    })
     //logTest(id)
 }
 
@@ -131,16 +166,14 @@ addTestFiles = async (testPaths) => {
         ...config.tests,
         ...newTests
     }
-    console.log("xd")
     const projectFile = config.sourceFile.replace(/\.cpp$/, ".json")
-    console.log("h");
     await asyncFileActions.saveFile(projectFile, JSON.stringify(config))
 
     loadConfig(config.sourceFile)
 }
 
 loadConfig = async (sourceFile) => {
-    console.log('loading config', sourceFile)
+    console.log('Loading config...', sourceFile)
     if (!(await asyncFileActions.fileExist(sourceFile))) {
         webserver.sendError("The file you provided doesn't exist", "")
         return
@@ -162,7 +195,7 @@ loadConfig = async (sourceFile) => {
     } else {
         config = JSON.parse(await asyncFileActions.readFile(projectFile))
     }
-    console.log('read config')
+    console.log('Read config!')
 
     const tests = { }
     for (const key in config.tests) {
@@ -188,8 +221,9 @@ loadConfig = async (sourceFile) => {
         tests,
         sourceFile,
     }
-    console.log('loaded config')
+    console.log('Loaded config!')
     webserver.sendConfig(config)
+    detailedTestChanges = { }
 }
 
 loadProject = async (sourceFile) => {

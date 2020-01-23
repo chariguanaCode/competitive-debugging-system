@@ -8,7 +8,7 @@ import { CssBaseline, createMuiTheme, Switch, FormControlLabel } from '@material
 import Header from './Header'
 import Content from './Content'
 import Sidebar from './Sidebar'
-import { amber, } from '@material-ui/core/colors';
+import { amber, yellow, orange, lightGreen, grey, green, teal,  cyan,  purple, blue, deepOrange, indigo, } from '@material-ui/core/colors';
 import { ThemeProvider } from '@material-ui/core/styles'
 import TestProgress from './TestProgress'
 import { Interface } from 'readline'
@@ -44,14 +44,44 @@ export const ConnectionError: React.FunctionComponent<ConnectionErrorProps> = ()
 const lightTheme = createMuiTheme({
     palette: {
         type: "light",
-        primary: amber
+        primary: amber,
+        watchblocks: {          //do ogarniecia bo srednio wyglada
+            line: orange[500],
+            name: blue[600],
+            data_type: grey[600],
+
+            array: cyan[600],
+            pair: purple[500],
+            struct: teal[700],
+            watchblock: teal[700],
+
+            string: green[500],
+            bitset: deepOrange[500],
+            number: indigo[500],
+            pointer: "#FF80FF",
+        }
     }
 })
 
 const darkTheme = createMuiTheme({
     palette: {
         type: "dark",
-        primary: amber
+        primary: amber,
+        watchblocks: {
+            line: yellow[600],
+            name: lightGreen["A400"],
+            data_type: grey[500],
+
+            array: cyan[600],
+            pair: purple["A100"],
+            struct: teal[700],
+            watchblock: teal[500],
+
+            string: green[700],
+            bitset: teal["A400"],
+            number: cyan["A400"],
+            pointer: "#FF80FF",
+        }
     }
 })
 
@@ -73,8 +103,9 @@ const App: React.FC<sr> = ({ language, changeLanguage }) => {
     const [ filename, setFilename ] = useState("")
     const [ executionState, setExecutionState ] = useState<ExecutionState>(ExecutionState.NoProject)
     const [ socket, setSocket ] = useState()
-    const [ filePath, setFilePath ] = useState("/home/charodziej/Documents/OIG/OI27/nww.cpp")
-    const [ theme, setTheme ] = useState(lightTheme)
+    //const [ filePath, setFilePath ] = useState("/home/charodziej/Documents/OIG/OI27/nww.cpp")
+    const [ filePath, setFilePath ] = useState("/home/charodziej/Documents/competitive-debugging-system/cpp/test.cpp")
+    const [ theme, setTheme ] = useState(darkTheme)
     const connectionTimeout = useRef(250)
     const lastServerPing = useRef(0);
     const isServerConnected = useRef(false)
@@ -174,6 +205,8 @@ const App: React.FC<sr> = ({ language, changeLanguage }) => {
         <>
         {socket ? null : <ConnectionError/>}
         <div style={socket ? {
+            width: "100vw",
+            height: "100vh",
         } : {pointerEvents: "none"}}>
             <CssBaseline />
             <Header 
@@ -189,9 +222,12 @@ const App: React.FC<sr> = ({ language, changeLanguage }) => {
             <div>geee</div>
             {language}
             {/*
-                //@ts-ignore    */}
+                //@ts-ignore    }
             <button onClick = {()=>{changeLanguage("pl")}}>LOL</button>
             {/*<Content />*/}
+            <Content 
+                socket={socket}
+            />
            
             <Sidebar variant="right">
                 <div style={{ margin: 8 }}>
