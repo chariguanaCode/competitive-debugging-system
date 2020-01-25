@@ -78,12 +78,27 @@ namespace cupl {
   *                              Support for structs                             
   * ============================================================================= **/
 
-#define declare_struct(name, ...) \
-    void print_process(name x) {  \
+#define _GET_NTH_ARG(_1, _2, _3, _4, _5, N, ...) N
+
+#define _fe_0(_call, ...)
+#define _fe_1(_call, member)      _call(member)
+#define _fe_2(_call, member, ...) _call(member) _fe_1(_call, __VA_ARGS__)
+#define _fe_3(_call, member, ...) _call(member) _fe_2(_call, __VA_ARGS__)
+#define _fe_4(_call, member, ...) _call(member) _fe_3(_call, __VA_ARGS__)
+
+#define _CALL_MACRO_FOR_EACH(func, ...) \
+    _GET_NTH_ARG("ignored", ##__VA_ARGS__, \
+    _fe_4, _fe_3, _fe_2, _fe_1, _fe_0)(func, ##__VA_ARGS__)
+
+#define _PRINT_STRUCT_MEMBER(_member) \
+    cupl::print_struct_member(this->_member, #_member);
+
+#define declare_struct(...) \
+    void print_process() { \
         std::cout << cupl::struct_start; \
+        _CALL_MACRO_FOR_EACH(_PRINT_STRUCT_MEMBER, ##__VA_ARGS__); \
         std::cout << cupl::struct_end; \
-    }
-    
+    } 
 
 /** =============================================================================
   *                                 Declarations
@@ -114,7 +129,6 @@ namespace cupl {
     const char array_end     = 'A';
 
     const char pair_start    = 'p';
-    const char pair_end      = 'P';
 
     const char struct_start  = 'o';
     const char struct_end    = 'O';
@@ -297,12 +311,19 @@ namespace cupl {
     }
 
     template <typename T>
+    void print_struct_member(T &x, string member_name) {
+        print_string(member_name);
+        print_process(x);
+    }
+
+    template <typename T>
     void print_pointer(T &x) {
+        string nullptrVar = "nullptr";
         cout << pointer_start;
         if (x != nullptr)
             print_process(*x);
         else
-            cout << "nullptr";
+            print_string(nullptrVar);
     }
 
     void print_string(string &x) {
@@ -314,7 +335,6 @@ namespace cupl {
         cout << pair_start;
         print_process(x.first);
         print_process(x.second);
-        cout << pair_end;
     }
 
     template <typename T>

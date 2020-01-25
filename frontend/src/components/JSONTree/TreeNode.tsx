@@ -33,6 +33,7 @@ export default function TreeNode({ data }: Props): ReactElement {
 
     if (type === "watchblock") childCount = Object.keys(children).length;
     if (type === "array")      childCount = value.length;
+    if (type === "struct")     childCount = value.length;
     if (type === "pair")       childCount = 2;
 
     const colored = (val: any) => {
@@ -63,6 +64,11 @@ export default function TreeNode({ data }: Props): ReactElement {
                 return (open && childCount) ? 
                     [ <>{colored({ array: '[' })}</>, <>{colored({ array: ']' })}</> ] : 
                     [ <>{colored({ array: '[' })} {childCount} {colored({ array: ']' })}</>, '' ]
+
+            case "struct":
+                return (open && childCount) ? 
+                    [ <>{colored({ array: '{' })}</>, <>{colored({ array: '}' })}</> ] : 
+                    [ <>{colored({ array: '{' })} {childCount} {colored({ array: '}' })}</>, '' ]
 
             case "pair":
                 return (open) ? 
@@ -104,6 +110,19 @@ export default function TreeNode({ data }: Props): ReactElement {
                         <TreeNode 
                             key={id} 
                             data={{ ...val, name: id }} 
+                        />
+                    ))}
+                </>
+            )
+        }
+
+        if (type === "struct") {
+            return (
+                <>
+                    {data.value.map((val: any, id: number) => (
+                        <TreeNode 
+                            key={id} 
+                            data={val} 
                         />
                     ))}
                 </>

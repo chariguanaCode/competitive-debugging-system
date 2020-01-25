@@ -12,7 +12,6 @@ const array_start   = 'a'.charCodeAt(0);
 const array_end     = 'A'.charCodeAt(0);
 
 const pair_start    = 'p'.charCodeAt(0);
-const pair_end      = 'P'.charCodeAt(0);
 
 const struct_start  = 'o'.charCodeAt(0);
 const struct_end    = 'O'.charCodeAt(0);
@@ -45,6 +44,28 @@ const convertContents = (contents, start) => {
                 end: val_end + 1
             }
 
+        case struct_start:
+            result = {
+                type: 'struct',
+                value: [ ]
+            }
+
+            while (contents[val_end + 1] !== struct_end) {
+                name = convertContents(contents, val_end + 1)
+                val_end = name.end
+
+                val = convertContents(contents, val_end + 1)
+                val.result.name = name.result.value
+
+                result.value.push(val.result)
+                val_end = val.end
+            }
+
+            return {
+                result,
+                end: val_end + 1
+            }
+
         case pair_start:
             let first = convertContents(contents, val_end + 1)
             first.result.name = "first"
@@ -62,11 +83,8 @@ const convertContents = (contents, start) => {
                         second: second.result,
                     }
                 },
-                end: val_end + 1
+                end: val_end
             }
-
-        case struct_start:
-            return { }
 
         case pointer_start:
             val = convertContents(contents, start + 1)
@@ -139,7 +157,7 @@ exports.parse = (stdout) => {
                     config = curr.slice(begin, end).toString()
 
                     begin = end + 1
-                    end = curr.indexOf(cupl_end, begin)
+                    end = curr.indexOf(divisor, begin)
                     contents = curr.slice(begin, end)
 
                     result = convertContents(contents, 0).result
