@@ -3,8 +3,10 @@ import { useState, useEffect, useRef} from "react";
 
 import { makeStyles                                        } from '@material-ui/core/styles';
 import { Button, IconButton                                } from '@material-ui/core';
-import { Fade, CircularProgress                            } from "@material-ui/core";
+import { Fade, CircularProgress, Snackbar                  } from "@material-ui/core";
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "@material-ui/core";
+
+import MuiAlert                                             from '@material-ui/lab/Alert';
 
 import SettingsIcon     from '@material-ui/icons/Settings';
 import CloseIcon        from '@material-ui/icons/Close';
@@ -37,7 +39,9 @@ interface State {
     areSettingsOpen: boolean
 }
 
-interface Table {
+interface Props {
+    minNumberOfSelectedFiles?: Number,
+    maxNumberOfSelectedFiles?: Number,
     selectFiles: Function,
     socket: any,
     loadDirectoryOnStart: string,
@@ -108,6 +112,7 @@ const useStyles = makeStyles({
         minWidth: '75vw',
         maxWidth: '75vw',
         overflow: 'hidden',
+        overflowX: 'hidden',
     },
     scrollBarHide: {
         '&::-webkit-scrollbar': {
@@ -115,6 +120,8 @@ const useStyles = makeStyles({
         },
     }
 });
+
+const Alert = (props : any) => (<MuiAlert elevation={6} variant="filled" {...props} />);
 
 const useFocus = () => {
     const htmlElRef = useRef(null)
@@ -127,7 +134,7 @@ const isNumeric = (number: any) => {
     return +number === +number
 }
 
-export const FileManager: React.FunctionComponent<Table> = ({isFileManagerOpen, availableFilesTypes, selectFiles, socket, loadDirectoryOnStart, dialogClose }) => {
+export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelectedFiles = Infinity, minNumberOfSelectedFiles = 1, isFileManagerOpen, availableFilesTypes, selectFiles, socket, loadDirectoryOnStart, dialogClose }) => {
     
     const [state, setState] = useState<State>({
         files: [],
@@ -141,15 +148,16 @@ export const FileManager: React.FunctionComponent<Table> = ({isFileManagerOpen, 
         sortMethodNumber: 0,
         areSettingsOpen: false,
     })
+    const [errorSnackbarMessage, SetErrorSnackbarMessage] = useState("");
     let isHiddenSearchOn = useRef<boolean>(true);
     const [advancedSettings, setAdvancedSettings] = useState({
         renderFilesLimit: 50
     })
-    const [loadingCircular, showLoadingCircular] = useState<boolean>(false)
+    const [loadingCircular, showLoadingCircular] = useState<boolean>(false);
     const [stateToRerenderSelf, RerenderSelf] = useState<boolean>(false);
     //const [fieldMode, updateFieldMode] = useState<boolean>(false)
 
-    let showFilesRenderForce = useRef<Array<number>>(new Array(10000))
+    let showFilesRenderForce = useRef<Array<number>>(new Array(10000));
     let renderFilesLimit = advancedSettings.renderFilesLimit + state.numberOfColumns - (advancedSettings.renderFilesLimit % state.numberOfColumns);
     
     let previousHiddenSearch = useRef<any>(null)
@@ -257,7 +265,7 @@ export const FileManager: React.FunctionComponent<Table> = ({isFileManagerOpen, 
     }
 
     const onFileClick = (file: FileType, e: any, fileIsAlreadyClicked = false, id: number) => {
-        e.persist();    
+        if(e.persist) e.persist();    
         let isRightMB = false;
         if ("which" in e)  // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
             isRightMB = e.which == 3; 
@@ -274,12 +282,16 @@ export const FileManager: React.FunctionComponent<Table> = ({isFileManagerOpen, 
             loadDirectory(file.path);
         }
         else if(!isRightMB && !fileIsAlreadyClicked){
-            selectedFiles.set(file.path, file);
-            //e.target.style.backgroundColor = "green"
-            RenderForceFoo(id)
-            setState(prevState => (
-                { ...prevState, selectedFiles: selectedFiles, /*showFilesRenderForce: (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1)*/ }
-            ))
+            if(selectedFiles.size < maxNumberOfSelectedFiles) {
+                selectedFiles.set(file.path, file);
+                //e.target.style.backgroundColor = "green"
+                RenderForceFoo(id)
+                setState(prevState => (
+                    { ...prevState, selectedFiles: selectedFiles, /*showFilesRenderForce: (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1)*/ }
+                ))
+            } else {
+                SetErrorSnackbarMessage(`Maximum number of selected files is ${maxNumberOfSelectedFiles}`);
+            }
         } else {
             //e.target.style.backgroundColor = "green"
             RenderForceFoo(id)
@@ -394,7 +406,7 @@ export const FileManager: React.FunctionComponent<Table> = ({isFileManagerOpen, 
                     <FileManagerMainToolbar socket = {socket} currentPath = {currentPath} loadDirectory = {loadDirectory} />
                 </div>
             </DialogTitle>       
-            <DialogContent style={{ paddingLeft: 5, paddingRight: 5, display: "flex", minHeight: '75vh', maxHeight: '75vh', }}>
+            <DialogContent style={{ overflowX: "hidden", paddingLeft: 5, paddingRight: 5, display: "flex", minHeight: '69vh', maxHeight: '69vh', }}>
                 <div className = {classes.scrollBarHide} style = {{overflow: "scroll", scrollbarWidth: 'thin', minWidth: '13vw', maxWidth: '13vw'}}>
                     <FileManagerFoldersTree showLoadingCircular = {()=>{showLoadingCircular(true)}} currentPath = {state.currentPath} socket = {socket}/>
                 </div>  
@@ -413,11 +425,17 @@ export const FileManager: React.FunctionComponent<Table> = ({isFileManagerOpen, 
                         })}
                     </tbody></table>
                 </div>
+                <Snackbar open={errorSnackbarMessage ? true : false} autoHideDuration={2000} onClose={()=>{SetErrorSnackbarMessage("")}}>
+                    <Alert onClose={()=>{SetErrorSnackbarMessage("")}} severity="error">
+                        {errorSnackbarMessage}
+                    </Alert>
+                </Snackbar>
             </DialogContent>
-                {/*</span>*/}   
-                <DialogActions>
-                    {/*<Button disabled={(currentPath + selectedFolder === "null" || managerError) ? true : false} onClick = {() => {selectPath(currentPath +);dialogClose();}}>Select <b>{currentPath + selectedFolder}</b></Button>*/}
-                </DialogActions>
+            <DialogActions style = {{justifyContent: "center",  overflowY: "visible", display: "flex", minHeight: '6vh', maxHeight: '6vh'}}>
+                <div style = {{alignContent: "center", textAlign: "center", overflowY: "visible", overflowX: "hidden", scrollbarWidth: "none"}}>
+                <Button disabled={selectedFiles.size < minNumberOfSelectedFiles} onClick = {() => {selectFiles(selectedFiles); dialogClose()}}>Select <b>{selectedFiles.size}</b> files</Button>
+                </div>
+            </DialogActions>
             </Dialog>
         </>)
 }

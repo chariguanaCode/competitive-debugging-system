@@ -219,8 +219,6 @@ const App: React.FC<sr> = ({ language, changeLanguage }) => {
                     socket={socket}
                 />
             </Sidebar>
-            <div>geee</div>
-            {language}
             {/*
                 //@ts-ignore    }
             <button onClick = {()=>{changeLanguage("pl")}}>LOL</button>

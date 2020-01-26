@@ -8,7 +8,7 @@ import CancelIcon     from '@material-ui/icons/Cancel';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 
 import { FoldersTable }       from "./folderManager"
-import { FileManager        } from "./fileManager"
+import { FileManager        } from "../FileManager/fileManager"
 import { FilesLoadingStatus } from "./filesLoadingStatus"
 interface Props {
     socket: any,
@@ -137,6 +137,9 @@ export const TestManager: React.FunctionComponent<Props> = ({ socket, availableF
         }))
     }
 
+    const selectFiles = (files: any) => {
+
+    }
     const updateFolderManagerOpen = (val: boolean) => {
         setState(prevState => ({
             ...prevState,
@@ -146,7 +149,7 @@ export const TestManager: React.FunctionComponent<Props> = ({ socket, availableF
 
     return (<div style={{padding: "20px"}}>
         <span style = {isLoadButtonDisabled ? {pointerEvents: "none", opacity: "0.4"} : {}}>
-        <FileManager isFileManagerOpen = {state.folderManagerOpen} dialogClose = {() => {updateFolderManagerOpen(false)}} socket={socket} availableFilesTypes = {["."]} selectFiles = {updateSelectedPath} loadDirectoryOnStart= {selectedPath} />
+        <FileManager maxNumberOfSelectedFiles = {2} isFileManagerOpen = {state.folderManagerOpen} dialogClose = {() => {updateFolderManagerOpen(false)}} socket={socket} availableFilesTypes = {["."]} selectFiles = {updateSelectedPath} loadDirectoryOnStart= {selectedPath} />
            <TextField error = {formError.pathError ? true : false} helperText = {formError.pathError} value = {selectedPath} InputProps={{ style: { fontSize: "15px", width: "400px" }, endAdornment: <InputAdornment position="end">
                <IconButton onClick={() => { updateFolderManagerOpen(true) }}>
                     <FolderOpenIcon/>
