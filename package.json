@@ -7,7 +7,7 @@
     "run": "node ./backend/main.js"
   },
   "repository": {
-    "type": "git",  
+    "type": "git",
     "url": "git+https://github.com/chariguanaCode/competitive-debugging-system.git"
   },
   "author": "Adam Jeliński & Kajetan Lewandowski",

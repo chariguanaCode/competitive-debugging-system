@@ -30,9 +30,10 @@ interface Props {
     socket: any,
     filePath: string,
     loadProject: () => void,
+    runTests: () => void,
 }
 
-export default function Header({ socket, filePath, loadProject }: Props): ReactElement {
+export default function Header({ socket, filePath, loadProject, runTests }: Props): ReactElement {
     const classes = useStyles()
     const [ menuOpen, setMenuOpen ] = useState(false);
     return (
@@ -60,7 +61,10 @@ export default function Header({ socket, filePath, loadProject }: Props): ReactE
 
                     <div style={{ flexGrow: 1 }} />
 
-                    <IconButton color="inherit">
+                    <IconButton 
+                        color="inherit"
+                        onClick={runTests}
+                    >
                         <PlayArrow color="inherit"/>
                     </IconButton>
                     <IconButton 

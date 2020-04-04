@@ -1,41 +1,45 @@
-
-const util = require('util');
-const execFile = util.promisify(require('child_process').execFile);
+const util = require('util')
+const execFile = util.promisify(require('child_process').execFile)
 const spawn = require('child_process').spawn
 
 exports.compileCpp = async (filename) => {
     try {
         //await execFile('g++', ['-std=c++17', '-O3', '-static', '-o./cpp/test.bin', `${filename}`]);
-        await execFile('g++', ['-std=c++17', '-static', '-o./cpp/test.bin', `${filename}`]);
-        return "./cpp/test.bin"
+        await execFile('g++', [
+            '-std=c++17',
+            '-static',
+            '-o./cpp/test.bin',
+            `${filename}`,
+        ])
+        return './cpp/test.bin'
     } catch (err) {
         throw err.stderr
     }
 }
 
 exports.executeTest = (binaryName, input, pushStdout) => {
-    const child = spawn(binaryName, [ ], {
+    const child = spawn(binaryName, [], {
         //shell: true
-        encoding: "buffer"
+        encoding: 'buffer',
     })
-    let stdout = Buffer.from("")
+    let stdout = Buffer.from('')
     let stderr = ''
 
     let stdoutUpdateInterval = setInterval(() => {
         if (stdout.length) {
             pushStdout(stdout)
-            stdout = Buffer.from("")
+            stdout = Buffer.from('')
         }
-    }, 100);
+    }, 100)
 
     child.stdin.write(input)
     child.stdin.end()
 
-    child.stdout.on('data', data => {
-        stdout = Buffer.concat([ stdout, data ])
+    child.stdout.on('data', (data) => {
+        stdout = Buffer.concat([stdout, data])
     })
 
-    child.stderr.on('data', data => {
+    child.stderr.on('data', (data) => {
         stderr += data
     })
 
@@ -48,7 +52,9 @@ exports.executeTest = (binaryName, input, pushStdout) => {
                 pushStdout(stdout)
                 resolve()
             } else {
-                const err = new Error(`child exited with code ${code} and signal ${signal}`)
+                const err = new Error(
+                    `child exited with code ${code} and signal ${signal}`
+                )
                 err.stderr = stderr
                 err.code = code
                 err.signal = signal
