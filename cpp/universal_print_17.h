@@ -95,9 +95,9 @@ namespace cupl {
 
 #define declare_struct(...) \
     void print_process() { \
-        std::cout << cupl::struct_start; \
+        std::cerr << cupl::struct_start; \
         _CALL_MACRO_FOR_EACH(_PRINT_STRUCT_MEMBER, ##__VA_ARGS__); \
-        std::cout << cupl::struct_end; \
+        std::cerr << cupl::struct_end; \
     } 
 
 /** =============================================================================
@@ -178,6 +178,7 @@ namespace cupl {
     class main_wrapper {
         public:
             main_wrapper() {
+                setvbuf(stdout, nullptr, _IONBF, 0);
                 watchblock_open("main", 0);
             };
 
@@ -189,26 +190,26 @@ namespace cupl {
     main_wrapper wrapper;
 
     int watchblock_open(string name, int line) {
-        cout << watchblock_open_start
+        cerr << watchblock_open_start
              << cupl_element_id++ << divisor 
              << name << divisor 
              << line
              << cupl_end
-             << flush;
+             << endl;
         return 1;
     }
 
     int watchblock_close(string name){
-        cout << watchblock_close_start
+        cerr << watchblock_close_start
              << name
              << cupl_end
-             << flush;
+             << endl;
         return 0;
     }
 
     template <typename T>
     void print_main(T x, int line, string name){
-        cout << watch_start 
+        cerr << watch_start 
              << cupl_element_id++ << divisor
              << name << divisor 
              << line << divisor 
@@ -216,13 +217,13 @@ namespace cupl {
              << "config" << divisor
              << flush;
         print_process(x);
-        cout << divisor << cupl_end
-             << flush;
+        cerr << divisor << cupl_end
+             << endl;
     }
 
     template <typename T, size_t N>
     void print_main(T (&x)[N],  int line, string name) {
-        cout << watch_start 
+        cerr << watch_start 
              << cupl_element_id++ << divisor
              << name << divisor 
              << line << divisor 
@@ -230,8 +231,8 @@ namespace cupl {
              << "config" << divisor
              << flush;
         print_array(x);
-        cout << divisor << cupl_end
-             << flush;
+        cerr << divisor << cupl_end
+             << endl;
     }
 
     template <typename T>
@@ -279,30 +280,30 @@ namespace cupl {
 
     template <typename T, size_t N>
     void print_array(T (&a)[N]){
-        cout << array_start;
+        cerr << array_start;
         for(int i = 0; i < (int)N; ++i) {
             print_process(a[i]);
         }
-        cout << array_end;
+        cerr << array_end;
     }
 
     template <typename T>
     void print_iterable(T &x){
-        cout << array_start;
+        cerr << array_start;
         for (auto e: x) {
             print_process(e);
         }
-        cout << array_end;
+        cerr << array_end;
     }
 
     template <typename T>
     void print_arithmetic(T &x) {
-        cout << number_start << x << variable_end;
+        cerr << number_start << x << variable_end;
     }
 
     template <size_t T>
     void print_bitset(bitset<T> &x) {
-        cout << bitset_start << x << variable_end;
+        cerr << bitset_start << x << variable_end;
     }
 
     template <typename T>
@@ -319,7 +320,7 @@ namespace cupl {
     template <typename T>
     void print_pointer(T &x) {
         string nullptrVar = "nullptr";
-        cout << pointer_start;
+        cerr << pointer_start;
         if (x != nullptr)
             print_process(*x);
         else
@@ -327,12 +328,12 @@ namespace cupl {
     }
 
     void print_string(string &x) {
-        cout << string_start << x << variable_end;
+        cerr << string_start << x << variable_end;
     }
 
     template <typename U, typename H>
     void print_pair(pair<U, H> &x) {
-        cout << pair_start;
+        cerr << pair_start;
         print_process(x.first);
         print_process(x.second);
     }

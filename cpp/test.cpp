@@ -11,7 +11,7 @@ struct example {
 };
 
 int main() {
-    for (int i = 0; i < 500000000; ++i) { }
+    for (int i = 0; i < 5000000; ++i) { cout << i;}
     long long a, b;
     cin >> a >> b;
     //usleep(500000);
