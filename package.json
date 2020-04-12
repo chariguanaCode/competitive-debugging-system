@@ -1,25 +1,66 @@
 {
-  "name": "competitive-debugging-system",
-  "version": "0.0.1",
-  "private": true,
-  "description": "",
-  "scripts": {
-    "run": "node ./backend/main.js"
-  },
-  "repository": {
-    "type": "git",  
-    "url": "git+https://github.com/chariguanaCode/competitive-debugging-system.git"
-  },
-  "author": "Adam Jeliński & Kajetan Lewandowski",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/chariguanaCode/competitive-debugging-system/issues"
-  },
-  "homepage": "https://github.com/chariguanaCode/competitive-debugging-system#readme",
-  "dependencies": {
-    "express": "^4.17.1",
-    "http": "0.0.0",
-    "md5": "^2.2.1",
-    "ws": "^7.2.1"
-  }
+    "name": "competitive-debugging-system",
+    "version": "0.0.1",
+    "private": true,
+    "description": "",
+    "scripts": {
+        "run": "concurrently \"BROWSER=none npm start --prefix ./frontend\" \"wait-on http://localhost:3000 && npm run electron\" ",
+        "electron": "export ELECTRON_START_URL=http://localhost:3000 && electron .",
+        "build": "npm run build --prefix frontend && electron-builder"
+    },
+    "main": "electron/main.js",
+    "build": {
+        "productName": "Competitive Debugging System",
+        "files": [
+            "frontend/build/**/*",
+            "electron/**/*"
+        ],
+        "linux": {
+            "category": "Programming",
+            "target": [
+                {
+                    "target": "tar.xz",
+                    "arch": "x64"
+                }
+            ]
+        }
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/chariguanaCode/competitive-debugging-system.git"
+    },
+    "contributors": [
+        {
+            "name": "Adam Jeliński"
+        },
+        {
+            "name": "Kajetan Lewandowski"
+        }
+    ],
+    "author": {
+        "name": "chariguanaCode",
+        "email": "test@example.com"
+    },
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/chariguanaCode/competitive-debugging-system/issues"
+    },
+    "homepage": "https://github.com/chariguanaCode/competitive-debugging-system#readme",
+    "dependencies": {
+        "md5": "^2.2.1"
+    },
+    "devDependencies": {
+        "concurrently": "^5.1.0",
+        "electron": "^8.2.0",
+        "electron-builder": "^22.4.1",
+        "wait-on": "^4.0.2"
+    },
+    "prettier": {
+        "trailingComma": "es5",
+        "semi": false,
+        "tabWidth": 4,
+        "resolveGlobalModules": true,
+        "singleQuote": true,
+        "arrowParens": "always"
+    }
 }
