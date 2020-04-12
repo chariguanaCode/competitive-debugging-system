@@ -1,10 +1,9 @@
 import React, { ReactElement, useState } from 'react'
-import { AppBar, Toolbar, IconButton, Typography, Breadcrumbs } from '@material-ui/core'
+import { AppBar, Toolbar, IconButton, Typography, Breadcrumbs, Fade } from '@material-ui/core'
 import { Apps, Settings, PlayArrow, Refresh } from '@material-ui/icons'
 import { styled, makeStyles } from '@material-ui/core/styles'
-import MainMenu from './MainMenu'
+import { MainMenu } from './MainMenu/index'
 import { ReactComponent as Logo } from '../assets/cds_logo.svg'
-
 const MarginTypography = styled(Typography)(({ theme }) => ({
     marginLeft: theme.spacing(2)
 }))
@@ -75,10 +74,13 @@ export default function Header({ socket, filePath, loadProject }: Props): ReactE
                 </Toolbar>
             </AppBar>
             <MainMenu
-                socket={socket} 
+                isAnyProjectOpen={true}
                 open={menuOpen}
                 handleClose={() => setMenuOpen(false)}
+                socket = {socket}
             />
+            {/*socket={socket} 
+                */}
         </>
     )
 }

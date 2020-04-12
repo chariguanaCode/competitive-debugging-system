@@ -41,6 +41,8 @@ wss.on('connection', (ws) => {
             executeTask.loadTestsCANCEL()
         } else if (type === "loadFilesOnDirectory") { 
             executeTask.loadFilesOnDirectory(data.data)
+        } else if (type === "createNewProject") { 
+            executeTask.createNewProject(data.data)
         }
     })
     ws.send(JSON.stringify({ state: "success" }))
@@ -153,6 +155,16 @@ exports.updateDetailedTest = (testChanges) => {
         }))
     })
 }
+
+exports.createNewProjectResponse = (status, obj) => {
+    wss.clients.forEach((ws) => {
+        ws.send(JSON.stringify({ 
+            type: "createNewProjectResponse", 
+            data: { status, obj }
+        }))
+    })
+}
+
 
 setInterval(() => {
     console.log("Connections alive:", wss.clients.size)

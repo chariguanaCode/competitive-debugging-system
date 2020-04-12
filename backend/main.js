@@ -7,7 +7,7 @@ const loadTests = require('./handleTests').loadTests
 const loadTestsCANCEL = require('./handleTests').loadTestsCANCEL
 const asyncFileActions = require('./asyncFileActions')
 const watchParse = require('./watchParse')
-
+const createNewProject = require('./projectManagement').createNewProject
 var hrstart
 let config
 let fileTracking
@@ -247,7 +247,8 @@ webserver.setExecuteTask({
     loadDirectory,
     loadTests: loadTestsMain,
     loadFilesOnDirectory,
-    loadTestsCANCEL
+    loadTestsCANCEL,
+    createNewProject
 })
 
 

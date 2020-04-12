@@ -11,14 +11,12 @@ import MuiAlert                                             from '@material-ui/l
 import SettingsIcon     from '@material-ui/icons/Settings';
 import CloseIcon        from '@material-ui/icons/Close';
 
-//import { useRef } from "@storybook/addons";
-
 import { ShowFiles }              from "./renderFileTable"
 import { FileManagerToolbar }     from "./fileManagerToolbar";
 import { FileManagerSettings }    from "./fileManagerSettings";
 import { FileManagerFoldersTree } from './fileManagerFoldersTree'
 import { FileManagerMainToolbar } from './fileManagerMainToolbar'
-import { forceReRender } from "@storybook/react";
+
 interface FileType {
     name: string,
     type: string,
@@ -46,7 +44,7 @@ interface Props {
     socket: any,
     loadDirectoryOnStart: string,
     dialogClose: Function,
-    availableFilesTypes: Array<string>,
+    availableFilesTypes?: Array<string>,
     isFileManagerOpen: boolean
 }
 
@@ -169,8 +167,6 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
     const SetFilesRefs = (where: number, refValue: any) => {
         filesRefs.current[where] = refValue;
     }
-
-    let renderFilesTableRef = useRef();
 
     const RenderForceFoo = (index: number) => {
         if(index === -1){
@@ -357,7 +353,11 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
     }
 
     const onKeyDownOnDialog = (e: any) => {
-        if(e.keyCode === 37 ) return;
+        if(e.keyCode === 27) dialogClose();
+        else if(e.keyCode === 13){
+            selectFiles(selectedFiles); 
+            dialogClose();
+        } else if(e.keyCode === 37 ) return;
         else if(e.keyCode === 39) return;
         else if(isHiddenSearchOn.current && !checkIfActiveElementIsInput() && e.keyCode >= 49 && e.keyCode <= 125){
             let currentTime = (new Date()).getTime()

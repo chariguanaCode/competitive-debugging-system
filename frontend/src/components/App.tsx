@@ -14,6 +14,7 @@ import TestProgress from './TestProgress'
 import { Interface } from 'readline'
 import { connect } from "react-redux";
 import { changeLanguage } from '../redux/actions'
+import { MainMenu } from './MainMenu/index'
 enum ExecutionState {
     NoProject,
     Compiling,
@@ -105,7 +106,7 @@ const App: React.FC<sr> = ({ language, changeLanguage }) => {
     const [ socket, setSocket ] = useState()
     //const [ filePath, setFilePath ] = useState("/home/charodziej/Documents/OIG/OI27/nww.cpp")
     const [ filePath, setFilePath ] = useState("/home/charodziej/Documents/competitive-debugging-system/cpp/test.cpp")
-    const [ theme, setTheme ] = useState(darkTheme)
+    const [ theme, setTheme ] = useState(lightTheme)
     const connectionTimeout = useRef(250)
     const lastServerPing = useRef(0);
     const isServerConnected = useRef(false)
