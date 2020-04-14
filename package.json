@@ -4,8 +4,8 @@
     "private": true,
     "description": "",
     "scripts": {
-        "run": "concurrently \"BROWSER=none npm start --prefix ./frontend\" \"wait-on http://localhost:3000 && npm run electron\" ",
-        "electron": "export ELECTRON_START_URL=http://localhost:3000 && electron .",
+        "run": "concurrently \"set BROWSER=\"none\" && npm start --prefix ./frontend\" \"wait-on http://localhost:3000 && npm run electron\" ",
+        "electron": "set ELECTRON_START_URL=http://localhost:3000 && electron .",
         "build": "npm run build --prefix frontend && electron-builder"
     },
     "main": "electron/main.js",
@@ -47,11 +47,16 @@
     },
     "homepage": "https://github.com/chariguanaCode/competitive-debugging-system#readme",
     "dependencies": {
-        "md5": "^2.2.1"
+        "line": "^0.1.8",
+        "md5": "^2.2.1",
+        "react": "^16.13.1",
+        "react-lineto": "^3.1.4",
+        "react-polygon": "^0.2.0",
+        "to": "^0.2.9"
     },
     "devDependencies": {
         "concurrently": "^5.1.0",
-        "electron": "^8.2.0",
+        "electron": "^8.2.1",
         "electron-builder": "^22.4.1",
         "wait-on": "^4.0.2"
     },

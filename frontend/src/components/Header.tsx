@@ -24,7 +24,7 @@ const MarginBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
-        zIndex: theme.zIndex.drawer + 1,
+        zIndex: theme.zIndex.drawer + 2,
         color:
             theme.palette.type === 'dark'
                 ? 'white'
@@ -56,7 +56,7 @@ export default function Header(): ReactElement {
                 <AppBar position="relative" className={classes.appBar}>
                     <Toolbar>
                         <IconButton
-                            onClick={() => setMenuOpen(true)}
+                            onClick={() => setMenuOpen(previousState => !previousState)}
                             color="inherit"
                         >
                             <Apps color="inherit" />
@@ -90,6 +90,7 @@ export default function Header(): ReactElement {
                 </AppBar>
                 <MainMenu
                     open={menuOpen}
+                    isAnyProjectOpen={true}
                     handleClose={() => setMenuOpen(false)}
                 />
             </>

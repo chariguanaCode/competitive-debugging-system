@@ -1,8 +1,8 @@
 import React                          from "react";
 import { useState, useEffect, useRef} from "react";
 
-import { makeStyles                                        } from '@material-ui/core/styles';
-import { Button, IconButton                                } from '@material-ui/core';
+import { makeStyles, useTheme                              } from '@material-ui/core/styles';
+import { Button, IconButton, Slider                        } from '@material-ui/core';
 import { Fade, CircularProgress, Snackbar                  } from "@material-ui/core";
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "@material-ui/core";
 
@@ -17,6 +17,8 @@ import { FileManagerSettings }    from "./fileManagerSettings";
 import { FileManagerFoldersTree } from './fileManagerFoldersTree'
 import { FileManagerMainToolbar } from './fileManagerMainToolbar'
 
+import { loadFilesOnDirectory } from '../../backend/filesHandlingFunctions'
+import { Rectangle } from './Rectangle'
 interface FileType {
     name: string,
     type: string,
@@ -34,21 +36,21 @@ interface State {
     mouseOverPath: string,
     numberOfColumns: number,
     sortMethodNumber: number,
-    areSettingsOpen: boolean
+    areSettingsOpen: boolean,
+    filesDisplaySize: number
 }
 
 interface Props {
     minNumberOfSelectedFiles?: Number,
     maxNumberOfSelectedFiles?: Number,
     selectFiles: Function,
-    socket: any,
     loadDirectoryOnStart: string,
     dialogClose: Function,
     availableFilesTypes?: Array<string>,
     isFileManagerOpen: boolean
 }
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
     navigation: {
         display: "flex",
         alignContent: "center",
@@ -56,44 +58,15 @@ const useStyles = makeStyles({
         fontWeight: 500,
         justifyContent: "center",
     },
-    fileTable: {
-        border: "none",
-        '& tbody': {
-          '& tr': {
-              '& td': {
-                  border: "1px solid",
-                  borderColor: "#e0ebeb",
-                  borderCollapse: "collapse",
-                  align: "left",
-                  '& button': {
-                      textAlign: "left",
-                      }
-              }
-            }
-        }
-        
-      },
-      filesManager: {
-        '& td': {
-            width: "50%",
-            minWidth: "250px",
-            textAlign: "center",
-            border: "1px solid black",
-        },
-        "& table": {
-            width: "100%",
-            borderCollapse: "collapse",
-            marginTop: "10px",
-            minHeight: "600px",
-            //tableLayout: "auto"
-        },
+    filesManager: {
+        WebkitUserSelect: 'none',
         "& button:focus": {
             outline: "none !important",
             border: "none"
         },
         "& button": {
             width: "100%",
-            fontWeight: 600,
+            fontWeight: 200,
             backgroundColor: "transparent",
             border: "none",
             outline: "none",
@@ -112,12 +85,16 @@ const useStyles = makeStyles({
         overflow: 'hidden',
         overflowX: 'hidden',
     },
+    dialogRoot: {
+        backgroundColor: theme.palette.fileManager.backgroundColor,
+        color: theme.palette.fileManager.fontColor,
+    },
     scrollBarHide: {
         '&::-webkit-scrollbar': {
             width: '1px'
         },
     }
-});
+}));
 
 const Alert = (props : any) => (<MuiAlert elevation={6} variant="filled" {...props} />);
 
@@ -132,7 +109,18 @@ const isNumeric = (number: any) => {
     return +number === +number
 }
 
-export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelectedFiles = Infinity, minNumberOfSelectedFiles = 1, isFileManagerOpen, availableFilesTypes, selectFiles, socket, loadDirectoryOnStart, dialogClose }) => {
+const checkIfActiveElementIsInput = () => {
+    let activeElement = document.activeElement;
+    let inputs = ['input', 'select', 'textarea'];
+    return (activeElement && inputs.indexOf(activeElement.tagName.toLowerCase()) !== -1);
+}
+
+const sortStringCompare = (string1: string, string2: string) => {
+    return string1 < string2;
+    //return (string1.length < string2.length ? true : (string1.length === string2.length ? string1 < string2 : false))
+}
+
+export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelectedFiles = Infinity, minNumberOfSelectedFiles = 1, isFileManagerOpen, availableFilesTypes, selectFiles, loadDirectoryOnStart, dialogClose }) => {
     
     const [state, setState] = useState<State>({
         files: [],
@@ -143,122 +131,81 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
         filesTypes: [],
         mouseOverPath: "",
         numberOfColumns: 5,
+        filesDisplaySize: 100,
         sortMethodNumber: 0,
         areSettingsOpen: false,
     })
+    const [mouseSelectionStart, setMouseSelectionStart] = useState({x1: "", y1: "", x2: "", y2: ""})
     const [errorSnackbarMessage, SetErrorSnackbarMessage] = useState("");
-    let isHiddenSearchOn = useRef<boolean>(true);
     const [advancedSettings, setAdvancedSettings] = useState({
         renderFilesLimit: 50
     })
     const [loadingCircular, showLoadingCircular] = useState<boolean>(false);
     const [stateToRerenderSelf, RerenderSelf] = useState<boolean>(false);
     //const [fieldMode, updateFieldMode] = useState<boolean>(false)
-
-    let showFilesRenderForce = useRef<Array<number>>(new Array(10000));
-    let renderFilesLimit = advancedSettings.renderFilesLimit + state.numberOfColumns - (advancedSettings.renderFilesLimit % state.numberOfColumns);
-    
     let previousHiddenSearch = useRef<any>(null)
     let lastSearchOnHiddenSearch = useRef<number>(0)
     let searchWord = useRef<string>("")
     let filesRefs = useRef<Array<any>>([]);
+    let showFilesRenderForce = useRef<Array<number>>(new Array(10000));
+    let isHiddenSearchOn = useRef<boolean>(true);
+
+    let renderFilesLimit = advancedSettings.renderFilesLimit + state.numberOfColumns - (advancedSettings.renderFilesLimit % state.numberOfColumns);
     let { selectedFiles, files, currentPath, managerError, mouseOverPath } = state;
-    
-    const SetFilesRefs = (where: number, refValue: any) => {
-        filesRefs.current[where] = refValue;
-    }
 
-    const RenderForceFoo = (index: number) => {
-        if(index === -1){
-            for(let i = 0; i < showFilesRenderForce.current.length; ++i){
-                showFilesRenderForce.current[i] = (showFilesRenderForce.current[i] > 32000 ? 5 : showFilesRenderForce.current[i] + 1)
-            }
-        } else
-            showFilesRenderForce.current[index] = (showFilesRenderForce.current[index] > 32000 ? 5 : showFilesRenderForce.current[index] + 1)
+    /********************************
+    *           USEEFFECT           *    
+    ********************************/
 
-    }
+    useEffect(() => {
+        CheckSelection();
+    }, [mouseSelectionStart])
 
-    const checkIfActiveElementIsInput = () => {
-        let activeElement = document.activeElement;
-        let inputs = ['input', 'select', 'textarea'];
-        return (activeElement && inputs.indexOf(activeElement.tagName.toLowerCase()) !== -1);
-    }
+    useEffect(() => {
+        RenderForceFoo(-1);
+    }, [state.filesDisplaySize])
 
     useEffect(() => {
         showFilesRenderForce.current.fill(0)
+        console.log(loadDirectoryOnStart)
         loadDirectory(loadDirectoryOnStart);
     }, [loadDirectoryOnStart]);
 
-    const sortStringCompare = (string1: string, string2: string) => {
-        return string1 < string2;
-        //return (string1.length < string2.length ? true : (string1.length === string2.length ? string1 < string2 : false))
-    }
-
-    const comparatorForFilesSort = (obj1: FileType, obj2: FileType) => {
-        switch(state.sortMethodNumber){
-            case 0:
-                return (obj1.typeGroup < obj2.typeGroup ? -1 : 
-                    (obj1.typeGroup === obj2.typeGroup ? (obj1.type < obj2.type ? -1 : (obj1.type===obj2.type ? (sortStringCompare(obj1.name, obj2.name) ? -1 : 1) : 1)) : 1))
-            case 1:
-                return (obj1.typeGroup > obj2.typeGroup ? -1 : 
-                    (obj1.typeGroup === obj2.typeGroup ? (obj1.type < obj2.type ? -1 : (obj1.type===obj2.type ? (sortStringCompare(obj1.name, obj2.name) ? -1 : 1) : 1)) : 1))
-            case 2:
-                return sortStringCompare(obj2.name, obj1.name) ? -1 : 1
-            case 3:
-                return sortStringCompare(obj1.name, obj2.name) ? -1 : 1
-            default:
-                return -1
-        }
-    }
-
     useEffect(() => {
-        if (socket) {
-            socket.addEventListener("message", (msg: any) => {
-                const message = JSON.parse(msg.data)
-                const type = message.type
-                const data = message.data
-                if (type === "loadDirectory") {
-                    if(previousHiddenSearch.current) previousHiddenSearch.current.style.backgroundColor = "transparent"
-                    data.files.sort(comparatorForFilesSort);
-                    showLoadingCircular(false);
-                    RenderForceFoo(-1);
-                    setState(prevState => ({
-                            ...prevState,
-                            currentPath: data.path,
-                            managerError: data.files.length ? null : {message: "No files found from given regex :(", code: "404", number: "404"},
-                            files: data.files,
-                            //showFilesRenderForce: (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1)
-                    }))
-                } else if (type === "loadDirectoryERROR") {
-                    RenderForceFoo(-1)
-                    setState(prevState => (
-                        {
-                            ...prevState,
-                            currentPath: data.path,
-                            newPath: null,
-                            managerError: data.error,
-                            files: [],
-                           // showFilesRenderForce: (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1)
-                        }
-                    ))  
-                }
-            })
-        }
-    }, [socket]);
+        files.sort(comparatorForFilesSort);
+        RenderForceFoo(-1)
+        setState(prevState => ({
+            ...prevState,
+            //showFilesRenderForce: (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1),
+            files: files
+        }))
 
-    const loadDirectory = (path: string, regex?: string) => {
+    }, [state.sortMethodNumber]);
+
+    /********************************
+    *            BACKEND            *    
+    ********************************/
+
+    const loadDirectory = async (path: string, regex?: string) => {
         showLoadingCircular(true);
-        if(socket){
-            socket.send(JSON.stringify({
-                type: "loadFilesOnDirectory",
-                data: {
-                    directory: path,
-                    ShowFilesTypes: state.filesTypes,
-                    regex: regex ? regex : null
-                }
-            }))
-        } else console.log("connection error")
+        //@ts-ignore
+        let [files, newPath]= await loadFilesOnDirectory({directory: path, regex: regex ? regex : null, filetypes: state.filesTypes});
+        if(previousHiddenSearch.current) previousHiddenSearch.current.style.backgroundColor = "transparent"
+        files.sort(comparatorForFilesSort);
+        showLoadingCircular(false);
+        RenderForceFoo(-1);
+        setState(prevState => ({
+            ...prevState,
+            currentPath: newPath,
+            managerError: files.length ? null : {message: "No files found from given regex :(", code: "404", number: "404"},
+            files: files,
+                            //showFilesRenderForce: (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1)
+        }))
     }
+
+     /********************************
+    *        DISPLAYING FILES        *    
+    ********************************/
 
     const onFileClick = (file: FileType, e: any, fileIsAlreadyClicked = false, id: number) => {
         if(e.persist) e.persist();    
@@ -299,7 +246,6 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
 
     const showDeleteFileFromSelectedFilesButton = (overPath: string, currentOverPath = "", id: number) => {
         if(currentOverPath === "" || (currentOverPath === state.mouseOverPath)){
-            //console.log("UPDATE", overPath);
             RenderForceFoo(id)
             setState(prevState=>({
                 ...prevState,
@@ -311,39 +257,65 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
         
     }
 
-    useEffect(() => {
-        files.sort(comparatorForFilesSort);
-        RenderForceFoo(-1)
-        setState(prevState => ({
-            ...prevState,
-            //showFilesRenderForce: (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1),
-            files: files
-        }))
+    const SetFilesRefs = (where: number, refValue: any) => {
+        filesRefs.current[where] = refValue;
+    }
 
-    }, [state.sortMethodNumber]);
+    const RenderForceFoo = (index: number) => {
+        if(index === -1){
+            for(let i = 0; i < showFilesRenderForce.current.length; ++i){
+                showFilesRenderForce.current[i] = (showFilesRenderForce.current[i] > 32000 ? 5 : showFilesRenderForce.current[i] + 1)
+            }
+        } else
+            showFilesRenderForce.current[index] = (showFilesRenderForce.current[index] > 32000 ? 5 : showFilesRenderForce.current[index] + 1)
+    }
 
-    const ChangeSortMethodNumber = (e: any) => {
+    /********************************
+    *          ON KEY DOWN          *    
+    ********************************/
+
+    const CheckSelection = () => {
+        for(let i = 0; i < filesRefs.current.length; ++i) {
+            let cords = filesRefs.current[i].getBoundingClientRect(); 
+            let x = cords.x, y = cords.y;
+            if( !selectedFiles.has(files[i].path) &&
+                x <= Math.max(parseInt(mouseSelectionStart.x1), parseInt(mouseSelectionStart.x2)) &&
+                x >= Math.min(parseInt(mouseSelectionStart.x1), parseInt(mouseSelectionStart.x2)) &&
+                y <= Math.max(parseInt(mouseSelectionStart.y1), parseInt(mouseSelectionStart.y2)) &&
+                y >= Math.min(parseInt(mouseSelectionStart.y1), parseInt(mouseSelectionStart.y2)))
+                filesRefs.current[i].click();
+        }
+    }
+
+    const onMouseMoveOnDialogContent = (e: any) => {
         e.persist();
-        setState(prevState => ({
-            ...prevState,
-            sortMethodNumber: e.target.value,
-        }))
+        if(mouseSelectionStart.x1) {
+            setMouseSelectionStart((pv: any) => ({
+                ...pv,
+                x2: e.pageX,
+                y2: e.pageY
+            }));
+        }
     }
 
-    const ChangeNumberOfColumns = (val: any) => {
-        if(isNumeric(val)){
-            if(val) RenderForceFoo(-1)
-            setState(prevState => ({
-                ...prevState, 
-                //showFilesRenderForce: val ? (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1) : prevState.showFilesRenderForce,
-                numberOfColumns: Math.max(val, 0)
-            }))
-        }   
+    const onMouseDownOnDialog = (e: any) => {
+        e.persist();
+        setMouseSelectionStart({
+            x1: e.pageX,
+            y1: e.pageY,
+            x2: e.pageX,
+            y2: e.pageY
+        })
     }
-    const classes = useStyles()
-    let testmap = [];
-    for(let i = 0; i < files.length; i += renderFilesLimit){
-        testmap.push(i);
+
+    const onMouseUpOnDialogContent = (e: any) => {
+        e.persist();
+        setMouseSelectionStart({
+            x1: "",
+            y1: "",
+            x2: "",
+            y2: ""
+        })
     }
 
     const onKeyDownOnFile = (e: any, path: string) => {
@@ -369,9 +341,61 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
             if(!e.shiftKey && key >= 65 && key <= 90) key += 32
             searchWord.current += String.fromCharCode(key);
             HiddenSearch(searchWord.current)
-            console.log(searchWord.current)
+            //console.log(searchWord.current)
         }
     }
+
+    /********************************
+    *         SORTING FILES         *    
+    ********************************/
+
+    const comparatorForFilesSort = (obj1: FileType, obj2: FileType) => {
+        switch(state.sortMethodNumber){
+            case 0:
+                return (obj1.typeGroup < obj2.typeGroup ? -1 : 
+                    (obj1.typeGroup === obj2.typeGroup ? (obj1.type < obj2.type ? -1 : (obj1.type===obj2.type ? (sortStringCompare(obj1.name, obj2.name) ? -1 : 1) : 1)) : 1))
+            case 1:
+                return (obj1.typeGroup > obj2.typeGroup ? -1 : 
+                    (obj1.typeGroup === obj2.typeGroup ? (obj1.type < obj2.type ? -1 : (obj1.type===obj2.type ? (sortStringCompare(obj1.name, obj2.name) ? -1 : 1) : 1)) : 1))
+            case 2:
+                return sortStringCompare(obj2.name, obj1.name) ? -1 : 1
+            case 3:
+                return sortStringCompare(obj1.name, obj2.name) ? -1 : 1
+            default:
+                return -1
+        }
+    }
+
+    const ChangeSortMethodNumber = (e: any) => {
+        e.persist();
+        setState(prevState => ({
+            ...prevState,
+            sortMethodNumber: e.target.value,
+        }))
+    }
+
+    const ChangeNumberOfColumns = (val: any) => {
+        if(isNumeric(val)){
+            if(val) RenderForceFoo(-1)
+            setState(prevState => ({
+                ...prevState, 
+                //showFilesRenderForce: val ? (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1) : prevState.showFilesRenderForce,
+                numberOfColumns: Math.max(val, 0)
+            }))
+        }   
+    }
+
+    const ChangeFilesDisplaySize = (e: any, newValue: number) => {
+        e.preventDefault();
+        setState(prevState => ({
+            ...prevState,
+            filesDisplaySize: newValue,
+        }),)
+    }
+
+    /********************************
+    *         HIDDEN SEARCH         *    
+    ********************************/
 
     const HiddenSearch = (regex: string) => {
         if(previousHiddenSearch.current) previousHiddenSearch.current.style.backgroundColor = "transparent"
@@ -384,11 +408,24 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
             }
         }
     }
+    /********************************/
 
+    const classes = useStyles()
+    let renderLimesArray = Array.from({length: Math.ceil(files.length/renderFilesLimit)}, (v, k) => k * renderFilesLimit);
+    console.log(files,filesRefs)
+    /*for(let i = 0; i < files.length; i += renderFilesLimit)
+        renderLimesArray.push(i);*/
     return (
         <>
+        { mouseSelectionStart.x1 !== "" ? 
+            <Rectangle 
+                x0 = {parseInt(mouseSelectionStart.x1)} 
+                x1 = {parseInt(mouseSelectionStart.x2)} 
+                y0 = {parseInt(mouseSelectionStart.y1)} 
+                y1 = {parseInt(mouseSelectionStart.y2)}
+            /> : null}
         <FileManagerSettings open = { state.areSettingsOpen } dialogClose = { () => {setState(prevState => ({...prevState, areSettingsOpen: false}))} } />
-        <Dialog onKeyDown = {(e)=>{onKeyDownOnDialog(e)}} scroll = "body" classes = {{ paper: classes.dialogPaper }} fullWidth={true} maxWidth="lg" className={classes.filesManager} open={isFileManagerOpen} >
+        <Dialog onMouseUp = {(e) => {onMouseUpOnDialogContent(e)}} onMouseMove = {(e) => {onMouseMoveOnDialogContent(e)}} onMouseDown = {(e) => {onMouseDownOnDialog(e)}} onKeyDown = {(e)=>{onKeyDownOnDialog(e)}} scroll = "body" classes = {{ paper: classes.dialogPaper}} fullWidth={true} maxWidth="lg" className={classes.filesManager} open={isFileManagerOpen} >
                 <div style = {{zIndex: 9999, position: "absolute", left: "calc(50% - 20px)", top: "calc(50% - 20px)"}}>
                             <Fade in={loadingCircular} style={{ transitionDelay: '100ms',}} unmountOnExit>
                                 <CircularProgress size={40}/>
@@ -401,16 +438,25 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
                 <div>Select directory</div>
                 <div style = {{display: "flex", flexDirection: "column"}}>
                     <div className={classes.navigation}>
-                    <FileManagerToolbar SetHiddenSearch = {() => {isHiddenSearchOn.current = !isHiddenSearchOn.current; if(isHiddenSearchOn.current){ RenderForceFoo(-1); RerenderSelf(ps => !ps)}}} sortMethodNumber = { state.sortMethodNumber } numberOfColumns = { state.numberOfColumns } ChangeNumberOfColumns = { ChangeNumberOfColumns } ChangeSortMethodNumber = { ChangeSortMethodNumber }/>
+                    <FileManagerToolbar 
+                        SetHiddenSearch = {() => {isHiddenSearchOn.current = !isHiddenSearchOn.current; if(isHiddenSearchOn.current){ RenderForceFoo(-1); RerenderSelf(ps => !ps)}}} 
+                        sortMethodNumber = { state.sortMethodNumber } 
+                        ChangeSortMethodNumber = { ChangeSortMethodNumber }
+                        numberOfColumns = { state.numberOfColumns } 
+                        ChangeNumberOfColumns = { ChangeNumberOfColumns } 
+                        filesDisplaySize = { state.filesDisplaySize }
+                        ChangeFilesDisplaySize = { ChangeFilesDisplaySize }
+                    />
                     </div>
-                    <FileManagerMainToolbar socket = {socket} currentPath = {currentPath} loadDirectory = {loadDirectory} />
+                    <FileManagerMainToolbar socket = {null} currentPath = {currentPath} loadDirectory = {loadDirectory} />
                 </div>
             </DialogTitle>       
-            <DialogContent style={{ overflowX: "hidden", paddingLeft: 5, paddingRight: 5, display: "flex", minHeight: '69vh', maxHeight: '69vh', }}>
+            <DialogContent classes = {{root: classes.dialogRoot}} style={{ overflowX: "hidden", paddingLeft: 5, paddingRight: 5, display: "flex", minHeight: '69vh', maxHeight: '69vh', }}>
+
                 <div className = {classes.scrollBarHide} style = {{overflow: "scroll", scrollbarWidth: 'thin', minWidth: '13vw', maxWidth: '13vw'}}>
-                    <FileManagerFoldersTree showLoadingCircular = {()=>{showLoadingCircular(true)}} currentPath = {state.currentPath} socket = {socket}/>
+                    <FileManagerFoldersTree showLoadingCircular = {()=>{showLoadingCircular(true)}} currentPath = {state.currentPath} joinDirectory = {loadDirectory}/>
                 </div>  
-                <div className = {classes.scrollBarHide} style = {{overflow: "scroll", minWidth: '62vw', maxWidth: '62vw', scrollbarWidth: 'thin'}}>
+                <div className = {classes.scrollBarHide} style = {{borderLeft: "solid 1px #a0a9ad4d", overflow: "scroll", minWidth: '62vw', maxWidth: '62vw', scrollbarWidth: 'thin'}}>
                     {managerError ?
                         <div style={{ textAlign: "center" }}>
                             <span style={{ color: "red", fontSize: "25px" }}><b>Error</b></span> <br />
@@ -418,12 +464,12 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
                             Error code: <b>{managerError.code}</b> <br />
                             Error number: <b>{managerError.number}</b>
                         </div> : null}
-                    <table className = {classes.fileTable} ><tbody>
-                        {testmap.map((i,ac)=>{
+                        <div>
+                        {renderLimesArray.map((i,ac)=>{
                             if(i > files.length) return null;
-                            return <ShowFiles onFileKeyDown = {onKeyDownOnFile} saveRefs = {isHiddenSearchOn.current} SetFilesRefs = {SetFilesRefs} key = {`filesRender-${i}`} renderFilesLimit = { renderFilesLimit } startIndex = {i} displaySettings = {{numberOfColumns: state.numberOfColumns}} showDeleteFileFromSelectedFilesButton = { showDeleteFileFromSelectedFilesButton } mouseOverPath={ mouseOverPath } files={files} selectedFiles = {selectedFiles} onFileClick={onFileClick} renderForce = {showFilesRenderForce.current[ac]} />
+                            return <ShowFiles filesDisplaySize = { state.filesDisplaySize } key = {`filesBlock-${i}-${ac}`} onFileKeyDown = {onKeyDownOnFile} saveRefs = {isHiddenSearchOn.current} SetFilesRefs = {SetFilesRefs} renderFilesLimit = { renderFilesLimit } startIndex = {i} displaySettings = {{numberOfColumns: state.numberOfColumns}} showDeleteFileFromSelectedFilesButton = { showDeleteFileFromSelectedFilesButton } mouseOverPath={ mouseOverPath } files={files.slice(i, i + renderFilesLimit)} selectedFiles = {selectedFiles} onFileClick={onFileClick} renderForce = {showFilesRenderForce.current[ac]} />
                         })}
-                    </tbody></table>
+                        </div>
                 </div>
                 <Snackbar open={errorSnackbarMessage ? true : false} autoHideDuration={2000} onClose={()=>{SetErrorSnackbarMessage("")}}>
                     <Alert onClose={()=>{SetErrorSnackbarMessage("")}} severity="error">

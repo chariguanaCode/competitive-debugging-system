@@ -2,11 +2,12 @@ import React, { memo }                  from 'react';
 import { useEffect, useState, useRef  } from 'react';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowDropUpIcon   from '@material-ui/icons/ArrowDropUp';
-
+import { useTheme } from '@material-ui/core/styles';
+import { loadFilesOnDirectory } from '../../backend/filesHandlingFunctions'
 interface FileManagerFoldersTreeTypes {
-    socket: any,
     currentPath: string,
-    showLoadingCircular: Function
+    showLoadingCircular: Function,
+    joinDirectory: Function,
 }
 
 interface FileType {
@@ -19,54 +20,20 @@ interface FileType {
 interface foldersTreeObjectTypes {
     [key: string]: Array<FileType>,
 }
-export const FileManagerFoldersTree: React.FunctionComponent<FileManagerFoldersTreeTypes> = memo(({showLoadingCircular,socket, currentPath}) => {
+export const FileManagerFoldersTree: React.FunctionComponent<FileManagerFoldersTreeTypes> = memo(({showLoadingCircular, currentPath, joinDirectory}) => {
 
     const [ rerenderValue, RerenderForce ] = useState(1)
     let foldersTree = useRef<foldersTreeObjectTypes>({});
     let treeVisibility = useRef(new Map()) 
 
-    const loadDirectory = (path: string) => {
-        if(socket){
-            socket.send(JSON.stringify({
-                type: "loadFilesOnDirectory",
-                data: {
-                    directory: path,
-                    filetypes: ["DIRECTORY"],
-                    key: "FolderTreeTests"
-                }
-            }))
-        } else console.log("connection error")
-    }
-
-    const joinDirectory = (path: string) => {
-        showLoadingCircular();
-        if(socket){
-            socket.send(JSON.stringify({
-                type: "loadFilesOnDirectory",
-                data: {
-                    directory: path,
-                    filetypes: null,
-                    key: ""
-                }
-            }))
-        } else console.log("connection error")
-    }
-
-    useEffect(() => {
-        if (socket) {
-            socket.addEventListener("message", (msg: any) => {
-                const message = JSON.parse(msg.data)
-                const type = message.type
-                const data = message.data
-                if (type === "loadDirectoryFolderTreeTests") {
-                    if(data.path){
-                        Object.assign(foldersTree.current,{[data.path === "/" ? data.path : data.path.slice(0,-1)]: data.files})
-                        RerenderForce(prevValue=>(prevValue+1))
-                    }
-                }
-            })
+    const loadDirectory = async (path: string) => {
+        //@ts-ignore
+        let [files, newPath]= await loadFilesOnDirectory({directory: path, regex: null, filetypes: ['DIRECTORY']});
+        if(newPath){
+            Object.assign(foldersTree.current,{[newPath === "/" ? newPath : newPath.slice(0,-1)]: files})
+            RerenderForce(prevValue=>(prevValue+1))
         }
-    }, [socket]);
+    }
 
     const showDirectory = (dir: string) => {
         treeVisibility.current.set(dir,!treeVisibility.current.get(dir));
@@ -78,11 +45,11 @@ export const FileManagerFoldersTree: React.FunctionComponent<FileManagerFoldersT
         let layer = <span style = {{whiteSpace: "nowrap"}}>
             {indentation}<button style = {{padding: '0px', margin: '0px'}} 
                                  onClick = {()=>{showDirectory(dir)}}>
-                            {treeVisibility.current.get(dir) ? <ArrowDropUpIcon/> : <ArrowDropDownIcon/>}
+                            {treeVisibility.current.get(dir) ? <ArrowDropUpIcon style = {{color: theme.palette.fileManager.fontColor}} /> : <ArrowDropDownIcon style = {{color: theme.palette.fileManager.fontColor}}/>}
                         </button>
                         <button onClick = {dir !== currentPath.slice(0,-1) ? ()=>{joinDirectory(dir)} : ()=>{}} 
                                 style = {{padding: '0px', margin: '0px', textAlign: "left", paddingBottom: '3px'}}>
-                                   <span style = {(dir === currentPath.slice(0,-1)) || (dir === '/' && currentPath === '/') ? {backgroundColor: '#40c4ff', padding: '4px'} : {}}>{name}</span> 
+                                   <span style = {(dir === currentPath.slice(0,-1)) || (dir === '/' && currentPath === '/') ? {backgroundColor: theme.palette.fileManager.selectionColor, padding: '4px', color: theme.palette.fileManager.fontColor} : {color: theme.palette.fileManager.fontColor}}>{name}</span> 
                         </button>
                     </span>
         if(treeVisibility.current.get(dir) === true){
@@ -93,10 +60,10 @@ export const FileManagerFoldersTree: React.FunctionComponent<FileManagerFoldersT
         }
         return <>{layer}</>
     }
-
+    const theme = useTheme();
     return <>
-        <div style = {{alignContent: "left", alignItems: "left", textAlign: "left", display: "flex", flexDirection: "column", width: "20%"}}>
-        {renderTree('/','', '/')}
+        <div style = {{color: theme.palette.fileManager.fontColor, alignContent: "left", alignItems: "left", textAlign: "left", display: "flex", flexDirection: "column", width: "20%"}}>
+        {renderTree('/','','/')}
         </div>
     </>
 })

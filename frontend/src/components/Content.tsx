@@ -5,7 +5,6 @@ import SplitterLayout from 'react-splitter-layout'
 import 'react-splitter-layout/lib/index.css'
 import JSONTree from './JSONTree'
 import GlobalStateContext from '../utils/GlobalStateContext'
-
 const useStyle = makeStyles((theme) => ({
     root: {
         marginLeft: theme.spacing(6) + 24,

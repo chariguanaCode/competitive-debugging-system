@@ -20,7 +20,7 @@ import {
     purple,
     blue,
     deepOrange,
-    indigo,
+    indigo
 } from '@material-ui/core/colors'
 import { ThemeProvider } from '@material-ui/core/styles'
 import TestProgress from './TestProgress'
@@ -54,6 +54,18 @@ const lightTheme = createMuiTheme({
             windowButtons: amber[200],
             closeButton: grey[600],
         },
+        mainMenu: {
+            backgroundColor: "white",
+            iconColorEnabled: grey[900]  ,
+            iconColorDisabled: "",
+            fontColor: "black",
+            selectedButtonBackgroundColor: "#b0bec5",
+        },
+        fileManager: {
+            fontColor: "black",
+            backgroundColor: "white",
+            selectionColor: cyan[300] + '44',
+        }
     },
 })
 
@@ -82,6 +94,18 @@ const darkTheme = createMuiTheme({
             windowButtons: grey[600],
             closeButton: amber[500],
         },
+        mainMenu: {
+            backgroundColor: grey[800],
+            iconColorEnabled: amber[500],
+            iconColorDisabled: "",
+            fontColor: "white",
+            selectedButtonBackgroundColor: "#8ea3ad",
+        },
+        fileManager: {
+            fontColor: "white",
+            backgroundColor: grey[800],
+            selectionColor: cyan[300] + '44',
+        }
     },
 })
 

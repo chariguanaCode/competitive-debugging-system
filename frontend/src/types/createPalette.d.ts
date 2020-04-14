@@ -24,13 +24,29 @@ declare module '@material-ui/core/styles/createPalette' {
         closeButton: string
     }
 
+    interface FileManagerOptions {
+        fontColor: string,
+        backgroundColor: string,
+        selectionColor: string,
+    }
+    interface MainMenuOptions {
+        backgroundColor: string,
+        iconColorEnabled: string,
+        iconColorDisabled: string,
+        fontColor: string,
+        selectedButtonBackgroundColor: string,
+    }
     interface PaletteOptions {
         watchblocks: WatchBlockOptions
         header: HeaderOptions
+        mainMenu: MainMenuOptions
+        fileManager: FileManagerOptions
     }
 
     interface Palette {
         watchblocks: WatchBlockOptions
         header: HeaderOptions
+        mainMenu: MainMenuOptions,
+        fileManager: FileManagerOptions
     }
 }

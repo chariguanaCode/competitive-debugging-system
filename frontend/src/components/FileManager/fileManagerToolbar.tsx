@@ -1,8 +1,8 @@
 import React, { memo }                from "react";
 
 import { TextField, InputAdornment, FormControlLabel    } from '@material-ui/core';
-import { makeStyles                   } from '@material-ui/core/styles';
-import { Button, IconButton, Checkbox } from '@material-ui/core';
+import { makeStyles                                     } from '@material-ui/core/styles';
+import { Button, IconButton, Checkbox, Slider           } from '@material-ui/core';
 
 import { Select, MenuItem, InputLabel } from '@material-ui/core';
 import { FormControl                  } from '@material-ui/core';  
@@ -12,18 +12,20 @@ import ExpandMoreIcon   from '@material-ui/icons/ExpandMore';
 import ViewColumnIcon   from '@material-ui/icons/ViewColumn';
 
 const arePropsEqual = (prevProps: any, nextProps: any) => {
-    return (prevProps.numberOfColumns === nextProps.numberOfColumns) && (prevProps.sortMethodNumber === nextProps.sortMethodNumber)
+    return (prevProps.numberOfColumns === nextProps.numberOfColumns) && (prevProps.sortMethodNumber === nextProps.sortMethodNumber) && (prevProps.filesDisplaySize === nextProps.filesDisplaySize);
 }
 
 interface FileManagerToolbarTypes {
     ChangeSortMethodNumber: Function,
     ChangeNumberOfColumns: Function,
+    ChangeFilesDisplaySize: Function,
+    filesDisplaySize: number,
     numberOfColumns: number,
     sortMethodNumber: number,
     SetHiddenSearch: Function,
 }
 
-export const FileManagerToolbar: React.FunctionComponent<FileManagerToolbarTypes> = memo(({SetHiddenSearch,ChangeSortMethodNumber, ChangeNumberOfColumns, numberOfColumns, sortMethodNumber}) => {
+export const FileManagerToolbar: React.FunctionComponent<FileManagerToolbarTypes> = memo(({SetHiddenSearch,ChangeSortMethodNumber, ChangeNumberOfColumns, numberOfColumns, sortMethodNumber, filesDisplaySize, ChangeFilesDisplaySize}) => {
     return <>
     <FormControl style = {{display: "flex", flexDirection: "row", alignItems: "center"}}>
         <InputLabel>Sort By</InputLabel>
@@ -63,6 +65,7 @@ export const FileManagerToolbar: React.FunctionComponent<FileManagerToolbarTypes
             }}
     />
     <FormControlLabel label = {"hidden search"} control  = {<Checkbox defaultChecked onChange = {()=>{SetHiddenSearch()}}/>} />
+    <Slider step = {2} value={ filesDisplaySize } onChange = { (e, newValue) => { ChangeFilesDisplaySize(e, newValue) } } />
     </FormControl> 
     </>
 },arePropsEqual)

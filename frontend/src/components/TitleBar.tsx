@@ -6,7 +6,7 @@ const { remote } = window.require('electron')
 
 const useStyles = makeStyles((theme) => ({
     titleBar: {
-        zIndex: theme.zIndex.drawer + 2,
+        zIndex: theme.zIndex.drawer + 3,
         position: 'relative',
         width: '100hv',
         height: 24,
