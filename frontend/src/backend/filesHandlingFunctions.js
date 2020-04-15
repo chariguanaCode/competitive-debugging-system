@@ -1,3 +1,4 @@
+import * as asyncFileActions from './asyncFileActions'
 const fs = window.require('fs')
 //const dirTree = require("directory-tree");
 const path = window.require('path')
@@ -100,7 +101,10 @@ export const loadFilesOnDirectory = async ({ filetypes, directory, regex }) => {
 
     let filesToSend = []
     directory = parsePath(directory)
-
+    if (!(await asyncFileActions.fileExist(directory))) {
+        //webserver.sendError("The file you provided doesn't exist", '')
+        return [[], directory]
+    }
     let files = fs.readdirSync(directory)
     //if (err) return "Reading directory error"
     if(!filetypes.length) filetypes = null;

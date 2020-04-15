@@ -57,7 +57,7 @@ const useAddTestFiles = () => {
                 },
             }
 
-            const projectFile = config.sourceFile.replace(/\.cpp$/, '.json')
+            const projectFile = config.projectInfo.files[0].replace(/\.cpp$/, '.json')
             await asyncFileActions.saveFile(
                 projectFile,
                 JSON.stringify(newConfig)
@@ -69,92 +69,6 @@ const useAddTestFiles = () => {
     )
 }
 
-const useLoadConfig = () => {
-    const { setConfig, taskStates, reloadTasks } = useContext(
-        GlobalStateContext
-    )
-
-    return useCallback(
-        async (sourceFile: string) => {
-            console.log('Loading config...', sourceFile)
-            if (!(await asyncFileActions.fileExist(sourceFile))) {
-                //webserver.sendError("The file you provided doesn't exist", '')
-                return
-            }
-
-            if (!sourceFile.match(/.*\.cpp/)) {
-                //webserver.sendError('Invalid source file', '')
-                return
-            }
-
-            const projectFile: string = sourceFile.replace(/\.cpp$/, '.json')
-            let newConfig
-            if (!(await asyncFileActions.fileExist(projectFile))) {
-                newConfig = {
-                    tests: {},
-                    sourceFile,
-                }
-
-                await asyncFileActions.saveFile(
-                    projectFile,
-                    JSON.stringify(newConfig)
-                )
-            } else {
-                newConfig = JSON.parse(
-                    (await asyncFileActions.readFile(projectFile)) as string
-                )
-            }
-            console.log('Read config!')
-
-            const newTasks: {
-                [key: string]: Task
-            } = {}
-            for (const key in newConfig.tests) {
-                if (newConfig.tests.hasOwnProperty(key)) {
-                    newTasks[key] = {
-                        state: TaskState.Pending,
-                    } as Task
-                }
-            }
-
-            console.log('Loaded config!', await setConfig(newConfig))
-            taskStates.current = newTasks
-            reloadTasks()
-
-            //state.detailedTestChanges = {}
-        },
-        [setConfig, taskStates, reloadTasks]
-    )
-}
-
-const useReloadProject = () => {
-    const { projectFile, config, fileTracking, setFileTracking } = useContext(
-        GlobalStateContext
-    )
-
-    const loadConfig = useLoadConfig()
-    const runTasks = useRunTasks()
-
-    return useCallback(async () => {
-        if (fileTracking) {
-            fileTracking.close()
-        }
-
-        await loadConfig(projectFile)
-        setFileTracking(
-            fileChangeTracking.track(config.sourceFile, runTasks, (err: any) =>
-                console.log(err)
-            )
-        )
-    }, [
-        projectFile,
-        config,
-        fileTracking,
-        setFileTracking,
-        loadConfig,
-        runTasks,
-    ])
-}
 
 /*
 const loadTestsMain = (obj) => {
@@ -162,4 +76,4 @@ const loadTestsMain = (obj) => {
 }
 */
 
-export { useLoadConfig, useReloadProject, useRunTasks, useAddTestFiles }
+export { useRunTasks, useAddTestFiles }

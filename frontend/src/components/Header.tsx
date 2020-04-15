@@ -12,7 +12,8 @@ import { MainMenu } from './MainMenu/index'
 import { ReactComponent as Logo } from '../assets/cds_logo.svg'
 
 import GlobalStateContext from '../utils/GlobalStateContext'
-import { useReloadProject, useRunTasks } from '../backend/main'
+import { useRunTasks } from '../backend/main'
+import { useLoadProject } from '../backend/projectManagement'
 
 const MarginTypography = styled(Typography)(({ theme }) => ({
     marginLeft: theme.spacing(2),
@@ -47,7 +48,8 @@ export default function Header(): ReactElement {
     const [menuOpen, setMenuOpen] = useState(false)
     const { config } = useContext(GlobalStateContext)
     const runTasks = useRunTasks()
-    const reloadProject = useReloadProject()
+    const LoadProject = useLoadProject();
+    //const reloadProject = useReloadProject()
     console.log(config)
 
     return useMemo(
@@ -68,11 +70,11 @@ export default function Header(): ReactElement {
                         </MarginTypography>
 
                         <MarginBreadcrumbs color="inherit">
-                            {config.sourceFile.split('/').map((val) => (
+                            {/*config.projectInfo.files[0].split('/').map((val) => (
                                 <Typography key={val} color="inherit">
                                     {val}
                                 </Typography>
-                            ))}
+                            ))*/}
                         </MarginBreadcrumbs>
 
                         <div style={{ flexGrow: 1 }} />
@@ -80,7 +82,7 @@ export default function Header(): ReactElement {
                         <IconButton color="inherit" onClick={runTasks}>
                             <PlayArrow color="inherit" />
                         </IconButton>
-                        <IconButton color="inherit" onClick={reloadProject}>
+                        <IconButton color="inherit" onClick = {() => {LoadProject("D://test.cdsp")}} /*onClick={/*reloadProject}*/>
                             <Refresh color="inherit" />
                         </IconButton>
                         <IconButton color="inherit">
@@ -95,6 +97,6 @@ export default function Header(): ReactElement {
                 />
             </>
         ),
-        [config, classes, menuOpen, runTasks, reloadProject]
+        [config, classes, menuOpen, runTasks]
     )
 }

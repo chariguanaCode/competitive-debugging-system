@@ -19,7 +19,7 @@ import { FileManagerMainToolbar } from './fileManagerMainToolbar'
 
 import { loadFilesOnDirectory } from '../../backend/filesHandlingFunctions'
 import { Rectangle } from './Rectangle'
-interface FileType {
+export interface FileType {
     name: string,
     type: string,
     path: string,
@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
     filesManager: {
         WebkitUserSelect: 'none',
         "& button:focus": {
-            outline: "none !important",
+            outline: "none !import  ant",
             border: "none"
         },
         "& button": {
@@ -128,7 +128,7 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
         managerError: null,
         selectedFiles: new Map(),
         //showFilesRenderForce: [],
-        filesTypes: [],
+        filesTypes: availableFilesTypes ? availableFilesTypes : [],
         mouseOverPath: "",
         numberOfColumns: 5,
         filesDisplaySize: 100,
@@ -158,7 +158,8 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
     ********************************/
 
     useEffect(() => {
-        CheckSelection();
+        if(mouseSelectionStart.x1.length)
+            CheckSelection();
     }, [mouseSelectionStart])
 
     useEffect(() => {
@@ -327,8 +328,8 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
     const onKeyDownOnDialog = (e: any) => {
         if(e.keyCode === 27) dialogClose();
         else if(e.keyCode === 13){
-            selectFiles(selectedFiles); 
-            dialogClose();
+            //selectFiles([...selectedFiles.values()]); 
+            //dialogClose();
         } else if(e.keyCode === 37 ) return;
         else if(e.keyCode === 39) return;
         else if(isHiddenSearchOn.current && !checkIfActiveElementIsInput() && e.keyCode >= 49 && e.keyCode <= 125){
@@ -479,7 +480,7 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
             </DialogContent>
             <DialogActions style = {{justifyContent: "center",  overflowY: "visible", display: "flex", minHeight: '6vh', maxHeight: '6vh'}}>
                 <div style = {{alignContent: "center", textAlign: "center", overflowY: "visible", overflowX: "hidden", scrollbarWidth: "none"}}>
-                <Button disabled={selectedFiles.size < minNumberOfSelectedFiles} onClick = {() => {selectFiles(selectedFiles); dialogClose()}}>Select <b>{selectedFiles.size}</b> files</Button>
+                <Button disabled={selectedFiles.size < minNumberOfSelectedFiles} onClick = {() => {selectFiles([...selectedFiles.values()]); dialogClose()}}>Select <b>{selectedFiles.size}</b> files</Button>
                 </div>
             </DialogActions>
             </Dialog>

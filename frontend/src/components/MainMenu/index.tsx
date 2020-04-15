@@ -1,5 +1,5 @@
 import React                           from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext, useMemo } from "react";
 import { Fade, IconButton, Button, Collapse, Paper, MenuList, MenuItem } from "@material-ui/core"
 import CloseIcon                       from "@material-ui/icons/Close"
 import SaveIcon                        from '@material-ui/icons/Save';
@@ -15,7 +15,9 @@ import FolderIcon                      from '@material-ui/icons/Folder';
 import { FileManager                 } from "../FileManager/fileManager";
 import { TextField, FormLabel, InputAdornment } from "@material-ui/core";
 import { makeStyles, useTheme, ThemeProvider } from '@material-ui/core/styles';
-
+import GlobalStateContext from '../../utils/GlobalStateContext'
+import { useLoadProject } from "../../backend/projectManagement";
+import { FileType } from "../FileManager/fileManager"
 interface Props {
    open: boolean,
    handleClose: Function,
@@ -135,6 +137,8 @@ const OptionsInfo: React.FunctionComponent<OptionsInfoTypes> = ({optionName, sel
                     <TextField label = "Project author"/>     
                 </form>
             </>
+        case "Open Project": 
+            return <><Button onClick = {() => {selectOption("openproject")}}>Open project</Button></>
         default:
             return <></>
     }
@@ -153,6 +157,7 @@ export const MainMenu: React.FunctionComponent<Props> = ({open, handleClose, isA
         isOpen: boolean,
         maxNumberOfFiles: Number,
         onSelectFiles: Function,
+        availableFilesTypes?: Array<string> | undefined
     }>(defaultFileManagerConfig);
 
     const createProject = (files?: Array<string>) => {
@@ -185,6 +190,27 @@ export const MainMenu: React.FunctionComponent<Props> = ({open, handleClose, isA
         })
     }
 
+ 
+     /********************************
+    *          OPEN PROJECT          *    
+    ********************************/
+
+    const LoadProject = useLoadProject();
+
+    const SelectPathToOpenProject = (selectedFiles: Array<FileType>) => {
+        if(selectedFiles.length)
+            LoadProject(selectedFiles[0].path)
+    }
+
+    const OpenProject = () => {
+        changeFileManagerConfig({
+            maxNumberOfFiles: 1,
+            onSelectFiles: SelectPathToOpenProject,
+            isOpen: true,
+            availableFilesTypes: ["DIRECTORY", ".cdsp"]
+        })
+    }
+
     const optionsFunctionsGroups = {
         "Create Project": (option: string) => {
             switch(option) {
@@ -200,18 +226,27 @@ export const MainMenu: React.FunctionComponent<Props> = ({open, handleClose, isA
                 default:
                     return;
             }
+        },
+        "Open Project": (option: string) => {
+            switch(option) {
+                case "openproject":
+                    OpenProject();
+                    return;
+                default:
+                    return;
+            }
         }
 
     }
 
-   
     const classes = useStyles({
         open: open
     });
     const theme = useTheme();
     //                <IconButton style = {{color: "red", right: "2px", top: "2px", position: "absolute", padding: "0px"}} onClick = { ()=>{handleClose()} }><CloseIcon/></IconButton>
 //style = {{display: "flex", border: "solid 1px", left: "60px", position: "relative", zIndex: 1201, top: "65px", minWidth: "800px", minHeight: "400px", backgroundColor: "white", flexDirection: "row"}}
-    return (<>
+    return useMemo(
+            () => (<>
             <div className = {classes.mainMenu} >
                 <MenuList className = {classes.mainMenuOptionsList}>
                     {Buttons.map((obj, index)=>{
@@ -235,6 +270,14 @@ export const MainMenu: React.FunctionComponent<Props> = ({open, handleClose, isA
                     </div>
                 </Fade>
             </div>
-        {fileManagerConfig.isOpen ? <FileManager maxNumberOfSelectedFiles = {fileManagerConfig.maxNumberOfFiles} selectFiles = {fileManagerConfig.onSelectFiles} loadDirectoryOnStart = {'/'} isFileManagerOpen = {fileManagerConfig.isOpen} dialogClose = {()=>{changeFileManagerConfig(defaultFileManagerConfig)}} /> : null}
-        </>)
+        {fileManagerConfig.isOpen ? 
+            <FileManager 
+                maxNumberOfSelectedFiles = {fileManagerConfig.maxNumberOfFiles} 
+                selectFiles = {fileManagerConfig.onSelectFiles} 
+                loadDirectoryOnStart = {'/'} 
+                isFileManagerOpen = {fileManagerConfig.isOpen} 
+                dialogClose = {()=>{changeFileManagerConfig(defaultFileManagerConfig)}} 
+                availableFilesTypes = {fileManagerConfig.availableFilesTypes}
+            /> : null}
+        </>), [optionInfo, fileManagerConfig] )
 }

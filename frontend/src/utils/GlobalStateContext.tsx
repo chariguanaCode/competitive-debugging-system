@@ -1,5 +1,5 @@
 import React, { useState, useRef, MutableRefObject } from 'react'
-
+import defaultConfig from '../data/defaultConfig.json'
 interface Props {
     children: any | Array<any>
 }
@@ -23,8 +23,30 @@ export enum TaskState {
 }
 
 export interface Config {
-    sourceFile: string
-    tests: {
+    "projectInfo": {
+        "files": Array<string>,
+        "path": string,
+        "name": string,
+        "author": string,
+        "createDate": string,
+        "lastEditDate": string,
+        "totalTimeSpent": string,
+        "description": string
+    },
+    "settings": {
+        "main": {
+            "darkMode": Boolean
+        },
+        "fileManager": {
+            "basic": {
+                "homePath": string
+            },
+            "developer": {
+                "renderBlockSize": number
+            }
+        }
+    },
+    "tests": {
         [key: string]: {
             filePath: string
         }
@@ -63,8 +85,10 @@ const GlobalStateContext = React.createContext({} as GlobalStateType)
 
 export const GlobalStateProvider = ({ children }: Props) => {
     const [config, setConfig] = useState<Config>({
-        sourceFile:
-            '/home/charodziej/Documents/competitive-debugging-system/cpp/test.cpp',
+        "projectInfo": {
+            "files":
+            ['/home/charodziej/Documents/competitive-debugging-system/cpp/test.cpp'],
+        } 
     } as Config)
     const [fileTracking, setFileTracking] = useState<any>(null)
     const [projectFile, setProjectFile] = useState<string>(
