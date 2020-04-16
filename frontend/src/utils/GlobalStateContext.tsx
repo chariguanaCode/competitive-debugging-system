@@ -25,6 +25,7 @@ export enum TaskState {
 export interface Config {
     "projectInfo": {
         "files": Array<string>,
+        "saveName": string,
         "path": string,
         "name": string,
         "author": string,

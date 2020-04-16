@@ -50,7 +50,7 @@ export default function Header(): ReactElement {
     const runTasks = useRunTasks()
     const LoadProject = useLoadProject();
     //const reloadProject = useReloadProject()
-    console.log(config)
+    console.log(menuOpen, "lool")
 
     return useMemo(
         () => (
@@ -66,23 +66,17 @@ export default function Header(): ReactElement {
                         <MarginTypography color="inherit"></MarginTypography>
                         <Logo className={classes.logo} width={50} height={50} />
                         <MarginTypography color="inherit">
-                            My random project
+                           { config.projectInfo.name }
                         </MarginTypography>
-
-                        <MarginBreadcrumbs color="inherit">
-                            {/*config.projectInfo.files[0].split('/').map((val) => (
-                                <Typography key={val} color="inherit">
-                                    {val}
-                                </Typography>
-                            ))*/}
-                        </MarginBreadcrumbs>
-
+                        <MarginTypography color="inherit">
+                        {config.projectInfo.path && (config.projectInfo.path+config.projectInfo.saveName)}
+                        </MarginTypography>
                         <div style={{ flexGrow: 1 }} />
 
                         <IconButton color="inherit" onClick={runTasks}>
                             <PlayArrow color="inherit" />
                         </IconButton>
-                        <IconButton color="inherit" onClick = {() => {LoadProject("D://test.cdsp")}} /*onClick={/*reloadProject}*/>
+                        <IconButton color="inherit" onClick = {() => {LoadProject("D:/test.cdsp")}} /*onClick={/*reloadProject}*/>
                             <Refresh color="inherit" />
                         </IconButton>
                         <IconButton color="inherit">

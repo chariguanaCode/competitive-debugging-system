@@ -71,9 +71,8 @@ export const FileManagerMainToolbar: React.FunctionComponent<MainToolbarTypes> =
     //const [fieldMode, updateFieldMode] = useState<boolean>(false)
     const [textFieldRef, setTextFieldFocus] = useFocus();
     let historyListIndex = useRef<number>(-1)
-
-    let { newPath, historyList, fieldMode } = state;   
-
+    let historyList = Array.from(state.historyList);
+    
     useEffect(() => {
                     if(historyList[historyListIndex.current+1]===currentPath) ++historyListIndex.current;
                     else if(historyList[historyListIndex.current]!==currentPath){
@@ -104,8 +103,8 @@ export const FileManagerMainToolbar: React.FunctionComponent<MainToolbarTypes> =
 
     useEffect(() => {
         //@ts-ignore
-        if(fieldMode) setTextFieldFocus();
-    }, [fieldMode]);
+        if(state.fieldMode) setTextFieldFocus();
+    }, [state.fieldMode]);
 
     const SetPathFromField = (e: any) => {
         e.preventDefault();
@@ -145,12 +144,12 @@ const classes = useStyles()
                     <div className={classes.navigation}>
                     <IconButton onClick={()=>{loadDirectory('/')}} style={{ width: "48px" }}><HomeIcon /></IconButton>
                     <IconButton onClick={Undo} disabled={historyListIndex.current > 0 ? false : true} style={{ width: "48px" }}><ArrowBackIcon /></IconButton>    
-                    {fieldMode ? 
+                    {state.fieldMode ? 
                     <TextField inputRef    = { textFieldRef } 
                                 onKeyDown  = { PathTextFieldKeyDown } 
                                 onBlur     = { () =>{ UpdateFieldMode(false) } } 
                                 inputProps = { { style: { fontSize: "15px", width: "350px" } } } 
-                                value      = { newPath !== null ? newPath : currentPath } 
+                                value      = { state.newPath !== null ? state.newPath : currentPath } 
                                 onChange   = { updateTextOnTextField }
                                 onFocus    = { e => { e.target.select() } }
                     />

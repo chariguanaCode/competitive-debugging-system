@@ -16,9 +16,12 @@ import { FileManagerToolbar }     from "./fileManagerToolbar";
 import { FileManagerSettings }    from "./fileManagerSettings";
 import { FileManagerFoldersTree } from './fileManagerFoldersTree'
 import { FileManagerMainToolbar } from './fileManagerMainToolbar'
+import { FileManagerSelectedFiles } from './fileManagerSelectedFiles'
 
 import { loadFilesOnDirectory } from '../../backend/filesHandlingFunctions'
 import { Rectangle } from './Rectangle'
+
+import { isNumeric, checkIfActiveElementIsInput } from'../../utils/tools'
 export interface FileType {
     name: string,
     type: string,
@@ -33,6 +36,7 @@ interface State {
     managerError: any,
     //showFilesRenderForce: Array<0>,
     filesTypes: Array<string>,
+    acceptableFileTypes: Set<string> | undefined,
     mouseOverPath: string,
     numberOfColumns: number,
     sortMethodNumber: number,
@@ -47,6 +51,7 @@ interface Props {
     loadDirectoryOnStart: string,
     dialogClose: Function,
     availableFilesTypes?: Array<string>,
+    acceptableFileTypes?: Array<string>,
     isFileManagerOpen: boolean
 }
 
@@ -98,37 +103,28 @@ const useStyles = makeStyles((theme) => ({
 
 const Alert = (props : any) => (<MuiAlert elevation={6} variant="filled" {...props} />);
 
-const useFocus = () => {
-    const htmlElRef = useRef(null)
-    //@ts-ignore
-	const setFocus = () => {htmlElRef.current &&  htmlElRef.current.focus()}
-	return [ htmlElRef,  setFocus ] 
-}
-
-const isNumeric = (number: any) => {
-    return +number === +number
-}
-
-const checkIfActiveElementIsInput = () => {
-    let activeElement = document.activeElement;
-    let inputs = ['input', 'select', 'textarea'];
-    return (activeElement && inputs.indexOf(activeElement.tagName.toLowerCase()) !== -1);
-}
-
 const sortStringCompare = (string1: string, string2: string) => {
     return string1 < string2;
     //return (string1.length < string2.length ? true : (string1.length === string2.length ? string1 < string2 : false))
 }
 
-export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelectedFiles = Infinity, minNumberOfSelectedFiles = 1, isFileManagerOpen, availableFilesTypes, selectFiles, loadDirectoryOnStart, dialogClose }) => {
-    
+export const FileManager: React.FunctionComponent<Props> = ({
+    maxNumberOfSelectedFiles = Infinity, 
+    minNumberOfSelectedFiles = 1, 
+    isFileManagerOpen, 
+    availableFilesTypes, 
+    acceptableFileTypes,
+    selectFiles,
+    loadDirectoryOnStart, 
+    dialogClose 
+}) => {
     const [state, setState] = useState<State>({
-        files: [],
-        currentPath: "",
-        managerError: null,
+        files: [], 
+        currentPath: "", 
+        managerError: null, 
         selectedFiles: new Map(),
-        //showFilesRenderForce: [],
         filesTypes: availableFilesTypes ? availableFilesTypes : [],
+        acceptableFileTypes: acceptableFileTypes ? new Set(acceptableFileTypes) : undefined,
         mouseOverPath: "",
         numberOfColumns: 5,
         filesDisplaySize: 100,
@@ -151,7 +147,6 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
     let isHiddenSearchOn = useRef<boolean>(true);
 
     let renderFilesLimit = advancedSettings.renderFilesLimit + state.numberOfColumns - (advancedSettings.renderFilesLimit % state.numberOfColumns);
-    let { selectedFiles, files, currentPath, managerError, mouseOverPath } = state;
 
     /********************************
     *           USEEFFECT           *    
@@ -173,12 +168,11 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
     }, [loadDirectoryOnStart]);
 
     useEffect(() => {
-        files.sort(comparatorForFilesSort);
         RenderForceFoo(-1)
         setState(prevState => ({
             ...prevState,
             //showFilesRenderForce: (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1),
-            files: files
+            files: Array.from(prevState.files).sort(comparatorForFilesSort)
         }))
 
     }, [state.sortMethodNumber]);
@@ -190,7 +184,11 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
     const loadDirectory = async (path: string, regex?: string) => {
         showLoadingCircular(true);
         //@ts-ignore
-        let [files, newPath]= await loadFilesOnDirectory({directory: path, regex: regex ? regex : null, filetypes: state.filesTypes});
+        let [files, newPath]= await loadFilesOnDirectory({
+            directory: path, 
+            regex: regex ? regex : null, 
+            filetypes: state.filesTypes
+        });
         if(previousHiddenSearch.current) previousHiddenSearch.current.style.backgroundColor = "transparent"
         files.sort(comparatorForFilesSort);
         showLoadingCircular(false);
@@ -215,34 +213,38 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
             isRightMB = e.which == 3; 
         else if ("button" in e)  // IE, Opera 
             isRightMB = e.button == 2; 
-        if((fileIsAlreadyClicked && isRightMB) || (fileIsAlreadyClicked && file.type !== "DIRECTORY")){
-            selectedFiles.delete(file.path);
-        }
-        if (fileIsAlreadyClicked && file.type === "DIRECTORY" && !isRightMB){
-            selectedFiles.delete(file.path);
-            setState(prevState => (
-                { ...prevState, selectedFiles: selectedFiles}
-            ))
-            loadDirectory(file.path);
-        }
-        else if(!isRightMB && !fileIsAlreadyClicked){
-            if(selectedFiles.size < maxNumberOfSelectedFiles) {
-                selectedFiles.set(file.path, file);
-                //e.target.style.backgroundColor = "green"
+        if(!state.acceptableFileTypes || (state.acceptableFileTypes && state.acceptableFileTypes.has(file.type))) {
+            let selectedFiles = new Map(state.selectedFiles)
+            if((fileIsAlreadyClicked && isRightMB) || (fileIsAlreadyClicked && file.type !== "DIRECTORY")){
+                selectedFiles.delete(file.path);
+            }
+            if (fileIsAlreadyClicked && file.type === "DIRECTORY" && !isRightMB){
+                selectedFiles.delete(file.path);
+                setState(prevState => (
+                    { ...prevState, selectedFiles: selectedFiles}
+                ))
+                loadDirectory(file.path);
+            }
+            else if(!isRightMB && !fileIsAlreadyClicked){
+                if(state.selectedFiles.size < maxNumberOfSelectedFiles) {
+                    selectedFiles.set(file.path, file);
+                        RenderForceFoo(id)
+                    setState(prevState => (
+                        { ...prevState, selectedFiles: selectedFiles }
+                    ))
+                } else {
+                    SetErrorSnackbarMessage(`Maximum number of selected files is ${maxNumberOfSelectedFiles}`);
+                }
+            } else {
                 RenderForceFoo(id)
                 setState(prevState => (
-                    { ...prevState, selectedFiles: selectedFiles, /*showFilesRenderForce: (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1)*/ }
+                    { ...prevState, selectedFiles: selectedFiles }
                 ))
-            } else {
-                SetErrorSnackbarMessage(`Maximum number of selected files is ${maxNumberOfSelectedFiles}`);
             }
-        } else {
-            //e.target.style.backgroundColor = "green"
-            RenderForceFoo(id)
-            setState(prevState => (
-                { ...prevState, selectedFiles: selectedFiles, /*showFilesRenderForce: (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1)*/ }
-            ))
+        } else if(file.type === "DIRECTORY") {
+            loadDirectory(file.path);
         }
+       
     }
 
     const showDeleteFileFromSelectedFilesButton = (overPath: string, currentOverPath = "", id: number) => {
@@ -251,7 +253,6 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
             setState(prevState=>({
                 ...prevState,
                 mouseOverPath: overPath,
-                //showFilesRenderForce: (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1)
             }))
         }
         
@@ -279,7 +280,7 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
         for(let i = 0; i < filesRefs.current.length; ++i) {
             let cords = filesRefs.current[i].getBoundingClientRect(); 
             let x = cords.x, y = cords.y;
-            if( !selectedFiles.has(files[i].path) &&
+            if( !state.selectedFiles.has(state.files[i].path) &&
                 x <= Math.max(parseInt(mouseSelectionStart.x1), parseInt(mouseSelectionStart.x2)) &&
                 x >= Math.min(parseInt(mouseSelectionStart.x1), parseInt(mouseSelectionStart.x2)) &&
                 y <= Math.max(parseInt(mouseSelectionStart.y1), parseInt(mouseSelectionStart.y2)) &&
@@ -401,8 +402,8 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
     const HiddenSearch = (regex: string) => {
         if(previousHiddenSearch.current) previousHiddenSearch.current.style.backgroundColor = "transparent"
         const regexExp = new RegExp(regex);
-        for(let i = 0; i < files.length; ++i){
-            if(regexExp.test(files[i].name)){
+        for(let i = 0; i < state.files.length; ++i){
+            if(regexExp.test(state.files[i].name)){
                 filesRefs.current[i].focus(); filesRefs.current[i].style.backgroundColor = "#e0e0e0"
                 previousHiddenSearch.current = filesRefs.current[i];
                 return;
@@ -412,8 +413,7 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
     /********************************/
 
     const classes = useStyles()
-    let renderLimesArray = Array.from({length: Math.ceil(files.length/renderFilesLimit)}, (v, k) => k * renderFilesLimit);
-    console.log(files,filesRefs)
+    let renderLimesArray = Array.from({length: Math.ceil(state.files.length/renderFilesLimit)}, (v, k) => k * renderFilesLimit);
     /*for(let i = 0; i < files.length; i += renderFilesLimit)
         renderLimesArray.push(i);*/
     return (
@@ -449,7 +449,7 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
                         ChangeFilesDisplaySize = { ChangeFilesDisplaySize }
                     />
                     </div>
-                    <FileManagerMainToolbar socket = {null} currentPath = {currentPath} loadDirectory = {loadDirectory} />
+                    <FileManagerMainToolbar socket = {null} currentPath = {state.currentPath} loadDirectory = {loadDirectory} />
                 </div>
             </DialogTitle>       
             <DialogContent classes = {{root: classes.dialogRoot}} style={{ overflowX: "hidden", paddingLeft: 5, paddingRight: 5, display: "flex", minHeight: '69vh', maxHeight: '69vh', }}>
@@ -457,21 +457,24 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
                 <div className = {classes.scrollBarHide} style = {{overflow: "scroll", scrollbarWidth: 'thin', minWidth: '13vw', maxWidth: '13vw'}}>
                     <FileManagerFoldersTree showLoadingCircular = {()=>{showLoadingCircular(true)}} currentPath = {state.currentPath} joinDirectory = {loadDirectory}/>
                 </div>  
-                <div className = {classes.scrollBarHide} style = {{borderLeft: "solid 1px #a0a9ad4d", overflow: "scroll", minWidth: '62vw', maxWidth: '62vw', scrollbarWidth: 'thin'}}>
-                    {managerError ?
+                <div className = {classes.scrollBarHide} style = {{borderLeft: "solid 1px #a0a9ad4d", overflow: "scroll", minWidth: '40vw', maxWidth: '62vw', scrollbarWidth: 'thin'}}>
+                    {state.managerError ?
                         <div style={{ textAlign: "center" }}>
                             <span style={{ color: "red", fontSize: "25px" }}><b>Error</b></span> <br />
-                            Error message: <b>{managerError.message}</b> <br />
-                            Error code: <b>{managerError.code}</b> <br />
-                            Error number: <b>{managerError.number}</b>
+                            Error message: <b>{state.managerError.message}</b> <br />
+                            Error code: <b>{state.managerError.code}</b> <br />
+                            Error number: <b>{state.managerError.number}</b>
                         </div> : null}
                         <div>
                         {renderLimesArray.map((i,ac)=>{
-                            if(i > files.length) return null;
-                            return <ShowFiles filesDisplaySize = { state.filesDisplaySize } key = {`filesBlock-${i}-${ac}`} onFileKeyDown = {onKeyDownOnFile} saveRefs = {isHiddenSearchOn.current} SetFilesRefs = {SetFilesRefs} renderFilesLimit = { renderFilesLimit } startIndex = {i} displaySettings = {{numberOfColumns: state.numberOfColumns}} showDeleteFileFromSelectedFilesButton = { showDeleteFileFromSelectedFilesButton } mouseOverPath={ mouseOverPath } files={files.slice(i, i + renderFilesLimit)} selectedFiles = {selectedFiles} onFileClick={onFileClick} renderForce = {showFilesRenderForce.current[ac]} />
+                            if(i > state.files.length) return null;
+                            return <ShowFiles acceptableFileTypes = {state.acceptableFileTypes} filesDisplaySize = { state.filesDisplaySize } key = {`filesBlock-${i}-${ac}`} onFileKeyDown = {onKeyDownOnFile} saveRefs = {isHiddenSearchOn.current} SetFilesRefs = {SetFilesRefs} renderFilesLimit = { renderFilesLimit } startIndex = {i} displaySettings = {{numberOfColumns: state.numberOfColumns}} showDeleteFileFromSelectedFilesButton = { showDeleteFileFromSelectedFilesButton } mouseOverPath={ state.mouseOverPath } files={state.files.slice(i, i + renderFilesLimit)} selectedFiles = {state.selectedFiles} onFileClick={onFileClick} renderForce = {showFilesRenderForce.current[ac]} />
                         })}
                         </div>
                 </div>
+                <div className = {classes.scrollBarHide} style = {{overflow: "scroll", scrollbarWidth: 'thin', minWidth: '13vw', maxWidth: '13vw'}}>
+                    <FileManagerSelectedFiles LoadDirectory = {loadDirectory} selectedFiles = {state.selectedFiles}/>
+                </div>  
                 <Snackbar open={errorSnackbarMessage ? true : false} autoHideDuration={2000} onClose={()=>{SetErrorSnackbarMessage("")}}>
                     <Alert onClose={()=>{SetErrorSnackbarMessage("")}} severity="error">
                         {errorSnackbarMessage}
@@ -480,7 +483,7 @@ export const FileManager: React.FunctionComponent<Props> = ({maxNumberOfSelected
             </DialogContent>
             <DialogActions style = {{justifyContent: "center",  overflowY: "visible", display: "flex", minHeight: '6vh', maxHeight: '6vh'}}>
                 <div style = {{alignContent: "center", textAlign: "center", overflowY: "visible", overflowX: "hidden", scrollbarWidth: "none"}}>
-                <Button disabled={selectedFiles.size < minNumberOfSelectedFiles} onClick = {() => {selectFiles([...selectedFiles.values()]); dialogClose()}}>Select <b>{selectedFiles.size}</b> files</Button>
+                <Button disabled={state.selectedFiles.size < minNumberOfSelectedFiles} onClick = {() => {selectFiles([...state.selectedFiles.values()]); dialogClose()}}>Select <b>{state.selectedFiles.size}</b> files</Button>
                 </div>
             </DialogActions>
             </Dialog>

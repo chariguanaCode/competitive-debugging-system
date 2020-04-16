@@ -80,11 +80,13 @@ const useStyles = makeStyles((theme) => ({
 interface Props {
     children: ReactElement | ReactElement[]
     variant: 'right' | 'left'
+    container?: any
 }
 
 export default function LeftSidebar({
     children,
     variant,
+    container
 }: Props): ReactElement {
     const classes = useStyles({ variant })
     const [open, setOpen] = useState(false)
@@ -98,6 +100,12 @@ export default function LeftSidebar({
                         ? classes.drawerOpen
                         : classes.drawerClose
                 }
+                /*PaperProps={{ style: { position: 'absolute' } }}
+                BackdropProps={{ style: { position: 'absolute' } }}
+                ModalProps={{
+                    container: document.getElementById('xdd'),
+                    style: { position: 'absolute' }
+                }}*/
             >
                 <div className={classes.wrapper} style={{}}>
                     {variant === 'right' && (

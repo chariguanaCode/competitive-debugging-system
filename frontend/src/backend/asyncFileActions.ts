@@ -1,4 +1,5 @@
 const fs = window.require('fs')
+const path = window.require('path')
 
 export const fileExist = (filePath: string) => {
     return new Promise((resolve, reject) => {
@@ -27,4 +28,25 @@ export const readFile = (filePath: string) => {
             resolve(data)
         })
     })
+}
+
+export const isDirectory = async (directory: string) => {
+    try {
+        let stat = fs.lstatSync(path);
+        return stat.isDirectory();
+    } catch (e) {
+        return false;
+    }
+}
+
+export const parsePath = (directory: string) => {
+    if (
+        directory[directory.length - 1] != '/' &&
+        directory[directory.length - 1] != '\\'
+    )
+        directory += '/'
+    if (!path.isAbsolute(directory))
+        directory = path.resolve(directory)
+    directory = directory.split('\\').join('/')
+    return directory
 }

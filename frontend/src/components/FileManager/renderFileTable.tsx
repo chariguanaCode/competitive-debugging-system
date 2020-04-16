@@ -31,7 +31,8 @@ interface ShowFilesTypes {
     SetFilesRefs: any,
     saveRefs?: boolean,
     onFileKeyDown: Function,
-    filesDisplaySize: number
+    filesDisplaySize: number,
+    acceptableFileTypes: Set<string> | undefined
 }
 const useStyles = makeStyles(theme => ({
     fileIcon: {
@@ -105,7 +106,7 @@ const ShowIcon: React.FunctionComponent<{fileType: string, classes: any}>  = ({f
     }
 }
 
-export const ShowFiles: React.FunctionComponent<ShowFilesTypes> = memo(({onFileKeyDown, saveRefs, SetFilesRefs, renderFilesLimit, files, displaySettings, selectedFiles, onFileClick, renderForce, showDeleteFileFromSelectedFilesButton, mouseOverPath, startIndex = 0, filesDisplaySize}) => {
+export const ShowFiles: React.FunctionComponent<ShowFilesTypes> = memo(({acceptableFileTypes, onFileKeyDown, saveRefs, SetFilesRefs, renderFilesLimit, files, displaySettings, selectedFiles, onFileClick, renderForce, showDeleteFileFromSelectedFilesButton, mouseOverPath, startIndex = 0, filesDisplaySize}) => {
     //let table: any;
     //let temp: any = null
     let iterator = -1;
@@ -148,6 +149,7 @@ export const ShowFiles: React.FunctionComponent<ShowFilesTypes> = memo(({onFileK
                         className = { isSelected ? classes.fileButtonSelected : classes.fileButton }
                         ref = {saveRefs ? (ref) => { SetFilesRefs(index+startIndex, ref); return true;} : null} 
                         onClick={(e) => { onFileClick(file, e, isSelected, startIndex/renderDividor) }}
+                        disabled = {acceptableFileTypes && file.type !== "DIRECTORY" && !acceptableFileTypes.has(file.type)}
                     >
                         <div className = { classes.fileView }>
                             <div style = {{display: "flex", alignContent: "center", justifyContent: "center"}}>

@@ -125,7 +125,7 @@ const OptionsInfo: React.FunctionComponent<OptionsInfoTypes> = ({optionName, sel
                             ),
                           }}
                     />    
-                    <Button style = {{padding: "3px"}}>Confirm</Button>
+                    <Button style = {{padding: "3px", marginTop: "2px"}}>Confirm</Button>
                     <div style={{paddingTop: "6px", paddingBottom: "5px", fontSize: "18px", opacity: 0.7}}>Optional</div>
                     <TextField 
                         label = "Project description"
@@ -138,7 +138,7 @@ const OptionsInfo: React.FunctionComponent<OptionsInfoTypes> = ({optionName, sel
                 </form>
             </>
         case "Open Project": 
-            return <><Button onClick = {() => {selectOption("openproject")}}>Open project</Button></>
+            return <><MenuList><MenuItem onClick = {() => {selectOption("openproject")}}>Open project</MenuItem></MenuList></>
         default:
             return <></>
     }
@@ -157,7 +157,8 @@ export const MainMenu: React.FunctionComponent<Props> = ({open, handleClose, isA
         isOpen: boolean,
         maxNumberOfFiles: Number,
         onSelectFiles: Function,
-        availableFilesTypes?: Array<string> | undefined
+        availableFilesTypes?: Array<string> | undefined,
+        acceptableFileTypes?: Array<string> | undefined
     }>(defaultFileManagerConfig);
 
     const createProject = (files?: Array<string>) => {
@@ -179,6 +180,8 @@ export const MainMenu: React.FunctionComponent<Props> = ({open, handleClose, isA
             maxNumberOfFiles: 1,
             onSelectFiles: createProject,
             isOpen: true,
+            acceptableFileTypes: ['.cpp'],
+            availableFilesTypes: ['DIRECTORY', '.cpp']
         })
     }
 
@@ -187,6 +190,8 @@ export const MainMenu: React.FunctionComponent<Props> = ({open, handleClose, isA
             maxNumberOfFiles: Infinity,
             onSelectFiles: createProject,
             isOpen: true,
+            acceptableFileTypes: ['.cpp'],
+            availableFilesTypes: ['DIRECTORY', '.cpp']
         })
     }
 
@@ -207,7 +212,8 @@ export const MainMenu: React.FunctionComponent<Props> = ({open, handleClose, isA
             maxNumberOfFiles: 1,
             onSelectFiles: SelectPathToOpenProject,
             isOpen: true,
-            availableFilesTypes: ["DIRECTORY", ".cdsp"]
+            availableFilesTypes: ["DIRECTORY", ".cdsp"],
+            acceptableFileTypes: [".cdsp"]
         })
     }
 
@@ -278,6 +284,7 @@ export const MainMenu: React.FunctionComponent<Props> = ({open, handleClose, isA
                 isFileManagerOpen = {fileManagerConfig.isOpen} 
                 dialogClose = {()=>{changeFileManagerConfig(defaultFileManagerConfig)}} 
                 availableFilesTypes = {fileManagerConfig.availableFilesTypes}
+                acceptableFileTypes = {fileManagerConfig.acceptableFileTypes}
             /> : null}
-        </>), [optionInfo, fileManagerConfig] )
+        </>), [optionInfo, fileManagerConfig, open, isAnyProjectOpen, theme, classes] )
 }

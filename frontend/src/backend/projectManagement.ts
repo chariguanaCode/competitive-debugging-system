@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { useContext, useCallback } from 'react'
 import GlobalStateContext, {
     Task,
@@ -9,8 +8,18 @@ import * as fileChangeTracking from './fileChangeTracking'
 import * as asyncFileActions from './asyncFileActions'
 import { Config as ConfigTypes} from '../utils/GlobalStateContext'
 import defaultConfig from '../data/defaultConfig.json'
-export const useSaveProject = () => {
 
+export const useSaveProject = () => {
+    const { config } = useContext(GlobalStateContext)
+
+    return useCallback(
+        async () => {
+            let path = asyncFileActions.parsePath(config.projectInfo.path)
+            if (!(await asyncFileActions.isDirectory(path))) {
+                return
+            }
+            return asyncFileActions.saveFile(path + config.projectInfo.saveName + '.cdsp', JSON.stringify(config));
+        }, [config])
 }
 
 export const useLoadProject = () => {
@@ -21,34 +30,30 @@ export const useLoadProject = () => {
     return useCallback(
         async (sourceFilePath: string) => {
             console.log('Loading config...', sourceFilePath)
-            if (!(await asyncFileActions.fileExist(sourceFilePath))) {
-                //webserver.sendError("The file you provided doesn't exist", '')
+            let path = asyncFileActions.parsePath(sourceFilePath)
+            if (!(await asyncFileActions.fileExist(path))) {
                 return
             }
 
-            if (!sourceFilePath.match(/.*\.cdsp/)) {
+            if (!path.match(/.*\.cdsp/)) {
                 console.log("this is not cdsp")
-                //webserver.sendError('Invalid source file', '')
                 return
             }
 
-            let newConfig: ConfigTypes;
+            let newConfig: ConfigTypes = defaultConfig;
 
             await asyncFileActions.readFile(
-                sourceFilePath
+                path
             ).then((data: any)=> {
                 newConfig = JSON.parse(data);
-                console.log('Read config!',      )
-                console.log('Loaded config!', setConfig(newConfig))
+                console.log('Read config!')
+                console.log('Loaded config!')
             })   
-            console.log("TEST", newConfig)  
-            /*await asyncFileActions.saveFile(
-                sourceFilePath,
-                JSON.stringify(newConfig)
-            )*/
-           
-            
-
+            let dividedPath = path.split('/');
+            newConfig.projectInfo.saveName = dividedPath[dividedPath.length - 2]
+            newConfig.projectInfo.path = dividedPath.slice(0,-2).join('/')+'/';
+            console.log(newConfig, dividedPath)
+            setConfig(newConfig)
             //rozdzielic do innej funkcji
             const newTasks: {
                 [key: string]: Task
@@ -63,8 +68,6 @@ export const useLoadProject = () => {
 
             taskStates.current = newTasks
             reloadTasks()
-
-            //state.detailedTestChanges = {}*/
         },
         [setConfig, taskStates, reloadTasks]
     )
