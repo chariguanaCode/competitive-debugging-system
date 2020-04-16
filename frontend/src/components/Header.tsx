@@ -1,11 +1,5 @@
 import React, { ReactElement, useState, useContext, useMemo } from 'react'
-import {
-    AppBar,
-    Toolbar,
-    IconButton,
-    Typography,
-    Breadcrumbs,
-} from '@material-ui/core'
+import { AppBar, Toolbar, IconButton, Typography } from '@material-ui/core'
 import { Apps, Settings, PlayArrow, Refresh } from '@material-ui/icons'
 import { styled, makeStyles } from '@material-ui/core/styles'
 import { MainMenu } from './MainMenu/index'
@@ -16,10 +10,6 @@ import { useRunTasks } from '../backend/main'
 import { useLoadProject } from '../backend/projectManagement'
 
 const MarginTypography = styled(Typography)(({ theme }) => ({
-    marginLeft: theme.spacing(2),
-}))
-
-const MarginBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
     marginLeft: theme.spacing(2),
 }))
 
@@ -48,7 +38,7 @@ export default function Header(): ReactElement {
     const [menuOpen, setMenuOpen] = useState(false)
     const { config } = useContext(GlobalStateContext)
     const runTasks = useRunTasks()
-    const loadProject = useLoadProject();
+    const loadProject = useLoadProject()
     //const reloadProject = useReloadProject()
 
     return useMemo(
@@ -57,7 +47,9 @@ export default function Header(): ReactElement {
                 <AppBar position="relative" className={classes.appBar}>
                     <Toolbar>
                         <IconButton
-                            onClick={() => setMenuOpen(previousState => !previousState)}
+                            onClick={() =>
+                                setMenuOpen((previousState) => !previousState)
+                            }
                             color="inherit"
                         >
                             <Apps color="inherit" />
@@ -65,17 +57,24 @@ export default function Header(): ReactElement {
                         <MarginTypography color="inherit"></MarginTypography>
                         <Logo className={classes.logo} width={50} height={50} />
                         <MarginTypography color="inherit">
-                           { config.projectInfo.name }
+                            {config.projectInfo.name}
                         </MarginTypography>
                         <MarginTypography color="inherit">
-                        {config.projectInfo.path && (config.projectInfo.path+config.projectInfo.saveName)}
+                            {config.projectInfo.path &&
+                                config.projectInfo.path +
+                                    config.projectInfo.saveName}
                         </MarginTypography>
                         <div style={{ flexGrow: 1 }} />
 
                         <IconButton color="inherit" onClick={runTasks}>
                             <PlayArrow color="inherit" />
                         </IconButton>
-                        <IconButton color="inherit" onClick = {() => {loadProject("D:/test.cdsp")}} /*onClick={/*reloadProject}*/>
+                        <IconButton
+                            color="inherit"
+                            onClick={() =>
+                                loadProject('./cpp/testConfig.cdsp')
+                            } /*onClick={/*reloadProject}*/
+                        >
                             <Refresh color="inherit" />
                         </IconButton>
                         <IconButton color="inherit">

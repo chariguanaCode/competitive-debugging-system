@@ -17,7 +17,7 @@ export default () => {
     const testError = useTestError()
 
     return useCallback(async () => {
-        const filename = "xd"//config.files[0]
+        const filename = config.projectInfo.files[0]
         const tests = config.tests
         try {
             updateExecutionState(ExecutionState.Compiling, '')

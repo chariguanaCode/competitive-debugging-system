@@ -1,7 +1,7 @@
 {
     "projectInfo": {
         "files": [
-            "test.cpp"
+            "./cpp/test.cpp"
         ],
         "saveName": "My_new_project",
         "path": "/",
@@ -26,7 +26,11 @@
         }
     },
     "tests": {
-        "test1": "./tests/test1.in",
-        "test2": "./tests/test2.in"
+        "test1": {
+            "filePath": "./cpp/tests/test1.in"
+        },
+        "test2": {
+            "filePath": "./cpp/tests/test2.in"
+        }
     }
 }

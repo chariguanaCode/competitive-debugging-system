@@ -209,7 +209,7 @@ export const MainMenu: React.FunctionComponent<Props> = ({open, handleClose, isA
 
     const OpenProject = () => {
         changeFileManagerConfig({
-            maxNumberOfFiles: 1,
+            maxNumberOfFiles: Infinity,
             onSelectFiles: SelectPathToOpenProject,
             isOpen: true,
             availableFilesTypes: ["DIRECTORY", ".cdsp"],
