@@ -11,8 +11,9 @@ import {
 import GlobalStateContext, { Task } from '../utils/GlobalStateContext'
 
 interface SingleTestProps {
-    testId: string
+    taskId: string
     taskState: Task
+    onClick: () => void
 }
 
 const colors = [
@@ -26,33 +27,44 @@ const colors = [
 ]
 
 const SingleTest = React.memo(
-    ({ testId, taskState }: SingleTestProps): ReactElement => {
+    ({ taskId, taskState, onClick }: SingleTestProps): ReactElement => {
         return (
             <TableRow>
                 <TableCell
                     style={{
                         backgroundColor: colors[taskState.state as number],
+                        paddingTop: 2,
+                        paddingBottom: 2,
                     }}
-                ></TableCell>
+                    onClick={onClick}
+                >
+                    {taskId}
+                </TableCell>
             </TableRow>
         )
     }
 )
 
 export default function TestProgress(): ReactElement {
-    const { taskStates, shouldTasksReload } = useContext(GlobalStateContext)
-    console.log(shouldTasksReload, taskStates.current)
+    const { taskStates, shouldTasksReload, setCurrentTaskId } = useContext(
+        GlobalStateContext
+    )
 
     return useMemo(
         () => (
             <Table>
                 <TableBody>
                     {Object.entries(taskStates.current).map(([id, val]) => (
-                        <SingleTest key={id} testId={id} taskState={val} />
+                        <SingleTest
+                            key={id}
+                            taskId={id}
+                            taskState={val}
+                            onClick={() => setCurrentTaskId(id)}
+                        />
                     ))}
                 </TableBody>
             </Table>
         ),
-        [taskStates, shouldTasksReload]
+        [taskStates, shouldTasksReload, setCurrentTaskId]
     )
 }

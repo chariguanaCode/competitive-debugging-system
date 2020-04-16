@@ -1,5 +1,9 @@
-import React, { useState, useRef, MutableRefObject } from 'react'
+import React, { useState, MutableRefObject } from 'react'
+import { useGrowingFileTrack } from '../backend/outputFileTracking'
+import { watchParse, clearWatchblocks } from '../backend/watchParse'
+import useMutableStateWithLimitedUpdateFrequency from './useMutableStateWithLimitedUpdateFrequency'
 import defaultConfig from '../data/defaultConfig.json'
+
 interface Props {
     children: any | Array<any>
 }
@@ -66,6 +70,15 @@ export interface Task {
     }
 }
 
+export type Watchblocks = any
+
+export interface TaskDetails {
+    id: string
+    stdout: MutableRefObject<string>
+    stdoutFileSize: number
+    watchblocks: MutableRefObject<Watchblocks>
+}
+
 export interface GlobalStateType {
     executionState: ExecutionState
     config: Config
@@ -75,11 +88,15 @@ export interface GlobalStateType {
         [key: string]: Task
     }>
     shouldTasksReload: number
+    currentTask: TaskDetails
+    shouldStdoutReload: number
+    shouldWatchblocksReload: number
     setExecutionState: (newState: ExecutionState) => void
     setConfig: (newConfig: Config) => void
     setFileTracking: (newTracking: any) => void
     setProjectFile: (newSource: string) => void
     reloadTasks: () => void
+    setCurrentTaskId: (newTaskId: string) => void
 }
 
 const GlobalStateContext = React.createContext({} as GlobalStateType)
@@ -95,16 +112,79 @@ export const GlobalStateProvider = ({ children }: Props) => {
     const [projectFile, setProjectFile] = useState<string>(
         '/home/charodziej/Documents/competitive-debugging-system/cpp/test.cpp'
     )
-    const taskStates = useRef<{ [key: string]: Task }>(
-        {} as { [key: string]: Task }
-    )
     const [executionState, setExecutionState] = useState<ExecutionState>(
         ExecutionState.NoProject
     )
-    const [shouldTasksReload, updateTaskCount] = useState(0)
-    const reloadTasks = () => {
-        updateTaskCount((val) => (val + 1) % 1000000000)
+
+    const [
+        taskStates,
+        shouldTasksReload,
+        reloadTasks,
+    ] = useMutableStateWithLimitedUpdateFrequency(
+        {} as { [key: string]: Task },
+        500
+    )
+    const [currentTaskId, setCurrentTaskId] = useState('')
+
+    const [
+        stdout,
+        shouldStdoutReload,
+        updateStdoutCount,
+    ] = useMutableStateWithLimitedUpdateFrequency('', 500)
+    const [stdoutFileSize, setStdoutFileSize] = useState(1)
+
+    const [
+        watchblocks,
+        shouldWatchblocksReload,
+        updateWatchblockCount,
+    ] = useMutableStateWithLimitedUpdateFrequency('', 500)
+
+    const appendStdout = (newData: Uint8Array) => {
+        stdout.current += new TextDecoder('utf-8').decode(newData)
+        updateStdoutCount()
     }
+
+    const setWatchblocks = (newWatchblocks: Uint8Array) => {
+        watchParse(newWatchblocks)
+        updateWatchblockCount()
+    }
+
+    useGrowingFileTrack(
+        currentTaskId !== '' &&
+            [TaskState.Running, TaskState.Successful].includes(
+                taskStates.current[currentTaskId].state
+            )
+            ? config.tests[currentTaskId].filePath + '.out'
+            : '',
+        false,
+        currentTaskId !== '' &&
+            taskStates.current[currentTaskId].state === TaskState.Successful,
+        appendStdout,
+        setStdoutFileSize,
+        () => {
+            stdout.current = ''
+            updateStdoutCount()
+            setStdoutFileSize(1)
+        }
+    )
+
+    useGrowingFileTrack(
+        currentTaskId !== '' &&
+            [TaskState.Running, TaskState.Successful].includes(
+                taskStates.current[currentTaskId].state
+            )
+            ? config.tests[currentTaskId].filePath + '.err'
+            : '',
+        true,
+        currentTaskId !== '' &&
+            taskStates.current[currentTaskId].state === TaskState.Successful,
+        setWatchblocks,
+        (x: number) => {},
+        () => {
+            clearWatchblocks(watchblocks)
+            updateWatchblockCount()
+        }
+    )
 
     return (
         <GlobalStateContext.Provider
@@ -115,11 +195,20 @@ export const GlobalStateProvider = ({ children }: Props) => {
                 projectFile,
                 taskStates,
                 shouldTasksReload,
+                currentTask: {
+                    id: currentTaskId,
+                    stdout,
+                    stdoutFileSize,
+                    watchblocks,
+                },
+                shouldStdoutReload,
+                shouldWatchblocksReload,
                 setExecutionState,
                 setConfig,
                 setFileTracking,
                 setProjectFile,
                 reloadTasks,
+                setCurrentTaskId,
             }}
         >
             {children}

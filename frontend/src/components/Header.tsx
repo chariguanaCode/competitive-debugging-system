@@ -48,9 +48,8 @@ export default function Header(): ReactElement {
     const [menuOpen, setMenuOpen] = useState(false)
     const { config } = useContext(GlobalStateContext)
     const runTasks = useRunTasks()
-    const LoadProject = useLoadProject();
+    const loadProject = useLoadProject();
     //const reloadProject = useReloadProject()
-    console.log(menuOpen, "lool")
 
     return useMemo(
         () => (
@@ -76,7 +75,7 @@ export default function Header(): ReactElement {
                         <IconButton color="inherit" onClick={runTasks}>
                             <PlayArrow color="inherit" />
                         </IconButton>
-                        <IconButton color="inherit" onClick = {() => {LoadProject("D:/test.cdsp")}} /*onClick={/*reloadProject}*/>
+                        <IconButton color="inherit" onClick = {() => {loadProject("D:/test.cdsp")}} /*onClick={/*reloadProject}*/>
                             <Refresh color="inherit" />
                         </IconButton>
                         <IconButton color="inherit">
