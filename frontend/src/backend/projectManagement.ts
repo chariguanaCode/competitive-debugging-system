@@ -30,7 +30,9 @@ export const useLoadProject = () => {
     return useCallback(
         async (sourceFilePath: string) => {
             console.log('Loading config...', sourceFilePath)
-            let path = asyncFileActions.parsePath(sourceFilePath)
+            let path = asyncFileActions.parsePath(sourceFilePath);
+            path = path.slice(0, path.length - 1)
+            console.log(path)
             if (!(await asyncFileActions.fileExist(path))) {
                 return
             }
@@ -50,8 +52,8 @@ export const useLoadProject = () => {
                 console.log('Loaded config!')
             })   
             let dividedPath = path.split('/');
-            newConfig.projectInfo.saveName = dividedPath[dividedPath.length - 2]
-            newConfig.projectInfo.path = dividedPath.slice(0,-2).join('/')+'/';
+            newConfig.projectInfo.saveName = dividedPath[dividedPath.length - 1]
+            newConfig.projectInfo.path = dividedPath.slice(0,-1).join('/')+'/';
             console.log(newConfig, dividedPath)
             setConfig(newConfig)
             //rozdzielic do innej funkcji

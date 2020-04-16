@@ -127,7 +127,8 @@ export const ShowFiles: React.FunctionComponent<ShowFilesTypes> = memo(({accepta
     return <div style = {{ display: "inline" }} id = {`renderFiles${startIndex.toString()}`}>
         { files.map((file, index) => {
             let isSelected = selectedFiles.has(file.path);
-            ++iterator;
+            let isAcceptable = acceptableFileTypes ? acceptableFileTypes.has(file.type) : true
+            ++iterator;     
             return <div
                     key = {`renderFiles${startIndex.toString()}File${index}`}
                     style = {{display: "inline", position: "relative", padding: "2px"}}
@@ -146,10 +147,10 @@ export const ShowFiles: React.FunctionComponent<ShowFilesTypes> = memo(({accepta
                         </Fade> : null
                     }
                     <button 
-                        className = { isSelected ? classes.fileButtonSelected : classes.fileButton }
+                        className = { (isSelected ? (classes.fileButtonSelected + " fileButton-selected") : classes.fileButton) + " " + (isAcceptable ? "fileButton-acceptable" : "") }
                         ref = {saveRefs ? (ref) => { SetFilesRefs(index+startIndex, ref); return true;} : null} 
                         onClick={(e) => { onFileClick(file, e, isSelected, startIndex/renderDividor) }}
-                        disabled = {acceptableFileTypes && file.type !== "DIRECTORY" && !acceptableFileTypes.has(file.type)}
+                        disabled = {acceptableFileTypes && file.type !== "DIRECTORY" && !isAcceptable}
                     >
                         <div className = { classes.fileView }>
                             <div style = {{display: "flex", alignContent: "center", justifyContent: "center"}}>
