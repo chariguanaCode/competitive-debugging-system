@@ -17,9 +17,9 @@ import { FileManagerSettings }    from "./fileManagerSettings";
 import { FileManagerFoldersTree } from './fileManagerFoldersTree'
 import { FileManagerMainToolbar } from './fileManagerMainToolbar'
 import { FileManagerSelectedFiles } from './fileManagerSelectedFiles'
+import { FileManagerSelection } from './fileManagerSelection'
 
-import { loadFilesOnDirectory } from '../../backend/filesHandlingFunctions'
-import { Rectangle } from './Rectangle'
+import { loadFilesOnDirectory, GetPartitionsNames } from '../../backend/filesHandlingFunctions'
 
 import { isNumeric, checkIfActiveElementIsInput, GetRectangleRightTopAndLeftBottomCorners, DoRectanglesOverclap } from'../../utils/tools'
 import { AssignmentReturnRounded } from "@material-ui/icons";
@@ -32,8 +32,9 @@ export interface FileType {
 
 interface State {
     files: Array<FileType>,
-    selectedFiles: Map<string,FileType>,
+    selectedFiles: Set<string>,
     currentPath: string,
+    currentRootPath: string,
     managerError: any,
     //showFilesRenderForce: Array<0>,
     filesTypes: Array<string>,
@@ -122,8 +123,9 @@ export const FileManager: React.FunctionComponent<Props> = ({
     const [state, setState] = useState<State>({
         files: [], 
         currentPath: "", 
+        currentRootPath: '/',
         managerError: null, 
-        selectedFiles: new Map(),
+        selectedFiles: new Set(),
         filesTypes: availableFilesTypes ? availableFilesTypes : [],
         acceptableFileTypes: acceptableFileTypes ? new Set(acceptableFileTypes) : undefined,
         mouseOverPath: "",
@@ -132,19 +134,19 @@ export const FileManager: React.FunctionComponent<Props> = ({
         sortMethodNumber: 0,
         areSettingsOpen: false,
     })
-    const [mouseSelectionStart, setMouseSelectionStart] = useState<{
-        x1: number,
-        y1: number,
-        x2: number,
-        y2: number,
-        isRightMB: boolean
-    } | undefined>(undefined)
     const [errorSnackbarMessage, SetErrorSnackbarMessage] = useState("");
     const [advancedSettings, setAdvancedSettings] = useState({
         renderFilesLimit: 50
     })
     const [loadingCircular, showLoadingCircular] = useState<boolean>(false);
     const [stateToRerenderSelf, RerenderSelf] = useState<boolean>(false);
+    const [mouseSelectionStart, SetMouseSelectionStart ] = useState<
+    {
+        x: number,
+        y: number,
+        isRightMB: boolean
+    } | undefined
+    >(undefined)
     //const [fieldMode, updateFieldMode] = useState<boolean>(false)
     let previousHiddenSearch = useRef<any>(null)
     let lastSearchOnHiddenSearch = useRef<number>(0)
@@ -158,15 +160,6 @@ export const FileManager: React.FunctionComponent<Props> = ({
     /********************************
     *           USEEFFECT           *    
     ********************************/
-
-    useEffect(() => {
-        let currentTime = window.process.hrtime()
-        let currentMicroSeconds = currentTime[0]*1000+Math.ceil(currentTime[1]/1000000)
-        if(mouseSelectionStart && (currentMicroSeconds - lastCheckSelectionTime.current > 1000)) {
-            CheckSelection();
-            lastCheckSelectionTime.current = currentMicroSeconds
-        }
-    }, [mouseSelectionStart])
 
     useEffect(() => {
         RenderForceFoo(-1);
@@ -225,7 +218,7 @@ export const FileManager: React.FunctionComponent<Props> = ({
         else if ("button" in e)  // IE, Opera 
             isRightMB = e.button == 2; 
         if(!state.acceptableFileTypes || (state.acceptableFileTypes && state.acceptableFileTypes.has(file.type))) {
-            let selectedFiles = new Map(state.selectedFiles)
+            let selectedFiles = new Set(state.selectedFiles)
             if((fileIsAlreadyClicked && isRightMB) || (fileIsAlreadyClicked && file.type !== "DIRECTORY")){
                 selectedFiles.delete(file.path);
             }
@@ -238,7 +231,7 @@ export const FileManager: React.FunctionComponent<Props> = ({
             }
             else if(!isRightMB && !fileIsAlreadyClicked){
                 if(state.selectedFiles.size < maxNumberOfSelectedFiles) {
-                    selectedFiles.set(file.path, file);
+                    selectedFiles.add(file.path);
                         RenderForceFoo(id)
                     setState(prevState => (
                         { ...prevState, selectedFiles: selectedFiles }
@@ -287,40 +280,6 @@ export const FileManager: React.FunctionComponent<Props> = ({
     *    ON KEY DOWN & SELECTION    *    
     ********************************/
 
-
-    const CheckSelection = () => {
-        if(mouseSelectionStart)
-            for(let i = 0; i < filesRefs.current.length; ++i) {
-                if(!filesRefs.current[i]) continue;
-                let isSelected = false;
-                if(filesRefs.current[i].classList.contains('fileButton-selected')) 
-                    isSelected = true;
-                if(!filesRefs.current[i].classList.contains('fileButton-acceptable') ||
-                    (isSelected && !mouseSelectionStart.isRightMB) ||
-                    (!isSelected && mouseSelectionStart.isRightMB)) continue;
-                let cords = filesRefs.current[i].getBoundingClientRect(); 
-                let corners = GetRectangleRightTopAndLeftBottomCorners(cords.x, cords.y, cords.x + cords.width, cords.y + cords.height)
-                let selectionCorners = GetRectangleRightTopAndLeftBottomCorners(mouseSelectionStart.x1, mouseSelectionStart.y1, mouseSelectionStart.x2, mouseSelectionStart.y2)
-                if(DoRectanglesOverclap(
-                    {x1: corners[0].x, y1: corners[0].y, x2: corners[1].x, y2: corners[1].y}, 
-                    {x1: selectionCorners[0].x, y1: selectionCorners[0].y, x2: selectionCorners[1].x, y2: selectionCorners[1].y}
-                ))
-                    console.log(filesRefs.current[i])
-                    filesRefs.current[i].click();
-            }
-    }
-
-    const onMouseMoveOnDialogContent = (e: any) => {
-        e.persist();
-        if(mouseSelectionStart) {
-            setMouseSelectionStart((pv: any) => ({
-                ...pv,
-                x2: e.pageX,
-                y2: e.pageY
-            }));
-        }
-    }
-
     const onMouseDownOnDialog = (e: any) => {
         if(e.target.tagName !== "DIV" || (
             e.target.id !== "FileManager-DialogContent" &&
@@ -332,19 +291,11 @@ export const FileManager: React.FunctionComponent<Props> = ({
             isRightMB = e.which == 3; 
         else if ("button" in e)  // IE, Opera 
             isRightMB = e.button == 2; 
-        setMouseSelectionStart({
-            x1: e.pageX,
-            y1: e.pageY,
-            x2: e.pageX,
-            y2: e.pageY,
+        SetMouseSelectionStart({
+            x: e.pageX,
+            y: e.pageY,
             isRightMB: isRightMB,
         })
-    }
-
-    const onMouseUpOnDialogContent = (e: any) => {
-        if(!mouseSelectionStart) return;
-        e.persist();
-        setMouseSelectionStart(undefined)
     }
 
     const onKeyDownOnFile = (e: any, path: string) => {
@@ -443,19 +394,23 @@ export const FileManager: React.FunctionComponent<Props> = ({
     let renderLimesArray = Array.from({length: Math.ceil(state.files.length/renderFilesLimit)}, (v, k) => k * renderFilesLimit);
     /*for(let i = 0; i < files.length; i += renderFilesLimit)
         renderLimesArray.push(i);*/
-    console.log(1)
+
     return (
         <>
-        { mouseSelectionStart ? 
-            <Rectangle 
-                x0 = {mouseSelectionStart.x1} 
-                x1 = {mouseSelectionStart.x2} 
-                y0 = {mouseSelectionStart.y1} 
-                y1 = {mouseSelectionStart.y2}
-            /> : null}
+        { mouseSelectionStart ? <FileManagerSelection 
+            selectedFilesState = {state.selectedFiles}
+            startPosition = {mouseSelectionStart} 
+            filesRefs = {filesRefs}
+            SetSelectedFiles = {(selectedFiles: Set<string>) => {setState(pvState => ({
+                ...pvState,
+                selectedFiles: selectedFiles
+            }))}}
+            RenderForceFoo = {RenderForceFoo}
+            EndSelection = {() => {SetMouseSelectionStart(undefined)}}
+        /> : null }
         <FileManagerSettings open = { state.areSettingsOpen } dialogClose = { () => {setState(prevState => ({...prevState, areSettingsOpen: false}))} } />
-        <Dialog onMouseUp = {(e) => {onMouseUpOnDialogContent(e)}} onMouseMove = {(e) => {onMouseMoveOnDialogContent(e)}} onMouseDown = {(e) => {onMouseDownOnDialog(e)}} onKeyDown = {(e)=>{onKeyDownOnDialog(e)}} scroll = "body" classes = {{ paper: classes.dialogPaper}} fullWidth={true} maxWidth="lg" className={classes.filesManager} open={isFileManagerOpen} >
-                <div style = {{zIndex: 9999, position: "absolute", left: "calc(50% - 20px)", top: "calc(50% - 20px)"}}>
+        <Dialog onMouseDown = {(e) => {onMouseDownOnDialog(e)}} onKeyDown = {(e)=>{onKeyDownOnDialog(e)}} scroll = "body" classes = {{ paper: classes.dialogPaper}} fullWidth={true} maxWidth="lg" className={classes.filesManager} open={isFileManagerOpen} >
+                <div style = {{zIndex: 10001, position: "absolute", left: "calc(50% - 20px)", top: "calc(50% - 20px)"}}>
                             <Fade in={loadingCircular} style={{ transitionDelay: '100ms',}} unmountOnExit>
                                 <CircularProgress size={40}/>
                             </Fade>
@@ -477,15 +432,15 @@ export const FileManager: React.FunctionComponent<Props> = ({
                         ChangeFilesDisplaySize = { ChangeFilesDisplaySize }
                     />
                     </div>
-                    <FileManagerMainToolbar socket = {null} currentPath = {state.currentPath} loadDirectory = {loadDirectory} />
+                    <FileManagerMainToolbar SetRootDirectory = {(newRootPath: string) => {setState(pvState => ({...pvState, currentRootPath: newRootPath}))}} currentPath = {state.currentPath} loadDirectory = {loadDirectory} />
                 </div>
             </DialogTitle>       
             <DialogContent id = "FileManager-DialogContent" classes = {{root: classes.dialogRoot}} style={{ overflowX: "hidden", paddingLeft: 5, paddingRight: 5, display: "flex", minHeight: '69vh', maxHeight: '69vh', }}>
 
                 <div className = {classes.scrollBarHide} style = {{overflow: "scroll", scrollbarWidth: 'thin', minWidth: '13vw', maxWidth: '13vw'}}>
-                    <FileManagerFoldersTree showLoadingCircular = {()=>{showLoadingCircular(true)}} currentPath = {state.currentPath} joinDirectory = {loadDirectory}/>
+                    <FileManagerFoldersTree showLoadingCircular = {()=>{showLoadingCircular(true)}} currentPath = {state.currentPath} joinDirectory = {loadDirectory} currentRootDirectory = {state.currentRootPath}/>
                 </div>  
-                <div className = {classes.scrollBarHide} style = {{borderLeft: "solid 1px #a0a9ad4d", overflow: "scroll", minWidth: '40vw', maxWidth: '62vw', scrollbarWidth: 'thin'}}>
+                <div className = {classes.scrollBarHide} style = {{borderLeft: "solid 1px #a0a9ad4d", borderRight: "solid 1px #a0a9ad4d", overflow: "scroll", minWidth: '49vw', maxWidth: '62vw', scrollbarWidth: 'thin'}}>
                     {state.managerError ?
                         <div style={{ textAlign: "center" }}>
                             <span style={{ color: "red", fontSize: "25px" }}><b>Error</b></span> <br />
@@ -509,7 +464,7 @@ export const FileManager: React.FunctionComponent<Props> = ({
                     </Alert>
                 </Snackbar>
             </DialogContent>
-            <DialogActions style = {{justifyContent: "center",  overflowY: "visible", display: "flex", minHeight: '6vh', maxHeight: '6vh'}}>
+            <DialogActions style = {{justifyContent: "center",  overflowY: "visible", display: "flex", minHeight: '3vh', maxHeight: '3vh'}}>
                 <div style = {{alignContent: "center", textAlign: "center", overflowY: "visible", overflowX: "hidden", scrollbarWidth: "none"}}>
                 <Button disabled={state.selectedFiles.size < minNumberOfSelectedFiles} onClick = {() => {selectFiles([...state.selectedFiles.values()]); dialogClose()}}>Select <b>{state.selectedFiles.size}</b> files</Button>
                 </div>

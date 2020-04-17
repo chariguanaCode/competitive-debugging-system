@@ -20,7 +20,7 @@ interface FileType {
 
 interface ShowFilesTypes {
     files: Array<FileType>,
-    selectedFiles: Map<string, FileType>,
+    selectedFiles: Set<string>,
     onFileClick: Function,
     mouseOverPath: string,
     renderForce: number,
@@ -36,26 +36,21 @@ interface ShowFilesTypes {
 }
 const useStyles = makeStyles(theme => ({
     fileIcon: {
-        //@ts-ignore
-        width: props => props.fileIconWidth, 
-        //@ts-ignore
-        height: props => props.fileIconWidth, 
+        width: (props: any) => props.fileIconWidth, 
+        height: (props: any) => props.fileIconWidth, 
     },
     fileButtonSelected: {
         backgroundColor: theme.palette.fileManager.selectionColor + "!important",
         color: theme.palette.fileManager.fontColor,
         fontWeight: 100,
-        fontSize: (props: any) => props.fileTextSize, //13px
-        //@ts-ignore
-        maxWidth: props => props.fileButtonWidth,//"120px",,
+        fontSize: "13px",//(props: any) => props.fileTextSize, //13px
+        maxWidth: (props: any) => props.fileButtonWidth,//"120px",,
         margin: "2px",
     },
     fileView: {
         display: "flex", 
-        //@ts-ignore
-        flexDirection: props => props.fileView.flexDirection, //"column",
-        //@ts-ignore
-        justifyContent: props => props.fileView.alignContent, //"center",
+        flexDirection: (props: any) => props.fileView.flexDirection, //"column",
+        justifyContent: (props: any) => props.fileView.alignContent, //"center",
         alignContent: "center",
         alignItems: "center"
     },
@@ -65,10 +60,8 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 100,
         margin: "2px",
         //fontWeight: "bold",
-        //@ts-ignore
-        fontSize: props => props.fileTextSize, //13px
-        //@ts-ignore
-        maxWidth: props => props.fileButtonWidth//"120px",
+        fontSize: "13px", //(props: any) => props.fileTextSize, //13px
+        maxWidth: (props: any) => props.fileButtonWidth//"120px",
     },
     iconButtonButton: {
             width: "14px !important", 
@@ -136,7 +129,7 @@ export const ShowFiles: React.FunctionComponent<ShowFilesTypes> = memo(({accepta
                     onMouseEnter = { (file.type === "DIRECTORY" && isSelected) ? () => { showDeleteFileFromSelectedFilesButton(file.path, "", startIndex/renderDividor); } : () => {}}  
                     onMouseLeave = { (file.type === "DIRECTORY" && isSelected) ? () => { showDeleteFileFromSelectedFilesButton("", file.path, startIndex/renderDividor); } : () => {}} 
                 >
-                    { (file.type === "DIRECTORY" && file.path === mouseOverPath) ? 
+                    {/* (file.type === "DIRECTORY" && file.path === mouseOverPath) ? 
                         <Fade in={true}>
                             <IconButton
                                 className = {classes.iconButtonButton}
@@ -145,12 +138,14 @@ export const ShowFiles: React.FunctionComponent<ShowFilesTypes> = memo(({accepta
                                 <ClearIcon className ={classes.iconButtonIcon}/>
                             </IconButton>
                         </Fade> : null
-                    }
+        */}
                     <button 
                         className = { (isSelected ? (classes.fileButtonSelected + " fileButton-selected") : classes.fileButton) + " " + (isAcceptable ? "fileButton-acceptable" : "") }
                         ref = {saveRefs ? (ref) => { SetFilesRefs(index+startIndex, ref); return true;} : null} 
                         onClick={(e) => { onFileClick(file, e, isSelected, startIndex/renderDividor) }}
                         disabled = {acceptableFileTypes && file.type !== "DIRECTORY" && !isAcceptable}
+                        data-path = { file.path }
+                        data-renderblockid = { startIndex/renderDividor }
                     >
                         <div className = { classes.fileView }>
                             <div style = {{display: "flex", alignContent: "center", justifyContent: "center"}}>

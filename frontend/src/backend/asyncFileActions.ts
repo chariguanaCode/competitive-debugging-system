@@ -1,6 +1,6 @@
-const fs = window.require('fs')
-const path = window.require('path')
-
+const fs = window.require('fs');
+const path = window.require('path');
+const util = window.require('util');
 export const fileExist = (filePath: string) => {
     return new Promise((resolve, reject) => {
         fs.access(filePath, fs.constants.F_OK, (err: any) => {
@@ -32,7 +32,7 @@ export const readFile = (filePath: string) => {
 
 export const isDirectory = async (directory: string) => {
     try {
-        let stat = fs.lstatSync(path);
+        let stat = await util.promisify(fs.lstat(directory));
         return stat.isDirectory();
     } catch (e) {
         return false;

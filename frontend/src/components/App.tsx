@@ -65,6 +65,7 @@ const lightTheme = createMuiTheme({
             fontColor: "black",
             backgroundColor: "white",
             selectionColor: cyan[300] + '44',
+            checkboxColor: amber[500]
         }
     },
 })
@@ -105,6 +106,7 @@ const darkTheme = createMuiTheme({
             fontColor: "white",
             backgroundColor: grey[800],
             selectionColor: cyan[300] + '44',
+            checkboxColor: amber[500]
         }
     },
 })

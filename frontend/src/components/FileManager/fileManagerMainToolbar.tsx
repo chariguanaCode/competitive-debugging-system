@@ -17,6 +17,8 @@ import SettingsIcon     from '@material-ui/icons/Settings';
 import CloseIcon        from '@material-ui/icons/Close';
 import { Sort, Check, CheckBox }         from "@material-ui/icons";
 import SearchIcon       from '@material-ui/icons/Search';
+import { useFocus } from '../../utils/tools'
+import { GetPartitionsNames } from '../../backend/filesHandlingFunctions'
 
 //import { useRef } from "@storybook/addons";
 
@@ -30,10 +32,10 @@ interface State {
 interface MainToolbarTypes {
     loadDirectory: Function,
     currentPath: string,
-    socket: any,
+    SetRootDirectory: Function
 }
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
     navigation: {
         display: "flex",
         alignContent: "center",
@@ -41,31 +43,27 @@ const useStyles = makeStyles({
         fontWeight: 500,
         justifyContent: "center",
     },
-});
-
-const useFocus = () => {
-    const htmlElRef = useRef(null)
-    //@ts-ignore
-	const setFocus = () => {htmlElRef.current &&  htmlElRef.current.focus()}
-	return [ htmlElRef,  setFocus ] 
-}
-
-const isNumeric = (number: any) => {
-    return +number === +number
-}
+    checkboxRoot: {
+        color: theme.palette.fileManager.checkboxColor,
+        '&$checked': {
+            color: theme.palette.fileManager.checkboxColor,
+        },
+    },
+    checkboxChecked: {},
+}));
 
 const arePropsEqual = (prevProps: any, nextProps: any) => {
     return prevProps.currentPath === nextProps.currentPath;
 }
 
-export const FileManagerMainToolbar: React.FunctionComponent<MainToolbarTypes> = memo(({loadDirectory, currentPath}) => {
+export const FileManagerMainToolbar: React.FunctionComponent<MainToolbarTypes> = memo(({loadDirectory, currentPath, SetRootDirectory}) => {
     
     const [state, setState] = useState<State>({
         newPath: null,
         historyList: [],
         fieldMode: false,
     })
-
+    const [partitionsNamesState, SetPartitionsNames] = useState<Array<string>>([]);
     const [searchFieldAutoSearch, changeSearchFieldAutoSearch] = useState<boolean>(true)
     const [searchFieldText, updateSearchFieldText] = useState<string>("")
     //const [fieldMode, updateFieldMode] = useState<boolean>(false)
@@ -73,14 +71,29 @@ export const FileManagerMainToolbar: React.FunctionComponent<MainToolbarTypes> =
     let historyListIndex = useRef<number>(-1)
     let historyList = Array.from(state.historyList);
     
+    useEffect(() => { 
+        SavePartitionsNames(); 
+    }, [])
+
     useEffect(() => {
-                    if(historyList[historyListIndex.current+1]===currentPath) ++historyListIndex.current;
-                    else if(historyList[historyListIndex.current]!==currentPath){
-                        historyList.splice(historyListIndex.current+1,0,currentPath);
-                        ++historyListIndex.current;
-                    }
-                    setState(prevState => ({...prevState, historyList: historyList}))
+        if(!currentPath) return;
+        if(historyList[historyListIndex.current+1]===currentPath) ++historyListIndex.current;
+        else if(historyList[historyListIndex.current]!==currentPath){
+            historyList.splice(historyListIndex.current+1,0,currentPath);
+            ++historyListIndex.current;
+        }
+        setState(prevState => ({...prevState, historyList: historyList}))
     }, [currentPath]);
+
+    const SavePartitionsNames = async() => {
+        let partitionsNamesToSet: Array<string> = [];
+        //console.log((await GetPartitionsNames()).split('\n').slice(1)); ///usuń średnik i pokaż Adamowi
+        (await GetPartitionsNames()).split('\n').slice(1).forEach((item: string) => {
+            const parsedItem = item.split(" ").join("").split('\t').join("").split('\r').join(''); 
+            parsedItem && partitionsNamesToSet.push(parsedItem)
+        })
+        SetPartitionsNames(partitionsNamesToSet)
+    }
 
     const UpdateFieldMode = (val: boolean) => {
         //updateFieldMode(val);
@@ -142,6 +155,14 @@ const classes = useStyles()
     return (
         <>
                     <div className={classes.navigation}>
+                    <div style = {{position: "absolute", left: "10px"}}>
+                        { partitionsNamesState.map(name => (
+                            <Button style = {{maxWidth: "min-content"}} onClick = {()=>{ 
+                                loadDirectory(name);
+                                SetRootDirectory(name);
+                            }}>{name}</Button>
+                        ))}
+                    </div>
                     <IconButton onClick={()=>{loadDirectory('/')}} style={{ width: "48px" }}><HomeIcon /></IconButton>
                     <IconButton onClick={Undo} disabled={historyListIndex.current > 0 ? false : true} style={{ width: "48px" }}><ArrowBackIcon /></IconButton>    
                     {state.fieldMode ? 
@@ -186,7 +207,7 @@ const classes = useStyles()
                                 onFocus    = { e => { e.target.select() } }         
                     />
                     <FormControlLabel style = {{paddingLeft: "10px",}} control = {                    
-                            <Checkbox checked = {searchFieldAutoSearch} onChange = {(e)=>{e.persist(); changeSearchFieldAutoSearch(e.target.checked)}} />
+                            <Checkbox color="default" classes = {{root: classes.checkboxRoot, checked: classes.checkboxChecked}} checked = {searchFieldAutoSearch} onChange = {(e)=>{e.persist(); changeSearchFieldAutoSearch(e.target.checked)}} />
                             } label = {<span style = {{fontSize: "15px"}}>autosearch</span>} />
 
                     </FormControl>

@@ -2,6 +2,9 @@ import * as asyncFileActions from './asyncFileActions'
 const fs = window.require('fs')
 //const dirTree = require("directory-tree");
 const path = window.require('path')
+const exec = window.require('child_process').exec;
+const util = window.require('util');
+
 //const  os 	= require('os-utils');
 
 const parsePath = (directory) => {
@@ -19,6 +22,19 @@ const parsePath = (directory) => {
     }
     directory = directory.split('\\').join('/')
     return directory
+}
+
+export const GetPartitionsNames = async () => {
+    const execPromisified = util.promisify(exec);
+    return (await execPromisified('wmic logicaldisk get name')).stdout;
+    /*.then((error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return;
+        }
+        console.log('stdout ', stdout);
+        console.log('stderr ', stderr);
+    });*/
 }
 
 const loadAllFilesOnDirectory = async (directory = 'C:/') => {

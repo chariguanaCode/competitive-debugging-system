@@ -8,6 +8,7 @@ interface FileManagerFoldersTreeTypes {
     currentPath: string,
     showLoadingCircular: Function,
     joinDirectory: Function,
+    currentRootDirectory: string
 }
 
 interface FileType {
@@ -20,7 +21,7 @@ interface FileType {
 interface foldersTreeObjectTypes {
     [key: string]: Array<FileType>,
 }
-export const FileManagerFoldersTree: React.FunctionComponent<FileManagerFoldersTreeTypes> = memo(({showLoadingCircular, currentPath, joinDirectory}) => {
+export const FileManagerFoldersTree: React.FunctionComponent<FileManagerFoldersTreeTypes> = memo(({showLoadingCircular, currentPath, joinDirectory, currentRootDirectory}) => {
 
     const [ rerenderValue, RerenderForce ] = useState(1)
     let foldersTree = useRef<foldersTreeObjectTypes>({});
@@ -63,7 +64,7 @@ export const FileManagerFoldersTree: React.FunctionComponent<FileManagerFoldersT
     const theme = useTheme();
     return <>
         <div style = {{color: theme.palette.fileManager.fontColor, alignContent: "left", alignItems: "left", textAlign: "left", display: "flex", flexDirection: "column", width: "20%"}}>
-        {renderTree('/','','/')}
+        {renderTree(currentRootDirectory,'',currentRootDirectory)}
         </div>
     </>
 })
