@@ -6,20 +6,22 @@ import GlobalStateContext, {
 import useCompilationAndExecution from './cppCompilationAndExecution'
 import * as fileChangeTracking from './fileChangeTracking'
 import * as asyncFileActions from './asyncFileActions'
-import { Config as ConfigTypes} from '../utils/GlobalStateContext'
+import { Config as ConfigTypes } from '../utils/GlobalStateContext'
 import defaultConfig from '../data/defaultConfig.json'
 
 export const useSaveProject = () => {
     const { config } = useContext(GlobalStateContext)
 
-    return useCallback(
-        async () => {
-            let path = asyncFileActions.parsePath(config.projectInfo.path)
-            if (!(await asyncFileActions.isDirectory(path))) {
-                return
-            }
-            return asyncFileActions.saveFile(path + config.projectInfo.saveName + '.cdsp', JSON.stringify(config));
-        }, [config])
+    return useCallback(async () => {
+        let path = asyncFileActions.parsePath(config.projectInfo.path)
+        if (!(await asyncFileActions.isDirectory(path))) {
+            return
+        }
+        return asyncFileActions.saveFile(
+            path + config.projectInfo.saveName + '.cdsp',
+            JSON.stringify(config)
+        )
+    }, [config])
 }
 
 export const useLoadProject = () => {
@@ -29,33 +31,34 @@ export const useLoadProject = () => {
 
     return useCallback(
         async (sourceFilePath: string) => {
-            console.log('Loading config...', sourceFilePath)
-            let path = asyncFileActions.parsePath(sourceFilePath);
+            let path = asyncFileActions.parsePath(sourceFilePath)
             path = path.slice(0, path.length - 1)
-            console.log(path)
+            console.log('Loading config...', path)
+
             if (!(await asyncFileActions.fileExist(path))) {
+                console.error("This file doesn't exist")
                 return
             }
 
             if (!path.match(/.*\.cdsp/)) {
-                console.log("this is not cdsp")
+                console.log('This is not a cdsp file')
                 return
             }
 
-            let newConfig: ConfigTypes = defaultConfig;
+            let newConfig: ConfigTypes = defaultConfig
 
-            await asyncFileActions.readFile(
-                path
-            ).then((data: any)=> {
-                newConfig = JSON.parse(data);
+            await asyncFileActions.readFile(path).then((data: any) => {
+                newConfig = JSON.parse(data)
                 console.log('Read config!')
                 console.log('Loaded config!')
-            })   
-            let dividedPath = path.split('/');
+            })
+            let dividedPath = path.split('/')
             newConfig.projectInfo.saveName = dividedPath[dividedPath.length - 1]
-            newConfig.projectInfo.path = dividedPath.slice(0,-1).join('/')+'/';
+            newConfig.projectInfo.path =
+                dividedPath.slice(0, -1).join('/') + '/'
             console.log(newConfig, dividedPath)
             setConfig(newConfig)
+
             //rozdzielic do innej funkcji
             const newTasks: {
                 [key: string]: Task

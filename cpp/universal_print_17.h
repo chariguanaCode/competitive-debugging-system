@@ -178,7 +178,8 @@ namespace cupl {
     class main_wrapper {
         public:
             main_wrapper() {
-                setvbuf(stdout, nullptr, _IONBF, 0);
+                setvbuf(stdout, nullptr, _IOLBF, 0);
+                setvbuf(stderr, nullptr, _IOLBF, 0);
                 watchblock_open("main", 0);
             };
 

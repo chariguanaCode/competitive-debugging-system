@@ -11,13 +11,13 @@ struct example {
 };
 
 int main() {
-    for (int i = 0; i < 5000000; ++i) { cout << i;}
+    for (int i = 0; i < 50000; ++i) { cout << i << ',';}
     long long a, b;
     cin >> a >> b;
     //usleep(500000);
     watchblock("testowańsko") {
         watch(a);
-        vector<vector<int>> vektorek(100, vector<int> (1, 1337));
+        vector<vector<int>> vektorek(1337, vector<int> (1, 1337));
         bitset<30> testing;
         int n = 30;
         int tab[n];
@@ -28,7 +28,13 @@ int main() {
         my_struct.test = "siemka";
         watch(my_struct);
         watch(string("se testuje"));
+        cerr << "test \ntest2";
         watch(testing);
+        watchblock("duuuża pętla") {
+            for (int i = 0; i < 1000; ++i) {
+                watch(i);
+            }
+        }
         watch(my_map);
         watchblock("testowańsko bardziej") {
             watch(tab);

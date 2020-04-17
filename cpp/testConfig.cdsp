@@ -1,0 +1,36 @@
+{
+    "projectInfo": {
+        "files": [
+            "./cpp/test.cpp"
+        ],
+        "saveName": "My_new_project",
+        "path": "/",
+        "name": "My new project",
+        "author": "",
+        "createDate": "01-01-1981",
+        "lastEditDate": "01-01-1981",
+        "totalTimeSpent": "0h0m0s",
+        "description": "My best solve!"
+    },
+    "settings": {
+        "main": {
+            "darkMode": true
+        },
+        "fileManager": {
+            "basic": {
+                "homePath": "C:\\\\"
+            },
+            "developer": {
+                "renderBlockSize": 50
+            }
+        }
+    },
+    "tests": {
+        "test1": {
+            "filePath": "./cpp/tests/test1.in"
+        },
+        "test2": {
+            "filePath": "./cpp/tests/test2.in"
+        }
+    }
+}

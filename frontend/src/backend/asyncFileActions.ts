@@ -35,18 +35,19 @@ export const isDirectory = async (directory: string) => {
         let stat = await util.promisify(fs.lstat(directory));
         return stat.isDirectory();
     } catch (e) {
-        return false;
+        return false
     }
 }
 
 export const parsePath = (directory: string) => {
+    if (!path.isAbsolute(directory)) directory = path.resolve(directory)
+
     if (
         directory[directory.length - 1] != '/' &&
         directory[directory.length - 1] != '\\'
     )
         directory += '/'
-    if (!path.isAbsolute(directory))
-        directory = path.resolve(directory)
+
     directory = directory.split('\\').join('/')
     return directory
 }
