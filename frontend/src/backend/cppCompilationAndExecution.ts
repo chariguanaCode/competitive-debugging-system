@@ -1,47 +1,49 @@
-import { useContext, useCallback } from 'react'
-import GlobalStateContext, { ExecutionState } from '../utils/GlobalStateContext'
-import * as cppActions from './cppActions'
-import PromiseQueue from '../utils/parallelPromiseQueue'
+import { useContextSelector } from 'use-context-selector';
+import GlobalStateContext, {
+    ExecutionState,
+} from '../utils/GlobalStateContext';
+import * as cppActions from './cppActions';
+import PromiseQueue from '../utils/parallelPromiseQueue';
 import {
     useUpdateExecutionState,
     useBeginTest,
     useFinishTest,
     useTestError,
-} from './testManagement'
+} from './testManagement';
 
 export default () => {
-    const { config } = useContext(GlobalStateContext)
-    const updateExecutionState = useUpdateExecutionState()
-    const beginTest = useBeginTest()
-    const finishTest = useFinishTest()
-    const testError = useTestError()
+    const config = useContextSelector(GlobalStateContext, (v) => v.config);
+    const updateExecutionState = useUpdateExecutionState();
+    const beginTest = useBeginTest();
+    const finishTest = useFinishTest();
+    const testError = useTestError();
 
-    return useCallback(async () => {
-        const filename = config.projectInfo.files[0]
-        const tests = config.tests
+    return async () => {
+        const filename = config.projectInfo.files[0];
+        const tests = config.tests;
         try {
-            updateExecutionState(ExecutionState.Compiling, '')
-            let hrstart = window.process.hrtime()
+            updateExecutionState(ExecutionState.Compiling, '');
+            let hrstart = window.process.hrtime();
             const binaryName = await cppActions.compileCpp(filename).then(
                 (result: string) => result,
                 (stderr: any) => {
                     updateExecutionState(
                         ExecutionState.CompilationError,
                         stderr
-                    )
-                    throw new Error()
+                    );
+                    throw new Error();
                 }
-            )
-            let hrend = window.process.hrtime(hrstart)
+            );
+            let hrend = window.process.hrtime(hrstart);
             updateExecutionState(
                 ExecutionState.Running,
                 `Took ${hrend[0]}s ${hrend[1] / 1000000}ms`
-            )
+            );
 
-            console.log('Running tests...')
+            console.log('Running tests...');
 
-            console.log('Found tests:', tests)
-            const testPromises = new PromiseQueue(3)
+            console.log('Found tests:', tests);
+            const testPromises = new PromiseQueue(3);
             await Promise.all(
                 Object.entries(tests).map(([id, { filePath }]) =>
                     testPromises
@@ -57,8 +59,8 @@ export default () => {
                         )
                         .then(finishTest(id), testError(id))
                 )
-            )
-            updateExecutionState(ExecutionState.Finished, '')
+            );
+            updateExecutionState(ExecutionState.Finished, '');
         } catch (err) {}
-    }, [config, updateExecutionState, beginTest, finishTest, testError])
-}
+    };
+};

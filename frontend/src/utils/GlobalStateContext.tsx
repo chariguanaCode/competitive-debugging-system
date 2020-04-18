@@ -1,11 +1,12 @@
-import React, { useState, MutableRefObject } from 'react'
-import { useGrowingFileTrack } from '../backend/outputFileTracking'
-import { watchParse, clearWatchblocks } from '../backend/watchParse'
-import useMutableStateWithLimitedUpdateFrequency from './useMutableStateWithLimitedUpdateFrequency'
-import defaultConfig from '../data/defaultConfig.json'
+import React, { useState, MutableRefObject, useMemo } from 'react';
+import { createContext } from 'use-context-selector';
+import { useGrowingFileTrack } from '../backend/outputFileTracking';
+import { watchParse, clearWatchblocks } from '../backend/watchParse';
+import useMutableStateWithLimitedUpdateFrequency from './useMutableStateWithLimitedUpdateFrequency';
+import defaultConfig from '../data/defaultConfig.json';
 
 interface Props {
-    children: any | Array<any>
+    children: any | Array<any>;
 }
 
 export enum ExecutionState {
@@ -27,94 +28,95 @@ export enum TaskState {
 }
 
 export interface Config {
-    "projectInfo": {
-        "files": Array<string>,
-        "saveName": string,
-        "path": string,
-        "name": string,
-        "author": string,
-        "createDate": string,
-        "lastEditDate": string,
-        "totalTimeSpent": string,
-        "description": string
-    },
-    "settings": {
-        "main": {
-            "darkMode": Boolean
-        },
-        "fileManager": {
-            "basic": {
-                "homePath": string
-            },
-            "developer": {
-                "renderBlockSize": number
-            }
-        }
-    },
-    "tests": {
+    projectInfo: {
+        files: Array<string>;
+        saveName: string;
+        path: string;
+        name: string;
+        author: string;
+        createDate: string;
+        lastEditDate: string;
+        totalTimeSpent: string;
+        description: string;
+    };
+    settings: {
+        main: {
+            darkMode: boolean;
+        };
+        fileManager: {
+            basic: {
+                homePath: string;
+            };
+            developer: {
+                renderBlockSize: number;
+            };
+        };
+    };
+    tests: {
         [key: string]: {
-            filePath: string
-        }
-    }
+            filePath: string;
+        };
+    };
 }
 
 export interface Task {
-    state: TaskState
-    childProcess: any
-    startTime: [number, number]
-    executionTime: string
+    state: TaskState;
+    childProcess: any;
+    startTime: [number, number];
+    executionTime: string;
     error?: {
-        code: number
-        signal: string
-        stderr: Uint8Array | string
-    }
+        code: number;
+        signal: string;
+        stderr: Uint8Array | string;
+    };
 }
 
-export type Watchblocks = any
+export type Watchblocks = any;
 
 export interface TaskDetails {
-    id: string
-    stdout: MutableRefObject<string>
-    stdoutFileSize: number
-    watchblocks: MutableRefObject<Watchblocks>
+    id: string;
+    stdout: MutableRefObject<string>;
+    stdoutFileSize: number;
+    watchblocks: MutableRefObject<Watchblocks>;
 }
 
 export interface GlobalStateType {
-    executionState: ExecutionState
-    config: Config
-    fileTracking: any
-    projectFile: string
+    executionState: ExecutionState;
+    config: Config;
+    fileTracking: any;
+    projectFile: string;
     taskStates: MutableRefObject<{
-        [key: string]: Task
-    }>
-    shouldTasksReload: number
-    currentTask: TaskDetails
-    shouldStdoutReload: number
-    shouldWatchblocksReload: number
-    setExecutionState: (newState: ExecutionState) => void
-    setConfig: (newConfig: Config) => void
-    setFileTracking: (newTracking: any) => void
-    setProjectFile: (newSource: string) => void
-    reloadTasks: () => void
-    setCurrentTaskId: (newTaskId: string) => void
+        [key: string]: Task;
+    }>;
+    shouldTasksReload: number;
+    currentTask: TaskDetails;
+    shouldStdoutReload: number;
+    shouldWatchblocksReload: number;
+    setExecutionState: (newState: ExecutionState) => void;
+    setConfig: (newConfig: Config) => void;
+    setFileTracking: (newTracking: any) => void;
+    setProjectFile: (newSource: string) => void;
+    reloadTasks: () => void;
+    setCurrentTaskId: (newTaskId: string) => void;
 }
 
-const GlobalStateContext = React.createContext({} as GlobalStateType)
+const GlobalStateContext = createContext({} as GlobalStateType);
 
 export const GlobalStateProvider = ({ children }: Props) => {
     const [config, setConfig] = useState<Config>({
-        "projectInfo": {
-            "files":
-            ['/home/charodziej/Documents/competitive-debugging-system/cpp/test.cpp'],
-        } 
-    } as Config)
-    const [fileTracking, setFileTracking] = useState<any>(null)
+        projectInfo: {
+            files: [
+                '/home/charodziej/Documents/competitive-debugging-system/cpp/test.cpp',
+            ],
+        },
+    } as Config);
+    const [fileTracking, setFileTracking] = useState<any>(null);
     const [projectFile, setProjectFile] = useState<string>(
         '/home/charodziej/Documents/competitive-debugging-system/cpp/test.cpp'
-    )
+    );
     const [executionState, setExecutionState] = useState<ExecutionState>(
         ExecutionState.NoProject
-    )
+    );
 
     const [
         taskStates,
@@ -123,31 +125,31 @@ export const GlobalStateProvider = ({ children }: Props) => {
     ] = useMutableStateWithLimitedUpdateFrequency(
         {} as { [key: string]: Task },
         500
-    )
-    const [currentTaskId, setCurrentTaskId] = useState('')
+    );
+    const [currentTaskId, setCurrentTaskId] = useState('');
 
     const [
         stdout,
         shouldStdoutReload,
         updateStdoutCount,
-    ] = useMutableStateWithLimitedUpdateFrequency('', 500)
-    const [stdoutFileSize, setStdoutFileSize] = useState(1)
+    ] = useMutableStateWithLimitedUpdateFrequency('', 500);
+    const [stdoutFileSize, setStdoutFileSize] = useState(1);
 
     const [
         watchblocks,
         shouldWatchblocksReload,
         updateWatchblockCount,
-    ] = useMutableStateWithLimitedUpdateFrequency('', 500)
+    ] = useMutableStateWithLimitedUpdateFrequency('', 500);
 
     const appendStdout = (newData: Uint8Array) => {
-        stdout.current += new TextDecoder('utf-8').decode(newData)
-        updateStdoutCount()
-    }
+        stdout.current += new TextDecoder('utf-8').decode(newData);
+        updateStdoutCount();
+    };
 
     const setWatchblocks = (newWatchblocks: Uint8Array) => {
-        watchParse(newWatchblocks)
-        updateWatchblockCount()
-    }
+        watchParse(newWatchblocks);
+        updateWatchblockCount();
+    };
 
     useGrowingFileTrack(
         currentTaskId !== '' &&
@@ -162,11 +164,11 @@ export const GlobalStateProvider = ({ children }: Props) => {
         appendStdout,
         setStdoutFileSize,
         () => {
-            stdout.current = ''
-            updateStdoutCount()
-            setStdoutFileSize(1)
+            stdout.current = '';
+            updateStdoutCount();
+            setStdoutFileSize(1);
         }
-    )
+    );
 
     useGrowingFileTrack(
         currentTaskId !== '' &&
@@ -181,10 +183,10 @@ export const GlobalStateProvider = ({ children }: Props) => {
         setWatchblocks,
         (x: number) => {},
         () => {
-            clearWatchblocks(watchblocks)
-            updateWatchblockCount()
+            clearWatchblocks(watchblocks);
+            updateWatchblockCount();
         }
-    )
+    );
 
     return (
         <GlobalStateContext.Provider
@@ -195,12 +197,15 @@ export const GlobalStateProvider = ({ children }: Props) => {
                 projectFile,
                 taskStates,
                 shouldTasksReload,
-                currentTask: {
-                    id: currentTaskId,
-                    stdout,
-                    stdoutFileSize,
-                    watchblocks,
-                },
+                currentTask: useMemo(
+                    () => ({
+                        id: currentTaskId,
+                        stdout,
+                        stdoutFileSize,
+                        watchblocks,
+                    }),
+                    [currentTaskId, stdout, stdoutFileSize, watchblocks]
+                ),
                 shouldStdoutReload,
                 shouldWatchblocksReload,
                 setExecutionState,
@@ -213,7 +218,7 @@ export const GlobalStateProvider = ({ children }: Props) => {
         >
             {children}
         </GlobalStateContext.Provider>
-    )
-}
+    );
+};
 
-export default GlobalStateContext
+export default GlobalStateContext;

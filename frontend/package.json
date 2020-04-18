@@ -31,6 +31,7 @@
         "redux": "^4.0.5",
         "styled-components": "^5.1.0",
         "typescript": "^3.8.3",
+        "use-context-selector": "^1.1.1",
         "wix-storybook-utils": "^3.0.117"
     },
     "homepage": "./",

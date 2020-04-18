@@ -59,7 +59,7 @@
     },
     "prettier": {
         "trailingComma": "es5",
-        "semi": false,
+        "semi": true,
         "tabWidth": 4,
         "resolveGlobalModules": true,
         "singleQuote": true,
