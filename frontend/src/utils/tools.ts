@@ -10,6 +10,7 @@ export const useFocus = () => {
 }
 
 export const isNumeric = (number: any) => {
+    // eslint-disable-next-line
     return +number === +number
 }
 

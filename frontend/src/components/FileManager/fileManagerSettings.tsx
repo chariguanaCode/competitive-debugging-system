@@ -12,11 +12,12 @@ import Typography from '@material-ui/core/Typography';
 import { Select, MenuItem, InputLabel } from '@material-ui/core';
 import { FormControl                  } from '@material-ui/core';  
 
-import CloseIcon                from '@material-ui/icons/Close'
+import CloseIcon                from '@material-ui/icons/Close';
 import PermDataSettingIcon      from '@material-ui/icons/PermDataSetting';
 import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications';
 import HelpIcon                 from '@material-ui/icons/Help';
 
+import { isNumeric } from '../../utils/tools';
 interface FileManagerSettingsTypes {
     open: boolean,
     dialogClose: Function,
@@ -37,10 +38,6 @@ const useStyles = makeStyles({
         maxWidth: '80vh'
     },
 })
-
-const isNumeric = (number: any) => {
-    return +number === +number
-}
 
 const settingsInfo = new Map([
     ["homeDirectory", "Set the home directory, for example C:/ or dev/ ."],

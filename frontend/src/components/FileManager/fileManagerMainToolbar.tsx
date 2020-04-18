@@ -4,7 +4,7 @@ import createFragment                 from "react-addons-create-fragment";
 
 import { TextField, InputAdornment, Checkbox, FormControl, FormControlLabel               } from '@material-ui/core';
 import { makeStyles                                        } from '@material-ui/core/styles';
-import { Button, IconButton                                } from '@material-ui/core';
+import { Button, IconButton, Select, MenuItem                            } from '@material-ui/core';
 import   Breadcrumbs                                         from '@material-ui/core/Breadcrumbs';
 import { Fade, CircularProgress                            } from "@material-ui/core";
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "@material-ui/core";
@@ -32,7 +32,8 @@ interface State {
 interface MainToolbarTypes {
     loadDirectory: Function,
     currentPath: string,
-    SetRootDirectory: Function
+    SetRootDirectory: Function,
+    currentRootDirectory: string
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -56,7 +57,7 @@ const arePropsEqual = (prevProps: any, nextProps: any) => {
     return prevProps.currentPath === nextProps.currentPath;
 }
 
-export const FileManagerMainToolbar: React.FunctionComponent<MainToolbarTypes> = memo(({loadDirectory, currentPath, SetRootDirectory}) => {
+export const FileManagerMainToolbar: React.FunctionComponent<MainToolbarTypes> = memo(({loadDirectory, currentPath, SetRootDirectory, currentRootDirectory}) => {
     
     const [state, setState] = useState<State>({
         newPath: null,
@@ -87,7 +88,7 @@ export const FileManagerMainToolbar: React.FunctionComponent<MainToolbarTypes> =
 
     const SavePartitionsNames = async() => {
         let partitionsNamesToSet: Array<string> = [];
-        //console.log((await GetPartitionsNames()).split('\n').slice(1)); ///usuń średnik i pokaż Adamowi
+        console.log((await GetPartitionsNames()).split('\n').slice(1));  ///usuń średnik i pokaż Adamowi
         (await GetPartitionsNames()).split('\n').slice(1).forEach((item: string) => {
             const parsedItem = item.split(" ").join("").split('\t').join("").split('\r').join(''); 
             parsedItem && partitionsNamesToSet.push(parsedItem)
@@ -150,19 +151,11 @@ export const FileManagerMainToolbar: React.FunctionComponent<MainToolbarTypes> =
         let val = e.target.value;
         setState(prevState => ({ ...prevState, newPath: val, }))
     }
-
+console.log(currentRootDirectory)
 const classes = useStyles()
     return (
         <>
                     <div className={classes.navigation}>
-                    <div style = {{position: "absolute", left: "10px"}}>
-                        { partitionsNamesState.map(name => (
-                            <Button style = {{maxWidth: "min-content"}} onClick = {()=>{ 
-                                loadDirectory(name);
-                                SetRootDirectory(name);
-                            }}>{name}</Button>
-                        ))}
-                    </div>
                     <IconButton onClick={()=>{loadDirectory('/')}} style={{ width: "48px" }}><HomeIcon /></IconButton>
                     <IconButton onClick={Undo} disabled={historyListIndex.current > 0 ? false : true} style={{ width: "48px" }}><ArrowBackIcon /></IconButton>    
                     {state.fieldMode ? 
@@ -174,17 +167,35 @@ const classes = useStyles()
                                 onChange   = { updateTextOnTextField }
                                 onFocus    = { e => { e.target.select() } }
                     />
-                    :
+                    : <>
+                    <Select
+                        value={currentRootDirectory}
+                        onChange={(e)=> {
+                            e.persist();
+                            loadDirectory(e.target.value);
+                            SetRootDirectory(e.target.value);
+                        }}
+                    >
+                        { partitionsNamesState.map(name => (
+                            <MenuItem value = {name} style = {{maxWidth: "min-content"}}>
+                                {name}
+                            </MenuItem>
+                        ))}
+                        {currentRootDirectory === '/' && 
+                        <MenuItem value = {'/'} style = {{maxWidth: "min-content"}}>
+                                /
+                        </MenuItem>}
+                    </Select>
                     <Breadcrumbs style = {{display: "inline-block", minWidth: "300px"}} aria-label="breadcrumb">
                         {/* 
                             // @ts-ignore */}
-                        { currentPath === '/' ? <Button style={{pointerEvents: "none"}}>/</Button> : currentPath.split('/').reduce((valIn,val,it)=>{
+                        { currentPath.split('/').slice(currentRootDirectory !== '/').reduce((valIn,val,it)=>{
                             let onPath = valIn[0]
                             //console.log(onPath,valIn)
                             if(val) return [onPath+val+'/',createFragment( { a: valIn[1], b: <Button onClick={()=>{loadDirectory(onPath+val+'/')}}>{val}</Button> })]
                             else return [onPath+val+'/', valIn[1]];
                         },["",null])}
-                    </Breadcrumbs>}
+                    </Breadcrumbs></>}
                     {/* 
                             // @ts-ignore */}
                     <IconButton onClick = {()=>{UpdateFieldMode(true);}} style={{ width: "48px  " }}><EditIcon/></IconButton>
@@ -214,3 +225,14 @@ const classes = useStyles()
                     </div>   
         </>)
 }, arePropsEqual)
+
+
+/*<div style = {{position: "absolute", left: "10px"}}>
+    { partitionsNamesState.map(name => (
+        <Button style = {{maxWidth: "min-content"}} onClick = {()=>{ 
+            loadDirectory(name);
+            SetRootDirectory(name);
+        }}>{name}</Button>
+    ))}
+</div>
+*/

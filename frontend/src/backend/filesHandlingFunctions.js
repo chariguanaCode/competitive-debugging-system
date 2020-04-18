@@ -9,8 +9,8 @@ const util = window.require('util');
 
 const parsePath = (directory) => {
     if (
-        directory[directory.length - 1] != '/' &&
-        directory[directory.length - 1] != '\\'
+        directory[directory.length - 1] !== '/' &&
+        directory[directory.length - 1] !== '\\'
     )
         directory += '/'
     if (!path.isAbsolute(directory)) {

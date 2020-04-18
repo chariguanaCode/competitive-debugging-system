@@ -202,6 +202,7 @@ export const FileManager: React.FunctionComponent<Props> = ({
             currentPath: newPath,
             managerError: files.length ? null : {message: "No files found from given regex :(", code: "404", number: "404"},
             files: files,
+            currentRootPath: newPath.split('/')[0]
                             //showFilesRenderForce: (prevState.showFilesRenderForce > 32000 ? 5 : prevState.showFilesRenderForce + 1)
         }))
     }
@@ -432,7 +433,7 @@ export const FileManager: React.FunctionComponent<Props> = ({
                         ChangeFilesDisplaySize = { ChangeFilesDisplaySize }
                     />
                     </div>
-                    <FileManagerMainToolbar SetRootDirectory = {(newRootPath: string) => {setState(pvState => ({...pvState, currentRootPath: newRootPath}))}} currentPath = {state.currentPath} loadDirectory = {loadDirectory} />
+                    <FileManagerMainToolbar  currentRootDirectory = {state.currentRootPath} SetRootDirectory = {(newRootPath: string) => {setState(pvState => ({...pvState, currentRootPath: newRootPath}))}} currentPath = {state.currentPath} loadDirectory = {loadDirectory} />
                 </div>
             </DialogTitle>       
             <DialogContent id = "FileManager-DialogContent" classes = {{root: classes.dialogRoot}} style={{ overflowX: "hidden", paddingLeft: 5, paddingRight: 5, display: "flex", minHeight: '69vh', maxHeight: '69vh', }}>
