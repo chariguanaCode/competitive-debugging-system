@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
     CssBaseline,
     createMuiTheme,
     Switch,
     FormControlLabel,
-} from '@material-ui/core'
-import Header from './Header'
-import Content from './Content'
-import Sidebar from './Sidebar'
+} from '@material-ui/core';
+import Header from './Header';
+import Content from './Content';
+import Sidebar from './Sidebar';
 import {
     amber,
     yellow,
@@ -20,13 +20,13 @@ import {
     purple,
     blue,
     deepOrange,
-    indigo
-} from '@material-ui/core/colors'
-import { ThemeProvider } from '@material-ui/core/styles'
-import TestProgress from './TestProgress'
-import { connect } from 'react-redux'
-import { changeLanguage } from '../redux/actions'
-import TitleBar from './TitleBar'
+    indigo,
+} from '@material-ui/core/colors';
+import { ThemeProvider } from '@material-ui/core/styles';
+import TestProgress from './TestProgress';
+import { connect } from 'react-redux';
+import { changeLanguage } from '../redux/actions';
+import TitleBar from './TitleBar';
 
 const lightTheme = createMuiTheme({
     palette: {
@@ -55,20 +55,20 @@ const lightTheme = createMuiTheme({
             closeButton: grey[600],
         },
         mainMenu: {
-            backgroundColor: "white",
-            iconColorEnabled: grey[900]  ,
-            iconColorDisabled: "",
-            fontColor: "black",
-            selectedButtonBackgroundColor: "#b0bec5",
+            backgroundColor: 'white',
+            iconColorEnabled: grey[900],
+            iconColorDisabled: '',
+            fontColor: 'black',
+            selectedButtonBackgroundColor: '#b0bec5',
         },
         fileManager: {
-            fontColor: "black",
-            backgroundColor: "white",
+            fontColor: 'black',
+            backgroundColor: 'white',
             selectionColor: cyan[300] + '44',
             checkboxColor: amber[500]
         }
     },
-})
+});
 
 const darkTheme = createMuiTheme({
     palette: {
@@ -98,36 +98,36 @@ const darkTheme = createMuiTheme({
         mainMenu: {
             backgroundColor: grey[800],
             iconColorEnabled: amber[500],
-            iconColorDisabled: "",
-            fontColor: "white",
-            selectedButtonBackgroundColor: "#8ea3ad",
+            iconColorDisabled: '',
+            fontColor: 'white',
+            selectedButtonBackgroundColor: '#8ea3ad',
         },
         fileManager: {
-            fontColor: "white",
+            fontColor: 'white',
             backgroundColor: grey[800],
             selectionColor: cyan[300] + '44',
             checkboxColor: amber[500]
         }
     },
-})
+});
 
 const mapStateToProps = (state: any) => {
-    return { language: state.language }
-}
+    return { language: state.language };
+};
 const mapDispatchToProps = (dispatch: any) => {
     return {
         changeLanguge: (language: string) => dispatch(changeLanguage(language)),
-    }
-}
+    };
+};
 
 interface sr {
-    language?: string
-    changeLanguage?: Function
+    language?: string;
+    changeLanguage?: Function;
 }
 
 const App: React.FC<sr> = ({ language, changeLanguage }) => {
     //const [ filePath, setFilePath ] = useState("/home/charodziej/Documents/OIG/OI27/nww.cpp")
-    const [theme, setTheme] = useState(darkTheme)
+    const [theme, setTheme] = useState(darkTheme);
 
     return (
         <ThemeProvider theme={theme}>
@@ -176,7 +176,7 @@ const App: React.FC<sr> = ({ language, changeLanguage }) => {
                 </div>
             </>
         </ThemeProvider>
-    )
-}
+    );
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default connect(mapStateToProps, mapDispatchToProps)(App);

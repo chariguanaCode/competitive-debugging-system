@@ -1,11 +1,11 @@
-import { useContext, useCallback } from 'react'
+import { useContextSelector } from 'use-context-selector';
 import GlobalStateContext, {
     Task,
     TaskState,
-} from '../utils/GlobalStateContext'
-import useCompilationAndExecution from './cppCompilationAndExecution'
-import * as fileChangeTracking from './fileChangeTracking'
-import * as asyncFileActions from './asyncFileActions'
+} from '../utils/GlobalStateContext';
+import useCompilationAndExecution from './cppCompilationAndExecution';
+import * as fileChangeTracking from './fileChangeTracking';
+import * as asyncFileActions from './asyncFileActions';
 
 /*
 const loadDirectory = require('./handleTests').loadDirectory
@@ -15,60 +15,69 @@ const loadTestsCANCEL = require('./handleTests').loadTestsCANCEL
 */
 
 const useRunTasks = () => {
-    const { config, taskStates, reloadTasks } = useContext(GlobalStateContext)
-    const compilationAndExecution = useCompilationAndExecution()
+    const config = useContextSelector(GlobalStateContext, (v) => v.config);
+    const taskStates = useContextSelector(
+        GlobalStateContext,
+        (v) => v.taskStates
+    );
+    const reloadTasks = useContextSelector(
+        GlobalStateContext,
+        (v) => v.reloadTasks
+    );
+    const compilationAndExecution = useCompilationAndExecution();
 
-    return useCallback(() => {
+    return () => {
         if (!config) {
             //webserver.sendError('No project selected!', '')
-            return
+            return;
         }
 
         Object.entries(taskStates.current).forEach(([id, test]) => {
             if (test.childProcess) {
-                test.childProcess.kill()
+                test.childProcess.kill();
             }
 
             test = {
                 state: TaskState.Pending,
-            } as Task
-        })
+            } as Task;
+        });
 
-        reloadTasks()
-        compilationAndExecution()
-    }, [config, taskStates, reloadTasks, compilationAndExecution])
-}
+        reloadTasks();
+        compilationAndExecution();
+    };
+};
 
 const useAddTestFiles = () => {
-    const { config, setConfig } = useContext(GlobalStateContext)
+    const config = useContextSelector(GlobalStateContext, (v) => v.config);
+    const setConfig = useContextSelector(
+        GlobalStateContext,
+        (v) => v.setConfig
+    );
 
-    return useCallback(
-        async (testPaths: Array<string>) => {
-            let newTests: { [key: string]: { filePath: string } } = {}
-            testPaths.forEach((val) => {
-                newTests[val] = { filePath: val }
-            })
+    if(!config) return;
+    return async (testPaths: Array<string>) => {
+        let newTests: { [key: string]: { filePath: string } } = {};
+        testPaths.forEach((val) => {
+            newTests[val] = { filePath: val };
+        });
 
-            const newConfig = {
-                ...config,
-                tests: {
-                    ...config.tests,
-                    ...newTests,
-                },
-            }
+        const newConfig = {
+            ...config,
+            tests: {
+                ...config.tests,
+                ...newTests,
+            },
+        };
 
-            const projectFile = config.projectInfo.files[0].replace(/\.cpp$/, '.json')
-            await asyncFileActions.saveFile(
-                projectFile,
-                JSON.stringify(newConfig)
-            )
+        const projectFile = config.projectInfo.files[0].replace(
+            /\.cpp$/,
+            '.json'
+        );
+        await asyncFileActions.saveFile(projectFile, JSON.stringify(newConfig));
 
-            setConfig(newConfig)
-        },
-        [config, setConfig]
-    )
-}
-
+        setConfig(newConfig);
+    };
+};
 
 /*
 const loadTestsMain = (obj) => {
@@ -76,4 +85,4 @@ const loadTestsMain = (obj) => {
 }
 */
 
-export { useRunTasks, useAddTestFiles }
+export { useRunTasks, useAddTestFiles };

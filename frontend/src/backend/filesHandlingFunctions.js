@@ -24,7 +24,7 @@ const parsePath = (directory) => {
     return directory
 }
 
-export const GetPartitionsNames = async () => {
+export const getPartitionsNames = async () => {
     const execPromisified = util.promisify(exec);
     return (await execPromisified('wmic logicaldisk get name')).stdout;
     /*.then((error, stdout, stderr) => {
@@ -36,7 +36,7 @@ export const GetPartitionsNames = async () => {
         console.log('stderr ', stderr);
     });*/
 }
-
+//
 const loadAllFilesOnDirectory = async (directory = 'C:/') => {
     let filesToSend = []
     directory = parsePath(directory)
@@ -55,7 +55,7 @@ const loadAllFilesOnDirectory = async (directory = 'C:/') => {
     })
 }
 
-const SelectFileType = (fileType) => {
+const selectFileType = (fileType) => {
     if (
         ['.img', '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.PNG'].includes(
             fileType
@@ -145,7 +145,7 @@ export const loadFilesOnDirectory = async ({ filetypes, directory, regex }) => {
                     path: directory + file,
                     typeGroup: isDir(directory + file)
                         ? 'DIRECTORY'
-                        : SelectFileType(
+                        : selectFileType(
                                 path.extname(directory + file)
                             ),
                 })

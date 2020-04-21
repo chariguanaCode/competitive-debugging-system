@@ -12,12 +12,12 @@ import SaveAltIcon                     from '@material-ui/icons/SaveAlt';
 import PrintIcon                       from '@material-ui/icons/Print';
 import ImportExportIcon                from '@material-ui/icons/ImportExport';
 import FolderIcon                      from '@material-ui/icons/Folder';
-import { FileManager                 } from "../FileManager/fileManager";
+import { FileManager                 } from "../FileManager/FileManagerWithConfig";
 import { TextField, FormLabel, InputAdornment } from "@material-ui/core";
 import { makeStyles, useTheme, ThemeProvider } from '@material-ui/core/styles';
 import GlobalStateContext from '../../utils/GlobalStateContext'
 import { useLoadProject } from "../../backend/projectManagement";
-import { FileType } from "../FileManager/fileManager"
+import { FileType } from "../FileManager/FileManager"
 interface Props {
    open: boolean,
    handleClose: Function,
@@ -155,7 +155,7 @@ export const MainMenu: React.FunctionComponent<Props> = ({open, handleClose, isA
     }
     const [fileManagerConfig, changeFileManagerConfig] = useState<{
         isOpen: boolean,
-        maxNumberOfFiles: Number,
+        maxNumberOfFiles: number,
         onSelectFiles: Function,
         availableFilesTypes?: Array<string> | undefined,
         acceptableFileTypes?: Array<string> | undefined
@@ -202,9 +202,10 @@ export const MainMenu: React.FunctionComponent<Props> = ({open, handleClose, isA
 
     const LoadProject = useLoadProject();
 
-    const SelectPathToOpenProject = (selectedFiles: Array<FileType>) => {
+    const SelectPathToOpenProject = (selectedFiles: Array<string>) => {
+        console.log(selectedFiles)
         if(selectedFiles.length)
-            LoadProject(selectedFiles[0].path)
+            LoadProject(selectedFiles[0])
     }
 
     const OpenProject = () => {
