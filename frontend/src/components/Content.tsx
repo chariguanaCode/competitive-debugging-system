@@ -1,14 +1,7 @@
 import React, { ReactElement } from 'react';
-import GlobalStateContext from '../utils/GlobalStateContext';
+import GlobalStateContext, { Watchblock, Watch } from '../utils/GlobalStateContext';
 import { useContextSelector } from 'use-context-selector';
-import {
-    Typography,
-    makeStyles,
-    AppBar,
-    Tabs,
-    Tab,
-    LinearProgress,
-} from '@material-ui/core';
+import { Typography, makeStyles, AppBar, Tabs, Tab, LinearProgress } from '@material-ui/core';
 import { useState } from 'react';
 import SplitterLayout from 'react-splitter-layout';
 import 'react-splitter-layout/lib/index.css';
@@ -27,9 +20,12 @@ const useStyle = makeStyles((theme) => ({
         position: 'unset',
     },
     splitContent: {
-        padding: theme.spacing(2),
         height: '100%',
-        overflowY: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        paddingTop: theme.spacing(2),
+        paddingBottm: theme.spacing(2),
+        paddingLeft: theme.spacing(2),
     },
 }));
 
@@ -41,62 +37,40 @@ enum Views {
 export default function Content(): ReactElement {
     const classes = useStyle();
     const [view, setView] = useState<Views>(Views.Debugging);
-    const currentTask = useContextSelector(
-        GlobalStateContext,
-        (v) => v.currentTask
-    );
-    const shouldStdoutReload = useContextSelector(
-        GlobalStateContext,
-        (v) => v.shouldStdoutReload
-    );
-    const shouldWatchblocksReload = useContextSelector(
-        GlobalStateContext,
-        (v) => v.shouldWatchblocksReload
-    );
+    const currentTask = useContextSelector(GlobalStateContext, (v) => v.currentTask);
+    const shouldStdoutReload = useContextSelector(GlobalStateContext, (v) => v.shouldStdoutReload);
+    const shouldWatchblocksReload = useContextSelector(GlobalStateContext, (v) => v.shouldWatchblocksReload);
+    const updateWatchblockCount = useContextSelector(GlobalStateContext, (v) => v.updateWatchblockCount);
+
+    const updateWatchblocks = (newWatchblocks: Array<Watchblock | Watch>) => {
+        console.log({ newWatchblocks });
+        currentTask.watchblocks.current.children = newWatchblocks;
+        updateWatchblockCount();
+    };
 
     return (
         <div className={classes.root}>
             <AppBar position="static" className={classes.appBar}>
-                <Tabs
-                    value={view}
-                    onChange={(evt, newVal) => setView(newVal)}
-                    indicatorColor="primary"
-                    textColor="primary"
-                >
+                <Tabs value={view} onChange={(evt, newVal) => setView(newVal)} indicatorColor="primary" textColor="primary">
                     <Tab label="Outputs" />
                     <Tab label="Debugging" />
                 </Tabs>
             </AppBar>
             <div style={{ height: 'calc(100% - 48px)' }}>
                 {view === Views.Debugging && (
-                    <SplitterLayout
-                        percentage
-                        customClassName={classes.splitter}
-                    >
+                    <SplitterLayout percentage customClassName={classes.splitter}>
                         <div className={classes.splitContent}>
-                            <Typography variant="h4">Watchblocks</Typography>
                             <Typography>{currentTask.id}</Typography>
-                            <JSONTree
-                                data={
-                                    currentTask.watchblocks.current.children ||
-                                    {}
-                                }
-                            />
+                            <JSONTree data={currentTask.watchblocks.current.children || []} updateData={updateWatchblocks} />
                         </div>
                         <div className={classes.splitContent}>
                             <Typography variant="h4">Watches</Typography>
                             <LinearProgress
                                 variant="determinate"
-                                value={
-                                    (100 * currentTask.stdout.current.length) /
-                                    currentTask.stdoutFileSize
-                                }
+                                value={(100 * currentTask.stdout.current.length) / currentTask.stdoutFileSize}
                             />
-                            <Typography variant="h5">
-                                {currentTask.stdout.current.length.toExponential(
-                                    5
-                                )}
-                            </Typography>
+                            {(100 * currentTask.stdout.current.length) / currentTask.stdoutFileSize}%
+                            <Typography variant="h5">{currentTask.stdout.current.length.toExponential(5)}</Typography>
                             {currentTask.stdout.current.substring(0, 10000)}
                         </div>
                     </SplitterLayout>

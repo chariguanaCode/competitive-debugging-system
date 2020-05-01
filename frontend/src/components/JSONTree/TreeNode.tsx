@@ -1,169 +1,143 @@
-import React, { ReactElement, useState } from 'react'
-import { useTheme } from '@material-ui/core'
-import { WatchBlockOptions } from '@material-ui/core/styles/createPalette'
+import React, { ReactElement } from 'react';
+import { useTheme } from '@material-ui/core';
+import { WatchBlockOptions } from '@material-ui/core/styles/createPalette';
+import { Watchblock, Watch } from '../../utils/GlobalStateContext';
 
 interface Props {
-    data: any,
+    node: any;
+    style: React.CSSProperties;
+    onChange: (newNodes: any) => void;
 }
 
 interface ColoredProps {
-    type: keyof WatchBlockOptions,
-    children: ReactElement[],
+    type: keyof WatchBlockOptions;
+    children: ReactElement[];
 }
 
 function Colored({ type, children }: ColoredProps): ReactElement {
-    const theme = useTheme()
+    const theme = useTheme();
     return (
-        <span 
+        <span
             style={{
-                color: theme.palette.watchblocks[type]
-
+                color: theme.palette.watchblocks[type],
             }}
         >
             {children}
         </span>
-    )
+    );
 }
 
-export default function TreeNode({ data }: Props): ReactElement {
-    const [ open, setOpen ] = useState(true)
-    const { name, line, type, children, value, data_type, pointer } = data
+export default React.memo(function TreeNode({ node, style, onChange }: Props): ReactElement {
+    const data = node as Watchblock | Watch;
 
-    let childCount: number = 0
+    const colored = (val: { [key in keyof WatchBlockOptions]: any }) => {
+        const [type, content] = Object.entries(val)[0] as [keyof WatchBlockOptions, any];
+        return <Colored type={type}>{content}</Colored>;
+    };
 
-    if (type === "watchblock") childCount = Object.keys(children).length;
-    if (type === "array")      childCount = value.length;
-    if (type === "struct")     childCount = value.length;
-    if (type === "pair")       childCount = 2;
+    const bracketMap = {
+        watchblock: ['{', '}'],
+        array: ['[', ']'],
+        struct: ['{', '}'],
+        pair: ['(', ')'],
+    };
 
-    const colored = (val: any) => {
-        const [ type, content ]: [ keyof WatchBlockOptions, ReactElement[] ] = Object.entries(val)[0] as any
-        return <Colored type={type}>{content}</Colored>
-    }
+    const { line, name } = data;
+    const getContents = () => {
+        const result = {
+            onClick: () => {},
+            body: [] as ReactElement[],
+        };
 
-    const getLabelPrefix = () => {
-        if (type === "watchblock") {
-            return (<>{colored({ line })}: {colored({ name })} = </>)
+        let open = false;
+        if (data.type === 'watchblock' || data.type === 'array' || data.type === 'struct' || data.type === 'pair') {
+            open = data.state?.expanded;
+            result.onClick = () =>
+                onChange({
+                    node: {
+                        ...data,
+                        state: {
+                            ...data.state,
+                            expanded: !open,
+                        },
+                    },
+                    type: 2,
+                });
         }
 
-        if (!line && !data_type) {
-            return <>{colored({ array: name })} : </>
+        if (data.type === 'closing') {
+            result.body.push(<>{colored({ [data.closingType]: bracketMap[data.closingType][1] })}</>);
+            return result;
         }
 
-        return (<>{colored({ line })}: {colored({ data_type })} {colored({ name })} = </>)
-    }
-
-    const getLabel = () => {
-        switch (type) {
-            case "watchblock":
-                return (open && childCount) ? 
-                    [ <>{colored({ watchblock: '{' })}</>, <>{colored({ watchblock: '}' })}</> ] : 
-                    [ <>{colored({ watchblock: '{' })} {childCount} {colored({ watchblock: '}' })}</>, '' ]
-
-            case "array":
-                return (open && childCount) ? 
-                    [ <>{colored({ array: '[' })}</>, <>{colored({ array: ']' })}</> ] : 
-                    [ <>{colored({ array: '[' })} {childCount} {colored({ array: ']' })}</>, '' ]
-
-            case "struct":
-                return (open && childCount) ? 
-                    [ <>{colored({ array: '{' })}</>, <>{colored({ array: '}' })}</> ] : 
-                    [ <>{colored({ array: '{' })} {childCount} {colored({ array: '}' })}</>, '' ]
-
-            case "pair":
-                return (open) ? 
-                    [ <>{colored({ pair: '(' })}</>, <>{colored({ pair: ')' })}</> ] : 
-                    [ <>{colored({ pair: '(' })} {colored({ pair: ')' })}</>, '' ]
-
-            case "string":
-                return [ <>{colored({ string: `"${value}"` })}</>, '' ]
-
-            case "bitset":
-                return [ <>{colored({ bitset: `${value}` })}</>, '' ]
-
-            case "number":
-                return [ <>{colored({ number: value })}</>, '' ]
-
-            default:
-                return [ `${value}`, '' ]
-        }
-    }
-
-    const getContent = () => {
-        if (type === "watchblock") {
-            return (
+        if (data.type === 'watchblock') {
+            result.body.push(
                 <>
-                    {Object.entries(data.children).map(([ id, val ]: any[]) => (
-                        <TreeNode 
-                            key={id} 
-                            data={val} 
-                        />
-                    ))}
+                    {colored({ line })}: {colored({ name })} ={' '}
                 </>
-            )
-        }
-
-        if (type === "array") {
-            return (
+            );
+        } else if (!line && !data.data_type) {
+            result.body.push(<>{colored({ array: name })} : </>);
+        } else {
+            result.body.push(
                 <>
-                    {data.value.map((val: any, id: number) => (
-                        <TreeNode 
-                            key={id} 
-                            data={{ ...val, name: id }} 
-                        />
-                    ))}
+                    {colored({ line })}: {colored({ name })} ={' '}
                 </>
-            )
+            );
         }
 
-        if (type === "struct") {
-            return (
-                <>
-                    {data.value.map((val: any, id: number) => (
-                        <TreeNode 
-                            key={id} 
-                            data={val} 
-                        />
-                    ))}
-                </>
-            )
+        if (data.type === 'string') {
+            result.body.push(<>{colored({ string: `"${data.value}"` })}</>);
         }
 
-        if (type === "pair") {
-            return (
-                <>
-                    <TreeNode 
-                        data={data.value.first} 
-                    />
-                    <TreeNode 
-                        data={data.value.second} 
-                    />
-                </>
-            )
+        if (data.type === 'bitset') {
+            result.body.push(<>{colored({ bitset: `${data.value}` })}</>);
         }
 
-        return null
-    }
+        if (data.type === 'number') {
+            result.body.push(<>{colored({ number: data.value })}</>);
+        }
 
+        if (data.type === 'array' || data.type === 'struct' || data.type === 'pair' || data.type === 'watchblock') {
+            result.body.push(
+                open && data.children.length - 1 ? (
+                    <>{colored({ [data.type]: bracketMap[data.type][0] })}</>
+                ) : (
+                    <>
+                        {colored({ [data.type]: bracketMap[data.type][0] })} {data.children.length - 1}{' '}
+                        {colored({ [data.type]: bracketMap[data.type][1] })}
+                    </>
+                )
+            );
+        }
+
+        return result;
+    };
+
+    const clickable = () => {
+        if (data.type === 'array' || data.type === 'struct' || data.type === 'pair' || data.type === 'watchblock') {
+            return data.children.length - 1 !== 0;
+        }
+        return false;
+    };
+
+    const contents = getContents();
     return (
-        <div>
-            <div 
-                style={{ 
-                    width: "100%", 
-                    wordSpacing: 4 
-                }}
-                onClick={() => setOpen((prev) => !prev)}
-            >
-                {getLabelPrefix()}{(pointer) && colored({ pointer: '*' })}{getLabel()[0]}
-            </div>
-            {(open && childCount !== 0) && 
-                <>
-                    <div style={{ paddingLeft: 32 }}>
-                        {getContent()}
-                    </div>
-                    <span>{getLabel()[1]}</span>
-                </>
-            }
+        <div
+            style={{
+                position: style.position,
+                height: style.height,
+                left: style.left,
+                top: style.top,
+                marginLeft: style.marginLeft,
+
+                wordSpacing: 4,
+                transform: `translate(${data.type === 'closing' ? -30 : 0}px)`,
+                cursor: clickable() ? 'pointer' : 'auto',
+            }}
+            onClick={contents.onClick}
+        >
+            {contents.body}
         </div>
-    )
-}
+    );
+});

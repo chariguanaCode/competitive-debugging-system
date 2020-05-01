@@ -1,7 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 
-const chokidar = window.require('chokidar')
-const fs = window.require('fs')
+const chokidar = window.require('chokidar');
+const fs = window.require('fs');
 
 export const useGrowingFileTrack = (
     filepath: string,
@@ -13,59 +13,59 @@ export const useGrowingFileTrack = (
 ) => {
     useEffect(() => {
         if (filepath !== '') {
-            cleanup()
+            cleanup();
 
-            const watcher = chokidar.watch(filepath, { alwaysStat: true })
-            let currSize = 0
-            let buffer = new Uint8Array([])
+            const watcher = chokidar.watch(filepath, { alwaysStat: true });
+            let currSize = 0;
+            let buffer = new Uint8Array([]);
 
             const handleEvent = (path: string, stats: any) => {
                 if (currSize < stats.size) {
                     const contentStream = fs.createReadStream(filepath, {
                         start: currSize,
                         end: stats.size - 1,
-                    })
-                    currSize = stats.size
-                    pushNewSize(currSize)
+                    });
+                    currSize = stats.size;
+                    pushNewSize(currSize);
 
                     contentStream.on('data', (data: Buffer) => {
                         if (!shouldBuffer) {
-                            pushNewData(data)
+                            pushNewData(data);
                         } else {
-                            buffer = Uint8Array.from([
-                                ...Array.from(buffer),
-                                ...Array.from(data),
-                            ])
+                            const oldBuffer = buffer;
+                            buffer = new Uint8Array(buffer.length + data.length);
+                            buffer.set(oldBuffer);
+                            buffer.set(data, oldBuffer.length);
 
                             let index = -1,
-                                prevIndex = -1
+                                prevIndex = -1;
                             do {
-                                prevIndex = index + 1
-                                index = buffer.indexOf(10, prevIndex)
+                                prevIndex = index + 1;
+                                index = buffer.indexOf(10, prevIndex);
                                 if (index !== -1) {
-                                    pushNewData(buffer.slice(prevIndex, index))
+                                    pushNewData(buffer.slice(prevIndex, index));
                                 }
-                            } while (index !== -1)
+                            } while (index !== -1);
 
-                            buffer = buffer.subarray(prevIndex)
+                            if (prevIndex > 0) buffer = buffer.subarray(prevIndex);
                         }
-                    })
+                    });
 
                     watcher.on('close', () => {
-                        contentStream.destroy()
-                    })
+                        contentStream.destroy();
+                    });
                 }
-            }
+            };
 
-            watcher.on('add', handleEvent)
-            watcher.on('change', handleEvent)
+            watcher.on('add', handleEvent);
+            watcher.on('change', handleEvent);
 
             return () => {
-                watcher.emit('close')
-                watcher.close()
-                cleanup()
-            }
+                watcher.emit('close');
+                watcher.close();
+                cleanup();
+            };
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filepath, finished])
-}
+    }, [filepath, finished]);
+};

@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-import {
-    CssBaseline,
-    createMuiTheme,
-    Switch,
-    FormControlLabel,
-} from '@material-ui/core';
+import { CssBaseline, createMuiTheme, Switch, FormControlLabel } from '@material-ui/core';
 import Header from './Header';
 import Content from './Content';
 import Sidebar from './Sidebar';
@@ -156,13 +151,7 @@ const App: React.FC<sr> = ({ language, changeLanguage }) => {
                                 control={
                                     <Switch
                                         checked={theme.palette.type === 'dark'}
-                                        onChange={(evt) =>
-                                            setTheme(
-                                                evt.target.checked
-                                                    ? darkTheme
-                                                    : lightTheme
-                                            )
-                                        }
+                                        onChange={(evt) => setTheme(evt.target.checked ? darkTheme : lightTheme)}
                                     />
                                 }
                             />

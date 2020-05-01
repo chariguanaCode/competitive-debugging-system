@@ -63,6 +63,7 @@
         "tabWidth": 4,
         "resolveGlobalModules": true,
         "singleQuote": true,
-        "arrowParens": "always"
+        "arrowParens": "always",
+        "printWidth": 128
     }
 }

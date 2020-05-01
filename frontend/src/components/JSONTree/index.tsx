@@ -1,28 +1,20 @@
-import React, { ReactElement } from 'react'
-import { makeStyles } from '@material-ui/core/styles'
-import TreeNode from './TreeNode'
-
-const useStyles = makeStyles({
-    container: {
-        width: "100%"
-    }
-})
+import React, { ReactElement } from 'react';
+import TreeNode from './TreeNode';
+import Tree from 'react-virtualized-tree';
 
 interface Props {
-    data: any
+    data: any;
+    updateData: (newData: any) => void;
 }
 
-export default function JSONTree({ data }: Props): ReactElement {
-    const classes = useStyles()
-
+export default function JSONTree({ data, updateData }: Props): ReactElement {
     return (
-        <div className={classes.container}>
-            {Object.entries(data).map(([ id, val ]) => (
-                <TreeNode 
-                    key={id} 
-                    data={val} 
-                />
-            ))}
+        <div style={{ flex: '1 1 auto' }}>
+            <Tree nodes={data} onChange={updateData}>
+                {({ node, style, onChange, ...rest }) => {
+                    return <TreeNode style={style} node={node} onChange={onChange} />;
+                }}
+            </Tree>
         </div>
-    )
+    );
 }
