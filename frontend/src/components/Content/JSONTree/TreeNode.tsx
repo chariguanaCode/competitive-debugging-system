@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import { useTheme } from '@material-ui/core';
 import { WatchBlockOptions } from '@material-ui/core/styles/createPalette';
-import { Watchblock, Watch } from '../../utils/GlobalStateContext';
+import { Watchblock, Watch } from '../../../utils/GlobalStateContext';
 
 interface Props {
     node: any;
@@ -84,6 +84,10 @@ export default React.memo(function TreeNode({ node, style, onChange }: Props): R
                     {colored({ line })}: {colored({ name })} ={' '}
                 </>
             );
+        }
+
+        if (data.type !== 'watchblock' && data.pointer) {
+            result.body.push(<>{colored({ pointer: '*' })}</>);
         }
 
         if (data.type === 'string') {

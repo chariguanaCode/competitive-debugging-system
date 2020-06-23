@@ -61,6 +61,11 @@ const lightTheme = createMuiTheme({
             backgroundColor: 'white',
             selectionColor: cyan[300] + '44',
         },
+        contentLayout: {
+            panelHeader: grey[100],
+            panelBackground: '#ffffff',
+            borders: grey[200],
+        },
     },
 });
 
@@ -100,6 +105,11 @@ const darkTheme = createMuiTheme({
             fontColor: 'white',
             backgroundColor: grey[800],
             selectionColor: cyan[300] + '44',
+        },
+        contentLayout: {
+            panelHeader: grey[800],
+            panelBackground: grey['A400'],
+            borders: grey[800],
         },
     },
 });

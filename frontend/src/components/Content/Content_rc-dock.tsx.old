@@ -1,0 +1,208 @@
+import React, { ReactElement } from 'react';
+import GlobalStateContext, { Watchblock, Watch } from '../utils/GlobalStateContext';
+import { useContextSelector } from 'use-context-selector';
+import { Typography, makeStyles, AppBar, Tabs, Tab, LinearProgress, Menu, MenuItem } from '@material-ui/core';
+import { useState, useEffect } from 'react';
+import JSONTree from './JSONTree';
+import DockLayout, { DockMode, LayoutData, PanelData, DockContext, TabBase, TabData } from 'rc-dock';
+import 'rc-dock/dist/rc-dock.css';
+import AddIcon from '@material-ui/icons/Add';
+
+const useStyle = makeStyles((theme) => ({
+    root: {
+        marginLeft: theme.spacing(6) + 24,
+        marginRight: 24,
+        height: 'calc(100vh - 64px - 24px)',
+    },
+    appBar: {
+        backgroundColor: theme.palette.background.default,
+    },
+    '@global': {
+        '.dock-tab': {
+            backgroundColor: theme.palette.contentLayout.panelHeader,
+        },
+        '.dock-top .dock-bar': {
+            backgroundColor: theme.palette.contentLayout.panelHeader,
+            borderBottom: `1px solid ${theme.palette.contentLayout.borders}`,
+        },
+        '.dock-panel': {
+            backgroundColor: theme.palette.contentLayout.panelBackground,
+            border: `1px solid ${theme.palette.contentLayout.borders}`,
+        },
+        '.dock-tab-active, .dock-tab-active:hover': {
+            color: theme.palette.primary.main,
+        },
+        '.dock-ink-bar': {
+            backgroundColor: theme.palette.primary.main,
+        },
+        '.dock-tab:hover': {
+            color: theme.palette.primary.dark,
+        },
+        '.dock-top .dock-bar:focus-within': {
+            boxShadow: 'none',
+        },
+    },
+}));
+
+enum Views {
+    Outputs,
+    Debugging,
+}
+
+let count = 0;
+
+function WatchComponent(): ReactElement {
+    const currentTask = useContextSelector(GlobalStateContext, (v) => v.currentTask);
+    const shouldWatchblocksReload = useContextSelector(GlobalStateContext, (v) => v.shouldWatchblocksReload);
+    const updateWatchblockCount = useContextSelector(GlobalStateContext, (v) => v.updateWatchblockCount);
+    const updateWatchblocks = (newWatchblocks: Array<Watchblock | Watch>) => {
+        console.log({ newWatchblocks });
+        currentTask.watchblocks.current.children = newWatchblocks;
+        updateWatchblockCount();
+    };
+
+    return <JSONTree data={currentTask.watchblocks.current.children || []} updateData={updateWatchblocks} />;
+}
+
+function TestComponent(): ReactElement {
+    const [value, setValue] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setValue((prev) => prev + 1);
+        }, 1000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
+
+    return <div>{value}</div>;
+}
+
+function AddTabMenu({ panelData, context }: { panelData: PanelData; context: DockContext }): ReactElement {
+    const [anchorEl, setAnchorEl] = useState<(EventTarget & SVGSVGElement) | null>(null);
+
+    const items = [{ id: 'testTab', name: 'Test Tab', component: <>Siema</> }];
+
+    const addTab = (item: { id: string; name: string; component: any }) => {
+        context.dockMove(
+            {
+                id: `${item.id}${++count}`,
+                title: item.name,
+                group: 'addTab',
+                content: <>{item.component}</>,
+            },
+            panelData,
+            'middle'
+        );
+        setAnchorEl(null);
+    };
+
+    return (
+        <>
+            <AddIcon style={{ float: 'right' }} onClick={(event) => setAnchorEl(event.currentTarget)} />
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={(event) => setAnchorEl(null)}>
+                {items.map((item) => (
+                    <MenuItem key={item.id} onClick={(event) => addTab(item)}>
+                        {item.name}
+                    </MenuItem>
+                ))}
+            </Menu>
+        </>
+    );
+}
+
+const groups = {
+    addTab: {
+        floatable: true,
+        closable: true,
+        panelExtra: (panelData: PanelData, context: DockContext) => <AddTabMenu panelData={panelData} context={context} />,
+    },
+};
+
+const defaultLayout: LayoutData = {
+    dockbox: {
+        mode: 'horizontal',
+        children: [
+            {
+                tabs: [
+                    { id: 'tab1', title: 'tab1', content: <div>Hello World</div>, group: 'addTab' },
+                    { id: 'tab2', title: 'tab2', content: <div>Hello World</div>, group: 'addTab' },
+                    { id: 'tab3', title: 'tab3', content: <div>Hello World</div>, group: 'addTab' },
+                    { id: 'tab4', title: 'tab4', content: <div>Hello World</div>, group: 'addTab' },
+                    {
+                        id: 'tab5',
+                        title: 'Watches',
+                        content: <WatchComponent />,
+                        group: 'addTab',
+                    },
+                ],
+            },
+        ],
+    },
+};
+
+export default function Content(): ReactElement {
+    const classes = useStyle();
+    const [view, setView] = useState<Views>(Views.Debugging);
+
+    const [layout, setLayout] = useState(defaultLayout);
+
+    const loadTab = (data: TabBase) => {
+        let { id } = data;
+        if (id === 'tab5') {
+            return {
+                id: 'tab5',
+                title: 'Watches',
+                content: <WatchComponent />,
+                group: 'addTab',
+            } as TabData;
+        }
+
+        if (id === 'tab4') {
+            return {
+                id: 'tab4',
+                title: 'Test',
+                content: <TestComponent />,
+                group: 'addTab',
+            } as TabData;
+        }
+
+        return {
+            id,
+            title: id,
+            content: <div>Tab Content</div>,
+            group: 'addTab',
+        } as TabData;
+    };
+
+    const onLayoutChange = (newLayout: LayoutData, currentTabId: string) => {
+        // control DockLayout from state
+        console.log(currentTabId, newLayout);
+        setLayout(newLayout);
+    };
+
+    return (
+        <div className={classes.root}>
+            <AppBar position="static" className={classes.appBar}>
+                <Tabs value={view} onChange={(evt, newVal) => setView(newVal)} indicatorColor="primary" textColor="primary">
+                    <Tab label="Outputs" />
+                    <Tab label="Debugging" />
+                </Tabs>
+            </AppBar>
+            <div style={{ height: 'calc(100% - 48px)', padding: 8 }}>
+                {view === Views.Debugging && (
+                    <DockLayout
+                        layout={layout}
+                        onLayoutChange={onLayoutChange}
+                        loadTab={loadTab}
+                        dropMode="edge"
+                        groups={groups}
+                        style={{ height: '100%', width: '100%' }}
+                    />
+                )}
+            </div>
+        </div>
+    );
+}
