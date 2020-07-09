@@ -13,7 +13,10 @@ interface Props {
 }
 
 const defaultLayout = {
-    global: {},
+    global: {
+        tabSetHeaderHeight: 30,
+        tabSetTabStripHeight: 30,
+    },
     layout: {
         type: 'row',
         weight: 100,
@@ -83,9 +86,9 @@ export default function DebuggingLayout({ addTabOpen, setAddTabOpen }: Props): R
     };
 
     return (
-        <>
+        <div style={{ position: 'relative', height: '100%' }}>
             <Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
             <DebuggingAddTab open={addTabOpen} onClose={addTab} />
-        </>
+        </div>
     );
 }

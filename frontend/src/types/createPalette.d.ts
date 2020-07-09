@@ -1,4 +1,5 @@
 import * as createPalette from '@material-ui/core/styles/createPalette';
+import { TaskState } from '../utils/GlobalStateContext';
 
 declare module '@material-ui/core/styles/createPalette' {
     interface WatchBlockOptions {
@@ -43,12 +44,23 @@ declare module '@material-ui/core/styles/createPalette' {
         borders: string;
     }
 
+    type TaskStateOptions = {
+        [key in TaskState]: string;
+    };
+
+    interface ScrollbarOptions {
+        thumb: string;
+        thumbHover: string;
+    }
+
     interface PaletteOptions {
         watchblocks: WatchBlockOptions;
         header: HeaderOptions;
         mainMenu: MainMenuOptions;
         fileManager: FileManagerOptions;
         contentLayout: ContentLayoutOptions;
+        taskState: TaskStateOptions;
+        scrollbar: ScrollbarOptions;
     }
 
     interface Palette {
@@ -57,5 +69,7 @@ declare module '@material-ui/core/styles/createPalette' {
         mainMenu: MainMenuOptions;
         fileManager: FileManagerOptions;
         contentLayout: ContentLayoutOptions;
+        taskState: TaskStateOptions;
+        scrollbar: ScrollbarOptions;
     }
 }

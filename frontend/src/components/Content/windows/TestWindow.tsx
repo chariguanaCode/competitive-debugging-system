@@ -13,7 +13,16 @@ function TestWindow(): ReactElement {
         };
     }, []);
 
-    return <div>{value}</div>;
+    return (
+        <div>
+            {value}
+            <ul>
+                {Array.from(Array(1000)).map((val, index) => (
+                    <li>{index}</li>
+                ))}
+            </ul>
+        </div>
+    );
 }
 
 export default TestWindow;

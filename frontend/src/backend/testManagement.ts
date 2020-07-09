@@ -1,9 +1,5 @@
 import { useContextSelector } from 'use-context-selector';
-import GlobalStateContext, {
-    ExecutionState,
-    TaskState,
-    Task,
-} from '../utils/GlobalStateContext';
+import GlobalStateContext, { ExecutionState, TaskState, Task } from '../utils/GlobalStateContext';
 
 let hrstart: [number, number];
 
@@ -28,14 +24,8 @@ const useUpdateExecutionState = () => {
 };
 
 const useBeginTest = () => {
-    const taskStates = useContextSelector(
-        GlobalStateContext,
-        (v) => v.taskStates
-    );
-    const reloadTasks = useContextSelector(
-        GlobalStateContext,
-        (v) => v.reloadTasks
-    );
+    const taskStates = useContextSelector(GlobalStateContext, (v) => v.taskStates);
+    const reloadTasks = useContextSelector(GlobalStateContext, (v) => v.reloadTasks);
 
     return (id: string) => (childProcess: any) => {
         taskStates.current[id] = {
@@ -51,19 +41,11 @@ const useBeginTest = () => {
 };
 
 const useFinishTest = () => {
-    const taskStates = useContextSelector(
-        GlobalStateContext,
-        (v) => v.taskStates
-    );
-    const reloadTasks = useContextSelector(
-        GlobalStateContext,
-        (v) => v.reloadTasks
-    );
+    const taskStates = useContextSelector(GlobalStateContext, (v) => v.taskStates);
+    const reloadTasks = useContextSelector(GlobalStateContext, (v) => v.reloadTasks);
 
     return (id: string) => () => {
-        const execTime = window.process.hrtime(
-            taskStates.current[id].startTime
-        );
+        const execTime = window.process.hrtime(taskStates.current[id].startTime);
 
         taskStates.current[id] = {
             state: TaskState.Successful,
@@ -76,23 +58,17 @@ const useFinishTest = () => {
 };
 
 const useKillTest = () => {
-    const taskStates = useContextSelector(
-        GlobalStateContext,
-        (v) => v.taskStates
-    );
-    const reloadTasks = useContextSelector(
-        GlobalStateContext,
-        (v) => v.reloadTasks
-    );
+    const taskStates = useContextSelector(GlobalStateContext, (v) => v.taskStates);
+    const reloadTasks = useContextSelector(GlobalStateContext, (v) => v.reloadTasks);
 
     return (id: string) => () => {
+        if (taskStates.current[id].state !== TaskState.Running) return;
+
         console.log(window.process.hrtime(hrstart), 'killed', id);
 
         taskStates.current[id].childProcess.kill();
 
-        const execTime = window.process.hrtime(
-            taskStates.current[id].startTime
-        );
+        const execTime = window.process.hrtime(taskStates.current[id].startTime);
         taskStates.current[id] = {
             state: TaskState.Killed,
             childProcess: null,
@@ -104,17 +80,13 @@ const useKillTest = () => {
 };
 
 const useTestError = () => {
-    const taskStates = useContextSelector(
-        GlobalStateContext,
-        (v) => v.taskStates
-    );
-    const reloadTasks = useContextSelector(
-        GlobalStateContext,
-        (v) => v.reloadTasks
-    );
+    const taskStates = useContextSelector(GlobalStateContext, (v) => v.taskStates);
+    const reloadTasks = useContextSelector(GlobalStateContext, (v) => v.reloadTasks);
 
     return (id: string) => (err: any) => {
         if (taskStates.current[id].state === TaskState.Running) {
+            const execTime = window.process.hrtime(taskStates.current[id].startTime);
+
             taskStates.current[id] = {
                 state: TaskState.Crashed,
                 childProcess: null,
@@ -123,25 +95,12 @@ const useTestError = () => {
                     signal: err.signal,
                     stderr: err.stderr,
                 },
+                executionTime: `${execTime[0]}s ${execTime[1] / 1000000}ms`,
             } as Task;
         }
-
-        const execTime = window.process.hrtime(
-            taskStates.current[id].startTime
-        );
-        taskStates.current[id] = {
-            ...taskStates.current[id],
-            executionTime: `${execTime[0]}s ${execTime[1] / 1000000}ms`,
-        } as Task;
 
         reloadTasks();
     };
 };
 
-export {
-    useUpdateExecutionState,
-    useBeginTest,
-    useFinishTest,
-    useKillTest,
-    useTestError,
-};
+export { useUpdateExecutionState, useBeginTest, useFinishTest, useKillTest, useTestError };

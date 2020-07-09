@@ -98,6 +98,12 @@ export interface TaskDetails {
     watchblocks: MutableRefObject<Watchblock>;
 }
 
+export enum Views {
+    Tasks,
+    Outputs,
+    Debugging,
+}
+
 export interface GlobalStateType {
     executionState: ExecutionState;
     config: Config;
@@ -110,6 +116,7 @@ export interface GlobalStateType {
     currentTask: TaskDetails;
     shouldStdoutReload: number;
     shouldWatchblocksReload: number;
+    view: Views;
     setExecutionState: (newState: ExecutionState) => void;
     setConfig: (newConfig: Config) => void;
     setFileTracking: (newTracking: any) => void;
@@ -117,6 +124,7 @@ export interface GlobalStateType {
     reloadTasks: () => void;
     setCurrentTaskId: (newTaskId: string) => void;
     updateWatchblockCount: () => void;
+    setView: (newView: Views) => void;
 }
 
 const GlobalStateContext = createContext({} as GlobalStateType);
@@ -135,7 +143,7 @@ export const GlobalStateProvider = ({ children }: Props) => {
 
     const [taskStates, shouldTasksReload, reloadTasks] = useMutableStateWithLimitedUpdateFrequency(
         {} as { [key: string]: Task },
-        500
+        200
     );
     const [currentTaskId, setCurrentTaskId] = useState('');
 
@@ -186,6 +194,8 @@ export const GlobalStateProvider = ({ children }: Props) => {
         }
     );
 
+    const [view, setView] = useState<Views>(Views.Debugging);
+
     return (
         <GlobalStateContext.Provider
             value={{
@@ -206,6 +216,7 @@ export const GlobalStateProvider = ({ children }: Props) => {
                 ),
                 shouldStdoutReload,
                 shouldWatchblocksReload,
+                view,
                 setExecutionState,
                 setConfig,
                 setFileTracking,
@@ -213,6 +224,7 @@ export const GlobalStateProvider = ({ children }: Props) => {
                 reloadTasks,
                 setCurrentTaskId,
                 updateWatchblockCount,
+                setView,
             }}
         >
             {children}
