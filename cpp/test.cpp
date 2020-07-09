@@ -15,30 +15,30 @@ int main() {
     long long a, b;
     cin >> a >> b;
     //usleep(500000);
-    watchblock("testowańsko") {
+    watchblock("first watchblock") {
         watch(a);
-        vector<vector<int>> vektorek(1337, vector<int> (1, 1337));
+        vector<vector<int>> vector_2d(13, vector<int> (1, 1337));
         bitset<30> testing;
         int n = 30;
-        int tab[n];
+        int dynamic_array[n];
         map<int, string> my_map;
         my_map[10] = "test";
         example my_struct;
         my_struct.a = 1337;
-        my_struct.test = "siemka";
+        my_struct.test = "some cool value";
         watch(my_struct);
-        watch(string("se testuje"));
+        watch(string("test message"));
         cerr << "test \ntest2";
         watch(testing);
-        watchblock("duuuża pętla") {
-            for (int i = 0; i < 1000; ++i) {
+        watchblock("my not long loop") {
+            for (int i = 0; i < 10; ++i) {
                 watch(i);
             }
         }
         watch(my_map);
-        watchblock("testowańsko bardziej") {
-            watch(tab);
-            watch(vektorek);
+        watchblock("2nd watchblock") {
+            watch(dynamic_array);
+            watch(vector_2d);
         }
     }
     cout << a / b << endl;

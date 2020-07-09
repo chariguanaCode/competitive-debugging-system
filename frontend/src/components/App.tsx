@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
-import {
-    CssBaseline,
-    createMuiTheme,
-    Switch,
-    FormControlLabel,
-} from '@material-ui/core';
+import { CssBaseline, createMuiTheme, Switch, FormControlLabel } from '@material-ui/core';
 import Header from './Header';
 import Content from './Content';
-import Sidebar from './Sidebar';
+import SideProgressbar from './SideProgressbar';
 import {
     amber,
     yellow,
     orange,
     lightGreen,
+    lightBlue,
     grey,
     green,
     teal,
@@ -21,12 +17,15 @@ import {
     blue,
     deepOrange,
     indigo,
+    red,
 } from '@material-ui/core/colors';
 import { ThemeProvider } from '@material-ui/core/styles';
 import TestProgress from './TestProgress';
 import { connect } from 'react-redux';
 import { changeLanguage } from '../redux/actions';
 import TitleBar from './TitleBar';
+import { TaskState } from '../utils/GlobalStateContext';
+import GlobalStyles from './GlobalStyles';
 
 const lightTheme = createMuiTheme({
     palette: {
@@ -65,6 +64,24 @@ const lightTheme = createMuiTheme({
             fontColor: 'black',
             backgroundColor: 'white',
             selectionColor: cyan[300] + '44',
+        },
+        contentLayout: {
+            panelHeader: grey[100],
+            panelBackground: '#ffffff',
+            borders: grey[200],
+        },
+        taskState: {
+            [TaskState.Pending]: grey[800],
+            [TaskState.Running]: lightBlue[400],
+            [TaskState.Successful]: lightGreen[400],
+            [TaskState.Timeout]: yellow[400],
+            [TaskState.WrongAnswer]: red[400],
+            [TaskState.Crashed]: purple[400],
+            [TaskState.Killed]: grey[400],
+        },
+        scrollbar: {
+            thumb: grey[200],
+            thumbHover: grey[300],
         },
     },
 });
@@ -106,6 +123,24 @@ const darkTheme = createMuiTheme({
             backgroundColor: grey[800],
             selectionColor: cyan[300] + '44',
         },
+        contentLayout: {
+            panelHeader: grey[800],
+            panelBackground: grey['A400'],
+            borders: grey[800],
+        },
+        taskState: {
+            [TaskState.Pending]: '#ffffff',
+            [TaskState.Running]: lightBlue[400],
+            [TaskState.Successful]: lightGreen[400],
+            [TaskState.Timeout]: yellow[400],
+            [TaskState.WrongAnswer]: red[400],
+            [TaskState.Crashed]: purple[400],
+            [TaskState.Killed]: grey[400],
+        },
+        scrollbar: {
+            thumb: grey[800],
+            thumbHover: grey[700],
+        },
     },
 });
 
@@ -126,6 +161,7 @@ interface sr {
 const App: React.FC<sr> = ({ language, changeLanguage }) => {
     //const [ filePath, setFilePath ] = useState("/home/charodziej/Documents/OIG/OI27/nww.cpp")
     const [theme, setTheme] = useState(darkTheme);
+    //const [theme, setTheme] = useState(lightTheme);
 
     return (
         <ThemeProvider theme={theme}>
@@ -137,32 +173,30 @@ const App: React.FC<sr> = ({ language, changeLanguage }) => {
                     }}
                 >
                     <CssBaseline />
+                    <GlobalStyles />
+
                     <TitleBar />
 
                     <Header />
-                    <Sidebar variant="left">
+                    {/*<Sidebar variant="left">
                         <TestProgress />
-                    </Sidebar>
+                    </Sidebar>*/}
                     {/*
                 //@ts-ignore    }
             <button onClick = {()=>{changeLanguage("pl")}}>LOL</button>
             {/*<Content />*/}
+                    <SideProgressbar />
+
                     <Content />
 
-                    <Sidebar variant="right">
+                    {/*<Sidebar variant="right">
                         <div style={{ margin: 8 }}>
                             <FormControlLabel
                                 label="Dark mode"
                                 control={
                                     <Switch
                                         checked={theme.palette.type === 'dark'}
-                                        onChange={(evt) =>
-                                            setTheme(
-                                                evt.target.checked
-                                                    ? darkTheme
-                                                    : lightTheme
-                                            )
-                                        }
+                                        onChange={(evt) => setTheme(evt.target.checked ? darkTheme : lightTheme)}
                                     />
                                 }
                             />
@@ -170,7 +204,7 @@ const App: React.FC<sr> = ({ language, changeLanguage }) => {
                                 <p key={index}>Testing</p>
                             ))}
                         </div>
-                    </Sidebar>
+                    </Sidebar>*/}
                 </div>
             </>
         </ThemeProvider>

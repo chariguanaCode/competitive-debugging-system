@@ -4,6 +4,7 @@ import { useGrowingFileTrack } from '../backend/outputFileTracking';
 import { watchParse, clearWatchblocks } from '../backend/watchParse';
 import useMutableStateWithLimitedUpdateFrequency from './useMutableStateWithLimitedUpdateFrequency';
 import defaultConfig from '../data/defaultConfig.json';
+import { ConvertResult } from '../backend/watchParse';
 
 interface Props {
     children: any | Array<any>;
@@ -71,13 +72,36 @@ export interface Task {
     };
 }
 
-export type Watchblocks = any;
+export type Watch = {
+    id: string;
+    line: number;
+    data_type: string;
+    config: any;
+} & ConvertResult;
+
+export interface Watchblock {
+    id: string;
+    children: Array<Watchblock | Watch>;
+    type: 'watchblock';
+    line: number;
+    name: string;
+    state: {
+        expanded: boolean;
+    };
+    //config: any;
+}
 
 export interface TaskDetails {
     id: string;
     stdout: MutableRefObject<string>;
     stdoutFileSize: number;
-    watchblocks: MutableRefObject<Watchblocks>;
+    watchblocks: MutableRefObject<Watchblock>;
+}
+
+export enum Views {
+    Tasks,
+    Outputs,
+    Debugging,
 }
 
 export interface GlobalStateType {
@@ -92,12 +116,15 @@ export interface GlobalStateType {
     currentTask: TaskDetails;
     shouldStdoutReload: number;
     shouldWatchblocksReload: number;
+    view: Views;
     setExecutionState: (newState: ExecutionState) => void;
     setConfig: (newConfig: Config) => void;
     setFileTracking: (newTracking: any) => void;
     setProjectFile: (newSource: string) => void;
     reloadTasks: () => void;
     setCurrentTaskId: (newTaskId: string) => void;
+    updateWatchblockCount: () => void;
+    setView: (newView: Views) => void;
 }
 
 const GlobalStateContext = createContext({} as GlobalStateType);
@@ -105,41 +132,28 @@ const GlobalStateContext = createContext({} as GlobalStateType);
 export const GlobalStateProvider = ({ children }: Props) => {
     const [config, setConfig] = useState<Config>({
         projectInfo: {
-            files: [
-                '/home/charodziej/Documents/competitive-debugging-system/cpp/test.cpp',
-            ],
+            files: ['/home/charodziej/Documents/competitive-debugging-system/cpp/test.cpp'],
         },
     } as Config);
     const [fileTracking, setFileTracking] = useState<any>(null);
     const [projectFile, setProjectFile] = useState<string>(
         '/home/charodziej/Documents/competitive-debugging-system/cpp/test.cpp'
     );
-    const [executionState, setExecutionState] = useState<ExecutionState>(
-        ExecutionState.NoProject
-    );
+    const [executionState, setExecutionState] = useState<ExecutionState>(ExecutionState.NoProject);
 
-    const [
-        taskStates,
-        shouldTasksReload,
-        reloadTasks,
-    ] = useMutableStateWithLimitedUpdateFrequency(
+    const [taskStates, shouldTasksReload, reloadTasks] = useMutableStateWithLimitedUpdateFrequency(
         {} as { [key: string]: Task },
-        500
+        200
     );
     const [currentTaskId, setCurrentTaskId] = useState('');
 
-    const [
-        stdout,
-        shouldStdoutReload,
-        updateStdoutCount,
-    ] = useMutableStateWithLimitedUpdateFrequency('', 500);
+    const [stdout, shouldStdoutReload, updateStdoutCount] = useMutableStateWithLimitedUpdateFrequency('', 500);
     const [stdoutFileSize, setStdoutFileSize] = useState(1);
 
-    const [
-        watchblocks,
-        shouldWatchblocksReload,
-        updateWatchblockCount,
-    ] = useMutableStateWithLimitedUpdateFrequency('', 500);
+    const [watchblocks, shouldWatchblocksReload, updateWatchblockCount] = useMutableStateWithLimitedUpdateFrequency(
+        { children: [] as Array<Watchblock | Watch> } as Watchblock,
+        500
+    );
 
     const appendStdout = (newData: Uint8Array) => {
         stdout.current += new TextDecoder('utf-8').decode(newData);
@@ -152,15 +166,11 @@ export const GlobalStateProvider = ({ children }: Props) => {
     };
 
     useGrowingFileTrack(
-        currentTaskId !== '' &&
-            [TaskState.Running, TaskState.Successful].includes(
-                taskStates.current[currentTaskId].state
-            )
+        currentTaskId !== '' && [TaskState.Running, TaskState.Successful].includes(taskStates.current[currentTaskId].state)
             ? config.tests[currentTaskId].filePath + '.out'
             : '',
         false,
-        currentTaskId !== '' &&
-            taskStates.current[currentTaskId].state === TaskState.Successful,
+        currentTaskId !== '' && taskStates.current[currentTaskId].state === TaskState.Successful,
         appendStdout,
         setStdoutFileSize,
         () => {
@@ -171,15 +181,11 @@ export const GlobalStateProvider = ({ children }: Props) => {
     );
 
     useGrowingFileTrack(
-        currentTaskId !== '' &&
-            [TaskState.Running, TaskState.Successful].includes(
-                taskStates.current[currentTaskId].state
-            )
+        currentTaskId !== '' && [TaskState.Running, TaskState.Successful].includes(taskStates.current[currentTaskId].state)
             ? config.tests[currentTaskId].filePath + '.err'
             : '',
         true,
-        currentTaskId !== '' &&
-            taskStates.current[currentTaskId].state === TaskState.Successful,
+        currentTaskId !== '' && taskStates.current[currentTaskId].state === TaskState.Successful,
         setWatchblocks,
         (x: number) => {},
         () => {
@@ -187,6 +193,8 @@ export const GlobalStateProvider = ({ children }: Props) => {
             updateWatchblockCount();
         }
     );
+
+    const [view, setView] = useState<Views>(Views.Debugging);
 
     return (
         <GlobalStateContext.Provider
@@ -208,12 +216,15 @@ export const GlobalStateProvider = ({ children }: Props) => {
                 ),
                 shouldStdoutReload,
                 shouldWatchblocksReload,
+                view,
                 setExecutionState,
                 setConfig,
                 setFileTracking,
                 setProjectFile,
                 reloadTasks,
                 setCurrentTaskId,
+                updateWatchblockCount,
+                setView,
             }}
         >
             {children}

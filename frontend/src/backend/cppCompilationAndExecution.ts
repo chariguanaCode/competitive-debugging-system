@@ -1,15 +1,8 @@
 import { useContextSelector } from 'use-context-selector';
-import GlobalStateContext, {
-    ExecutionState,
-} from '../utils/GlobalStateContext';
+import GlobalStateContext, { ExecutionState } from '../utils/GlobalStateContext';
 import * as cppActions from './cppActions';
 import PromiseQueue from '../utils/parallelPromiseQueue';
-import {
-    useUpdateExecutionState,
-    useBeginTest,
-    useFinishTest,
-    useTestError,
-} from './testManagement';
+import { useUpdateExecutionState, useBeginTest, useFinishTest, useTestError } from './testManagement';
 
 export default () => {
     const config = useContextSelector(GlobalStateContext, (v) => v.config);
@@ -27,34 +20,22 @@ export default () => {
             const binaryName = await cppActions.compileCpp(filename).then(
                 (result: string) => result,
                 (stderr: any) => {
-                    updateExecutionState(
-                        ExecutionState.CompilationError,
-                        stderr
-                    );
+                    updateExecutionState(ExecutionState.CompilationError, stderr);
                     throw new Error();
                 }
             );
             let hrend = window.process.hrtime(hrstart);
-            updateExecutionState(
-                ExecutionState.Running,
-                `Took ${hrend[0]}s ${hrend[1] / 1000000}ms`
-            );
+            updateExecutionState(ExecutionState.Running, `Took ${hrend[0]}s ${hrend[1] / 1000000}ms`);
 
             console.log('Running tests...');
 
             console.log('Found tests:', tests);
-            const testPromises = new PromiseQueue(3);
+            const testPromises = new PromiseQueue(2);
             await Promise.all(
                 Object.entries(tests).map(([id, { filePath }]) =>
                     testPromises
                         .enqueue(
-                            () =>
-                                cppActions.executeTest(
-                                    binaryName,
-                                    filePath,
-                                    filePath + '.out',
-                                    filePath + '.err'
-                                ),
+                            () => cppActions.executeTest(binaryName, filePath, filePath + '.out', filePath + '.err'),
                             beginTest(id)
                         )
                         .then(finishTest(id), testError(id))
