@@ -1,5 +1,4 @@
-import { MutableRefObject } from 'react';
-import { Watchblock, Watch } from '../utils/GlobalStateContext';
+import { Watchblock, Watch } from 'reduxState/models';
 
 const cupl_start = 240;
 //const cupl_end = 246
@@ -177,19 +176,24 @@ const convertContents = (contents: Uint8Array, start: number, id: string): { res
 
 let watchblockStack: Array<Watchblock> = [];
 
-export const clearWatchblocks = (watchblocks: MutableRefObject<Watchblock>) => {
-    watchblocks.current = {
-        id: '-1',
-        children: [],
-        type: 'watchblock',
-        line: -1,
-        name: '',
-        state: { expanded: true },
-    };
-    watchblockStack = [watchblocks.current];
+export const clearWatchblocks = () => {
+    watchblockStack = [
+        {
+            id: '-1',
+            children: [],
+            type: 'watchblock',
+            line: -1,
+            name: '',
+            state: { expanded: true },
+        },
+    ];
 };
 
-export const watchParse = (newData: Uint8Array) => {
+export const readWatchblocks = () => {
+    return watchblockStack[0];
+};
+
+export const parseWatchblocks = (newData: Uint8Array) => {
     let loc = newData.indexOf(cupl_start);
     if (loc === -1) return;
 

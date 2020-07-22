@@ -1,8 +1,9 @@
-import { useContextSelector } from 'use-context-selector';
-import GlobalStateContext, { Task, TaskState } from '../utils/GlobalStateContext';
 import useCompilationAndExecution from './cppCompilationAndExecution';
 import * as fileChangeTracking from './fileChangeTracking';
 import * as asyncFileActions from './asyncFileActions';
+import { useConfig, useAllTasksState } from 'reduxState/selectors';
+import { useConfigActions, useTaskStatesActions } from 'reduxState/actions';
+import { Task, TaskState } from 'reduxState/models';
 
 /*
 const loadDirectory = require('./handleTests').loadDirectory
@@ -12,9 +13,9 @@ const loadTestsCANCEL = require('./handleTests').loadTestsCANCEL
 */
 
 const useRunTasks = () => {
-    const config = useContextSelector(GlobalStateContext, (v) => v.config);
-    const taskStates = useContextSelector(GlobalStateContext, (v) => v.taskStates);
-    const reloadTasks = useContextSelector(GlobalStateContext, (v) => v.reloadTasks);
+    const config = useConfig();
+    const taskStates = useAllTasksState();
+    const { reloadTasks } = useTaskStatesActions();
     const compilationAndExecution = useCompilationAndExecution();
 
     return () => {
@@ -39,8 +40,8 @@ const useRunTasks = () => {
 };
 
 const useAddTestFiles = () => {
-    const config = useContextSelector(GlobalStateContext, (v) => v.config);
-    const setConfig = useContextSelector(GlobalStateContext, (v) => v.setConfig);
+    const config = useConfig();
+    const { setConfig } = useConfigActions();
 
     if(!config) return; 
     return async (testPaths: Array<string>) => {

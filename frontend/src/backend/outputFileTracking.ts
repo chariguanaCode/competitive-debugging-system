@@ -1,71 +1,52 @@
-import { useEffect } from 'react';
-
-const chokidar = window.require('chokidar');
 const fs = window.require('fs');
 
-export const useGrowingFileTrack = (
+export const readFileStream = (
     filepath: string,
-    shouldBuffer: boolean,
-    finished: boolean,
-    pushNewData: (newData: Uint8Array) => void,
-    pushNewSize: (newSize: number) => void,
-    cleanup: () => void
+    sendSingleLines: boolean,
+    pushData: (newData: Uint8Array) => void,
+    updateSize: (newSize: number) => void,
+    cleanup: () => void,
+    finish: () => void
 ) => {
-    useEffect(() => {
-        if (filepath !== '') {
-            cleanup();
+    if (filepath !== '') {
+        cleanup();
 
-            const watcher = chokidar.watch(filepath, { alwaysStat: true });
-            let currSize = 0;
-            let buffer = new Uint8Array([]);
+        let buffer = new Uint8Array([]);
 
-            const handleEvent = (path: string, stats: any) => {
-                if (currSize < stats.size) {
-                    const contentStream = fs.createReadStream(filepath, {
-                        start: currSize,
-                        end: stats.size - 1,
-                    });
-                    currSize = stats.size;
-                    pushNewSize(currSize);
+        const stats = fs.statSync(filepath);
+        const contentStream = fs.createReadStream(filepath);
+        updateSize(stats.size);
 
-                    contentStream.on('data', (data: Buffer) => {
-                        if (!shouldBuffer) {
-                            pushNewData(data);
-                        } else {
-                            const oldBuffer = buffer;
-                            buffer = new Uint8Array(buffer.length + data.length);
-                            buffer.set(oldBuffer);
-                            buffer.set(data, oldBuffer.length);
+        contentStream.on('data', (data: Buffer) => {
+            const oldBuffer = buffer;
+            buffer = new Uint8Array(buffer.length + data.length);
+            buffer.set(oldBuffer);
+            buffer.set(data, oldBuffer.length);
 
-                            let index = -1,
-                                prevIndex = -1;
-                            do {
-                                prevIndex = index + 1;
-                                index = buffer.indexOf(10, prevIndex);
-                                if (index !== -1) {
-                                    pushNewData(buffer.slice(prevIndex, index));
-                                }
-                            } while (index !== -1);
+            if (sendSingleLines) {
+                let index = -1,
+                    prevIndex = -1;
+                do {
+                    prevIndex = index + 1;
+                    index = buffer.indexOf(10, prevIndex);
+                    if (index !== -1) {
+                        pushData(buffer.slice(prevIndex, index));
+                    }
+                } while (index !== -1);
 
-                            if (prevIndex > 0) buffer = buffer.subarray(prevIndex);
-                        }
-                    });
+                if (prevIndex > 0) buffer = buffer.subarray(prevIndex);
+            }
+        });
 
-                    watcher.on('close', () => {
-                        contentStream.destroy();
-                    });
-                }
-            };
+        contentStream.on('close', () => {
+            if (!sendSingleLines) {
+                pushData(buffer);
+            }
+            finish();
+        });
 
-            watcher.on('add', handleEvent);
-            watcher.on('change', handleEvent);
-
-            return () => {
-                watcher.emit('close');
-                watcher.close();
-                cleanup();
-            };
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filepath, finished]);
+        return () => {
+            contentStream.close();
+        };
+    }
 };

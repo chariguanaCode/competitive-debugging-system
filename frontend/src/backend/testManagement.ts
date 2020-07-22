@@ -1,31 +1,12 @@
-import { useContextSelector } from 'use-context-selector';
-import GlobalStateContext, { ExecutionState, TaskState, Task } from '../utils/GlobalStateContext';
+import { TaskState, Task } from 'reduxState/models';
+import { useTaskStatesActions } from 'reduxState/actions';
+import { useAllTasksState } from 'reduxState/selectors';
 
 let hrstart: [number, number];
 
-const useUpdateExecutionState = () => {
-    return (type: ExecutionState, details: string) => {
-        switch (type) {
-            case ExecutionState.Compiling:
-                console.log('Compiling...');
-                break;
-            case ExecutionState.Running:
-                console.log('Compilation successful!', details);
-                break;
-            case ExecutionState.CompilationError:
-                console.log('Compilation failed!', details);
-                break;
-            case ExecutionState.Finished:
-                console.log('Testing successful!');
-                console.log('Everything finished!');
-                break;
-        }
-    };
-};
-
-const useBeginTest = () => {
-    const taskStates = useContextSelector(GlobalStateContext, (v) => v.taskStates);
-    const reloadTasks = useContextSelector(GlobalStateContext, (v) => v.reloadTasks);
+export const useBeginTest = () => {
+    const { reloadTasks } = useTaskStatesActions();
+    const taskStates = useAllTasksState();
 
     return (id: string) => (childProcess: any) => {
         taskStates.current[id] = {
@@ -40,12 +21,13 @@ const useBeginTest = () => {
     };
 };
 
-const useFinishTest = () => {
-    const taskStates = useContextSelector(GlobalStateContext, (v) => v.taskStates);
-    const reloadTasks = useContextSelector(GlobalStateContext, (v) => v.reloadTasks);
+export const useFinishTest = () => {
+    const { reloadTasks } = useTaskStatesActions();
+    const taskStates = useAllTasksState();
 
     return (id: string) => () => {
         const execTime = window.process.hrtime(taskStates.current[id].startTime);
+        console.log(taskStates.current[id]);
 
         taskStates.current[id] = {
             state: TaskState.Successful,
@@ -57,9 +39,9 @@ const useFinishTest = () => {
     };
 };
 
-const useKillTest = () => {
-    const taskStates = useContextSelector(GlobalStateContext, (v) => v.taskStates);
-    const reloadTasks = useContextSelector(GlobalStateContext, (v) => v.reloadTasks);
+export const useKillTest = () => {
+    const { reloadTasks } = useTaskStatesActions();
+    const taskStates = useAllTasksState();
 
     return (id: string) => () => {
         if (taskStates.current[id].state !== TaskState.Running) return;
@@ -79,9 +61,9 @@ const useKillTest = () => {
     };
 };
 
-const useTestError = () => {
-    const taskStates = useContextSelector(GlobalStateContext, (v) => v.taskStates);
-    const reloadTasks = useContextSelector(GlobalStateContext, (v) => v.reloadTasks);
+export const useTestError = () => {
+    const { reloadTasks } = useTaskStatesActions();
+    const taskStates = useAllTasksState();
 
     return (id: string) => (err: any) => {
         if (taskStates.current[id].state === TaskState.Running) {
@@ -102,5 +84,3 @@ const useTestError = () => {
         reloadTasks();
     };
 };
-
-export { useUpdateExecutionState, useBeginTest, useFinishTest, useKillTest, useTestError };

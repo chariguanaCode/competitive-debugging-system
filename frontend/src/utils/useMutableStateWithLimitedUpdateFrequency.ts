@@ -2,7 +2,7 @@ import { useRef, useState, MutableRefObject, useCallback } from 'react';
 
 export default <T>(initialValue: T, delay: number) => {
     const value = useRef(initialValue);
-    const timeout = useRef<null | number>(null);
+    const timeout = useRef<null | NodeJS.Timeout>(null);
     const shouldRerender = useRef(false);
     const [renderCounter, setRenderCounter] = useState(0);
 
@@ -21,9 +21,5 @@ export default <T>(initialValue: T, delay: number) => {
         }
     }, [timeout, shouldRerender, setRenderCounter, delay]);
 
-    return [value, renderCounter, rerender] as [
-        MutableRefObject<T>,
-        number,
-        () => void
-    ];
+    return [value, renderCounter, rerender] as [MutableRefObject<T>, number, () => void];
 };

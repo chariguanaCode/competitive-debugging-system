@@ -1,42 +1,27 @@
-import { useContextSelector } from 'use-context-selector';
-import GlobalStateContext, {
-    Task,
-    TaskState,
-} from '../utils/GlobalStateContext';
 import useCompilationAndExecution from './cppCompilationAndExecution';
 import * as fileChangeTracking from './fileChangeTracking';
 import * as asyncFileActions from './asyncFileActions';
-import { Config as ConfigTypes } from '../utils/GlobalStateContext';
 import defaultConfig from '../data/defaultConfig.json';
+import { ConfigModel, AllTasksModel, Task, TaskState } from 'reduxState/models';
+import { useConfig, useAllTasksState } from 'reduxState/selectors';
+import { useConfigActions, useTaskStatesActions } from 'reduxState/actions';
 
 export const useSaveProject = () => {
-    const config = useContextSelector(GlobalStateContext, (v) => v.config);
-    if(!config) return;
+    const config = useConfig();
+
     return async () => {
         let path = asyncFileActions.parsePath(config.projectInfo.path);
         if (!(await asyncFileActions.isDirectory(path))) {
             return;
         }
-        return asyncFileActions.saveFile(
-            path + config.projectInfo.saveName + '.cdsp',
-            JSON.stringify(config)
-        );
+        return asyncFileActions.saveFile(path + config.projectInfo.saveName + '.cdsp', JSON.stringify(config));
     };
 };
 
 export const useLoadProject = () => {
-    const setConfig = useContextSelector(
-        GlobalStateContext,
-        (v) => v.setConfig
-    );
-    const taskStates = useContextSelector(
-        GlobalStateContext,
-        (v) => v.taskStates
-    );
-    const reloadTasks = useContextSelector(
-        GlobalStateContext,
-        (v) => v.reloadTasks
-    );
+    const { setConfig } = useConfigActions();
+    const taskStates = useAllTasksState();
+    const { reloadTasks } = useTaskStatesActions();
 
     return async (sourceFilePath: string) => {
         let path = asyncFileActions.parsePath(sourceFilePath);
@@ -53,7 +38,7 @@ export const useLoadProject = () => {
             return;
         }
 
-        let newConfig: ConfigTypes = defaultConfig;
+        let newConfig: ConfigModel = defaultConfig;
 
         await asyncFileActions.readFile(path).then((data: any) => {
             newConfig = JSON.parse(data);
@@ -64,21 +49,29 @@ export const useLoadProject = () => {
         newConfig.projectInfo.saveName = dividedPath[dividedPath.length - 1];
         newConfig.projectInfo.path = dividedPath.slice(0, -1).join('/') + '/';
         console.log(newConfig, dividedPath);
+        /*
+        const tests = {} as { [key: string]: { filePath: string } };
+        for (let i = 0; i < 100; i++) {
+            for (const key in newConfig.tests) {
+                if (newConfig.tests.hasOwnProperty(key)) {
+                    tests[`${key} ${i}`] = newConfig.tests[key];
+                }
+            }
+        }
+        newConfig.tests = tests;
+        */
+
         setConfig(newConfig);
 
         //rozdzielic do innej funkcji
-        const newTasks: {
-            [key: string]: Task;
-        } = {};
         for (const key in newConfig.tests) {
             if (newConfig.tests.hasOwnProperty(key)) {
-                newTasks[key] = {
+                taskStates.current[key] = {
                     state: TaskState.Pending,
                 } as Task;
             }
         }
 
-        taskStates.current = newTasks;
         reloadTasks();
     };
 };
