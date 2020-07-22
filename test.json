@@ -1,0 +1,11 @@
+{
+    "tests": {
+        "./cpp/tests/test1.in": {
+            "filePath": "./cpp/tests/test1.in"
+        },
+        "./cpp/tests/test2.in": {
+            "filePath": "./cpp/tests/test2.in"
+        }
+    },
+    "sourceFile": "./cpp/test.cpp"
+}

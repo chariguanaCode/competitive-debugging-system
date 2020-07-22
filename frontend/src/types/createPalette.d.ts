@@ -29,6 +29,7 @@ declare module '@material-ui/core/styles/createPalette' {
         fontColor: string;
         backgroundColor: string;
         selectionColor: string;
+        checkboxColor: string;
     }
     interface MainMenuOptions {
         backgroundColor: string;

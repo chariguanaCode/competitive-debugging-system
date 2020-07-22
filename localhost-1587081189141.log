@@ -1,0 +1,153 @@
+log.js:24 [HMR] Waiting for update signal from WDS...
+Header.tsx:53 false "lool"
+TestProgress.tsx:44 0 {}
+react_devtools_backend.js:6 Electron Security Warning (Insecure Content-Security-Policy) This renderer process has either no Content Security
+    Policy set or a policy with "unsafe-eval" enabled. This exposes users of
+    this app to unnecessary security risks.
+
+For more information and help, consult
+https://electronjs.org/docs/tutorial/security.
+This warning will not show up
+once the app is packaged.
+r @ react_devtools_backend.js:6
+(anonymous) @ security-warnings.ts:179
+Promise.then (async)
+warnAboutInsecureCSP @ security-warnings.ts:172
+logSecurityWarnings @ security-warnings.ts:295
+loadHandler @ security-warnings.ts:312
+async function (async)
+loadHandler @ security-warnings.ts:311
+load (async)
+securityWarnings @ security-warnings.ts:315
+(anonymous) @ init.ts:216
+./lib/renderer/init.ts @ init.ts:217
+__webpack_require__ @ bootstrap:19
+(anonymous) @ bootstrap:83
+(anonymous) @ bootstrap:83
+NativeModule.compile @ internal/bootstrap/loaders.js:287
+NativeModule.compileForPublicLoader @ internal/bootstrap/loaders.js:222
+loadNativeModule @ internal/modules/cjs/helpers.js:23
+Module._load @ internal/modules/cjs/loader.js:699
+Module._load @ electron/js2c/asar.js:717
+Module._load @ electron/js2c/asar.js:717
+Module.runMain @ internal/modules/cjs/loader.js:1038
+(anonymous) @ internal/main/run_main_module.js:17
+react_devtools_backend.js:6 ./src/backend/filesHandlingFunctions.js
+  Line 12:41:  Expected '!==' and instead saw '!='                           eqeqeq
+  Line 13:41:  Expected '!==' and instead saw '!='                           eqeqeq
+  Line 40:7:   'loadAllFilesOnDirectory' is assigned a value but never used  no-unused-vars
+r @ react_devtools_backend.js:6
+printWarnings @ webpackHotDevClient.js:138
+handleWarnings @ webpackHotDevClient.js:143
+push../node_modules/react-dev-utils/webpackHotDevClient.js.connection.onmessage @ webpackHotDevClient.js:210
+react_devtools_backend.js:6 ./src/utils/tools.ts
+  Line 13:12:  Comparing to itself is potentially pointless  no-self-compare
+r @ react_devtools_backend.js:6
+printWarnings @ webpackHotDevClient.js:138
+handleWarnings @ webpackHotDevClient.js:143
+push../node_modules/react-dev-utils/webpackHotDevClient.js.connection.onmessage @ webpackHotDevClient.js:210
+react_devtools_backend.js:6 ./src/backend/testManagement.ts
+  Line 1:13:  'watchParse' is defined but never used  @typescript-eslint/no-unused-vars
+r @ react_devtools_backend.js:6
+printWarnings @ webpackHotDevClient.js:138
+handleWarnings @ webpackHotDevClient.js:143
+push../node_modules/react-dev-utils/webpackHotDevClient.js.connection.onmessage @ webpackHotDevClient.js:210
+react_devtools_backend.js:6 ./src/components/FileManager/fileManagerSettings.tsx
+  Line 1:17:   'memo' is defined but never used              @typescript-eslint/no-unused-vars
+  Line 2:20:   'useEffect' is defined but never used         @typescript-eslint/no-unused-vars
+  Line 2:31:   'useRef' is defined but never used            @typescript-eslint/no-unused-vars
+  Line 6:10:   'Button' is defined but never used            @typescript-eslint/no-unused-vars
+  Line 7:18:   'DialogActions' is defined but never used     @typescript-eslint/no-unused-vars
+  Line 12:10:  'Select' is defined but never used            @typescript-eslint/no-unused-vars
+  Line 12:18:  'MenuItem' is defined but never used          @typescript-eslint/no-unused-vars
+  Line 12:28:  'InputLabel' is defined but never used        @typescript-eslint/no-unused-vars
+  Line 13:10:  'FormControl' is defined but never used       @typescript-eslint/no-unused-vars
+  Line 42:12:  Comparing to itself is potentially pointless  no-self-compare
+r @ react_devtools_backend.js:6
+printWarnings @ webpackHotDevClient.js:138
+handleWarnings @ webpackHotDevClient.js:143
+push../node_modules/react-dev-utils/webpackHotDevClient.js.connection.onmessage @ webpackHotDevClient.js:210
+react_devtools_backend.js:6 ./src/components/FileManager/Rectangle.tsx
+  Line 1:17:  'memo' is defined but never used  @typescript-eslint/no-unused-vars
+r @ react_devtools_backend.js:6
+printWarnings @ webpackHotDevClient.js:138
+handleWarnings @ webpackHotDevClient.js:143
+push../node_modules/react-dev-utils/webpackHotDevClient.js.connection.onmessage @ webpackHotDevClient.js:210
+react_devtools_backend.js:6 There were more warnings in other files.
+You can find a complete log in the terminal.
+r @ react_devtools_backend.js:6
+printWarnings @ webpackHotDevClient.js:132
+handleWarnings @ webpackHotDevClient.js:143
+push../node_modules/react-dev-utils/webpackHotDevClient.js.connection.onmessage @ webpackHotDevClient.js:210
+Header.tsx:53 true "lool"
+filesHandlingFunctions.js:109 null
+react_devtools_backend.js:6 Warning: [JSS] Could not find the referenced rule "checked" in "makeStyles". 
+    in Anonymous
+r @ react_devtools_backend.js:6
+warning @ tiny-warning.esm.js:11
+(anonymous) @ jss-plugin-nested.esm.js:25
+onProcessStyle @ jss-plugin-nested.esm.js:86
+onProcessStyle @ jss.esm.js:1264
+onProcessRule @ jss.esm.js:1253
+process @ jss.esm.js:880
+StyleSheet @ jss.esm.js:1050
+createStyleSheet @ jss.esm.js:2025
+attach @ makeStyles.js:97
+(anonymous) @ makeStyles.js:236
+useSynchronousEffect @ makeStyles.js:188
+useStyles @ makeStyles.js:228
+(anonymous) @ fileManagerToolbar.tsx:55
+renderWithHooks @ react-dom.development.js:14803
+mountIndeterminateComponent @ react-dom.development.js:17482
+beginWork @ react-dom.development.js:18596
+beginWork$1 @ react-dom.development.js:23179
+performUnitOfWork @ react-dom.development.js:22154
+workLoopSync @ react-dom.development.js:22130
+performSyncWorkOnRoot @ react-dom.development.js:21756
+(anonymous) @ react-dom.development.js:11089
+unstable_runWithPriority @ scheduler.development.js:653
+runWithPriority$1 @ react-dom.development.js:11039
+flushSyncCallbackQueueImpl @ react-dom.development.js:11084
+flushSyncCallbackQueue @ react-dom.development.js:11072
+discreteUpdates$1 @ react-dom.development.js:21893
+discreteUpdates @ react-dom.development.js:806
+dispatchDiscreteEvent @ react-dom.development.js:4168
+react_devtools_backend.js:6 Warning: [JSS] Could not find the referenced rule "checked" in "makeStyles". 
+    in Anonymous
+r @ react_devtools_backend.js:6
+warning @ tiny-warning.esm.js:11
+(anonymous) @ jss-plugin-nested.esm.js:25
+onProcessStyle @ jss-plugin-nested.esm.js:86
+onProcessStyle @ jss.esm.js:1264
+onProcessRule @ jss.esm.js:1253
+process @ jss.esm.js:880
+StyleSheet @ jss.esm.js:1050
+createStyleSheet @ jss.esm.js:2025
+attach @ makeStyles.js:97
+(anonymous) @ makeStyles.js:236
+useSynchronousEffect @ makeStyles.js:188
+useStyles @ makeStyles.js:228
+(anonymous) @ fileManagerMainToolbar.tsx:138
+renderWithHooks @ react-dom.development.js:14803
+mountIndeterminateComponent @ react-dom.development.js:17482
+beginWork @ react-dom.development.js:18596
+beginWork$1 @ react-dom.development.js:23179
+performUnitOfWork @ react-dom.development.js:22154
+workLoopSync @ react-dom.development.js:22130
+performSyncWorkOnRoot @ react-dom.development.js:21756
+(anonymous) @ react-dom.development.js:11089
+unstable_runWithPriority @ scheduler.development.js:653
+runWithPriority$1 @ react-dom.development.js:11039
+flushSyncCallbackQueueImpl @ react-dom.development.js:11084
+flushSyncCallbackQueue @ react-dom.development.js:11072
+discreteUpdates$1 @ react-dom.development.js:21893
+discreteUpdates @ react-dom.development.js:806
+dispatchDiscreteEvent @ react-dom.development.js:4168
+fileManager.tsx:177 C:
+fileManager.tsx:177 D:
+fileManager.tsx:177 E:
+fileManager.tsx:177 F:
+fileManager.tsx:177 G:
+fileManager.tsx:177 T:
+fileManager.tsx:177 
+fileManager.tsx:178 (7) ["C:", "D:", "E:", "F:", "G:", "T:", ""]

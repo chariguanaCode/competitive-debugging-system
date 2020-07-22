@@ -25,9 +25,9 @@ export const executeTest = (
     stderrPath: string
 ) => {
     console.log(binaryPath, stdinPath, stdoutPath, stderrPath)
-    const stdinStream = fs.createReadStream(stdinPath)
-    const stdoutStream = fs.createWriteStream(stdoutPath)
-    const stderrStream = fs.createWriteStream(stderrPath)
+    const stdinStream = fs.createReadStream(stdinPath);
+    const stdoutStream = fs.createWriteStream(stdoutPath);
+    const stderrStream = fs.createWriteStream(stderrPath);
 
     const child = spawn(binaryPath, [], {
         //shell: true

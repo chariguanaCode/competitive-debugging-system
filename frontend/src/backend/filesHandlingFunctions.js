@@ -2,12 +2,15 @@ import * as asyncFileActions from './asyncFileActions'
 const fs = window.require('fs')
 //const dirTree = require("directory-tree");
 const path = window.require('path')
+const exec = window.require('child_process').exec;
+const util = window.require('util');
+
 //const  os 	= require('os-utils');
 
 const parsePath = (directory) => {
     if (
-        directory[directory.length - 1] != '/' &&
-        directory[directory.length - 1] != '\\'
+        directory[directory.length - 1] !== '/' &&
+        directory[directory.length - 1] !== '\\'
     )
         directory += '/'
     if (!path.isAbsolute(directory)) {
@@ -21,6 +24,19 @@ const parsePath = (directory) => {
     return directory
 }
 
+export const getPartitionsNames = async () => {
+    const execPromisified = util.promisify(exec);
+    return (await execPromisified('wmic logicaldisk get name')).stdout;
+    /*.then((error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return;
+        }
+        console.log('stdout ', stdout);
+        console.log('stderr ', stderr);
+    });*/
+}
+//
 const loadAllFilesOnDirectory = async (directory = 'C:/') => {
     let filesToSend = []
     directory = parsePath(directory)
@@ -39,7 +55,7 @@ const loadAllFilesOnDirectory = async (directory = 'C:/') => {
     })
 }
 
-const SelectFileType = (fileType) => {
+const selectFileType = (fileType) => {
     if (
         ['.img', '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.PNG'].includes(
             fileType
@@ -129,7 +145,7 @@ export const loadFilesOnDirectory = async ({ filetypes, directory, regex }) => {
                     path: directory + file,
                     typeGroup: isDir(directory + file)
                         ? 'DIRECTORY'
-                        : SelectFileType(
+                        : selectFileType(
                                 path.extname(directory + file)
                             ),
                 })
