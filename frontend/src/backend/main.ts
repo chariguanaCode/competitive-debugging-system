@@ -1,8 +1,5 @@
 import { useContextSelector } from 'use-context-selector';
-import GlobalStateContext, {
-    Task,
-    TaskState,
-} from '../utils/GlobalStateContext';
+import GlobalStateContext, { Task, TaskState } from '../utils/GlobalStateContext';
 import useCompilationAndExecution from './cppCompilationAndExecution';
 import * as fileChangeTracking from './fileChangeTracking';
 import * as asyncFileActions from './asyncFileActions';
@@ -16,14 +13,8 @@ const loadTestsCANCEL = require('./handleTests').loadTestsCANCEL
 
 const useRunTasks = () => {
     const config = useContextSelector(GlobalStateContext, (v) => v.config);
-    const taskStates = useContextSelector(
-        GlobalStateContext,
-        (v) => v.taskStates
-    );
-    const reloadTasks = useContextSelector(
-        GlobalStateContext,
-        (v) => v.reloadTasks
-    );
+    const taskStates = useContextSelector(GlobalStateContext, (v) => v.taskStates);
+    const reloadTasks = useContextSelector(GlobalStateContext, (v) => v.reloadTasks);
     const compilationAndExecution = useCompilationAndExecution();
 
     return () => {
@@ -32,12 +23,12 @@ const useRunTasks = () => {
             return;
         }
 
-        Object.entries(taskStates.current).forEach(([id, test]) => {
-            if (test.childProcess) {
-                test.childProcess.kill();
+        Object.keys(taskStates.current).forEach((id) => {
+            if (taskStates.current[id].childProcess) {
+                taskStates.current[id].childProcess.kill();
             }
 
-            test = {
+            taskStates.current[id] = {
                 state: TaskState.Pending,
             } as Task;
         });
@@ -49,10 +40,7 @@ const useRunTasks = () => {
 
 const useAddTestFiles = () => {
     const config = useContextSelector(GlobalStateContext, (v) => v.config);
-    const setConfig = useContextSelector(
-        GlobalStateContext,
-        (v) => v.setConfig
-    );
+    const setConfig = useContextSelector(GlobalStateContext, (v) => v.setConfig);
 
     if(!config) return; 
     return async (testPaths: Array<string>) => {
@@ -69,10 +57,7 @@ const useAddTestFiles = () => {
             },
         };
 
-        const projectFile = config.projectInfo.files[0].replace(
-            /\.cpp$/,
-            '.json'
-        );
+        const projectFile = config.projectInfo.files[0].replace(/\.cpp$/, '.json');
         await asyncFileActions.saveFile(projectFile, JSON.stringify(newConfig));
 
         setConfig(newConfig);
