@@ -156,7 +156,7 @@ export default function App({}): ReactElement {
                     <CssBaseline />
                     <GlobalStyles />
                     <Daemons />
-                
+
                     <Header />
                     <Content />
                     <Footer />
