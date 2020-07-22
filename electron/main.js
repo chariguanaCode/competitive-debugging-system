@@ -1,10 +1,10 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, session } = require('electron');
 const path = require('path');
 const url = require('url');
 
 let mainWindow;
 
-function createWindow() {
+const createWindow = async () => {
     const startUrl =
         process.env.ELECTRON_START_URL ||
         url.format({
@@ -30,8 +30,12 @@ function createWindow() {
 
     //mainWindow.setMenu(null)
     /*
-    BrowserWindow.addDevToolsExtension(
-        '/home/charodziej/.config/chromium/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.6.0_0/'
+    await session.defaultSession.loadExtension(
+        '/home/charodziej/.config/chromium/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.8.1_0/'
+    );
+
+    await session.defaultSession.loadExtension(
+        '/home/charodziej/.config/chromium/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0/'
     );
     */
 
@@ -42,7 +46,7 @@ function createWindow() {
     mainWindow.on('closed', function() {
         mainWindow = null;
     });
-}
+};
 
 app.on('ready', createWindow);
 

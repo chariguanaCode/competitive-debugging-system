@@ -1,8 +1,7 @@
 import React from 'react';
-
-import GlobalStateContext, { Task, TaskState } from '../utils/GlobalStateContext';
-import { useContextSelector } from 'use-context-selector';
 import { makeStyles, useTheme, Tooltip } from '@material-ui/core';
+import { Task, TaskState } from 'reduxState/models';
+import { useAllTasksState } from 'reduxState/selectors';
 
 const useStyles = makeStyles((theme) => ({
     wrapper: {
@@ -30,8 +29,7 @@ const SideProgressbar = () => {
     const classes = useStyles();
     const theme = useTheme();
 
-    const shouldTasksReload = useContextSelector(GlobalStateContext, (v) => v.shouldTasksReload);
-    const taskStates = useContextSelector(GlobalStateContext, (v) => v.taskStates).current;
+    const taskStates = useAllTasksState().current;
     const states = Object.values(taskStates).map((task: Task) => task.state);
 
     const stateOverview = {

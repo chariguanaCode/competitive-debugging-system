@@ -1,8 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, ReactElement } from 'react';
 import { CssBaseline, createMuiTheme, Switch, FormControlLabel } from '@material-ui/core';
-import Header from './Header';
-import Content from './Content';
-import SideProgressbar from './SideProgressbar';
 import {
     amber,
     yellow,
@@ -20,12 +17,13 @@ import {
     red,
 } from '@material-ui/core/colors';
 import { ThemeProvider } from '@material-ui/core/styles';
-import TestProgress from './TestProgress';
-import { connect } from 'react-redux';
-import { changeLanguage } from '../redux/actions';
 import TitleBar from './TitleBar';
-import { TaskState } from '../utils/GlobalStateContext';
+import Header from './Header';
+import Content from './Content';
+import SideProgressbar from './SideProgressbar';
+import { TaskState } from 'reduxState/models';
 import GlobalStyles from './GlobalStyles';
+import Daemons from './Daemons';
 
 const lightTheme = createMuiTheme({
     palette: {
@@ -144,22 +142,7 @@ const darkTheme = createMuiTheme({
     },
 });
 
-const mapStateToProps = (state: any) => {
-    return { language: state.language };
-};
-const mapDispatchToProps = (dispatch: any) => {
-    return {
-        changeLanguge: (language: string) => dispatch(changeLanguage(language)),
-    };
-};
-
-interface sr {
-    language?: string;
-    changeLanguage?: Function;
-}
-
-const App: React.FC<sr> = ({ language, changeLanguage }) => {
-    //const [ filePath, setFilePath ] = useState("/home/charodziej/Documents/OIG/OI27/nww.cpp")
+export default function App({}): ReactElement {
     const [theme, setTheme] = useState(darkTheme);
     //const [theme, setTheme] = useState(lightTheme);
 
@@ -174,17 +157,11 @@ const App: React.FC<sr> = ({ language, changeLanguage }) => {
                 >
                     <CssBaseline />
                     <GlobalStyles />
+                    <Daemons />
 
                     <TitleBar />
 
                     <Header />
-                    {/*<Sidebar variant="left">
-                        <TestProgress />
-                    </Sidebar>*/}
-                    {/*
-                //@ts-ignore    }
-            <button onClick = {()=>{changeLanguage("pl")}}>LOL</button>
-            {/*<Content />*/}
                     <SideProgressbar />
 
                     <Content />
@@ -209,6 +186,4 @@ const App: React.FC<sr> = ({ language, changeLanguage }) => {
             </>
         </ThemeProvider>
     );
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+}

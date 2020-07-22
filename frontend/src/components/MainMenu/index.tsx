@@ -15,7 +15,6 @@ import FolderIcon                      from '@material-ui/icons/Folder';
 import { FileManager                 } from "../FileManager/fileManager";
 import { TextField, FormLabel, InputAdornment } from "@material-ui/core";
 import { makeStyles, useTheme, ThemeProvider } from '@material-ui/core/styles';
-import GlobalStateContext from '../../utils/GlobalStateContext'
 import { useLoadProject } from "../../backend/projectManagement";
 import { FileType } from "../FileManager/fileManager"
 interface Props {

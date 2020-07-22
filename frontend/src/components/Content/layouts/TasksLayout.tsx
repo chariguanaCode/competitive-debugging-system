@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useContextSelector } from 'use-context-selector';
-import GlobalStateContext, { TaskState, Views } from '../../../utils/GlobalStateContext';
 import {
     Table,
     TableBody,
@@ -19,16 +17,24 @@ import {
 } from '@material-ui/core';
 import { useKillTest } from '../../../backend/testManagement';
 import { Close, FilterList, BugReport, Assessment } from '@material-ui/icons';
+import { useAllTasksState } from 'reduxState/selectors';
+import { Task, TaskState } from 'reduxState/models';
+import { useTaskStatesActions } from 'reduxState/actions';
+
+export enum Views {
+    Tasks,
+    Outputs,
+    Debugging,
+}
 
 const TasksLayout = () => {
     const theme = useTheme();
 
     const killTest = useKillTest();
 
-    const taskData = Object.entries(useContextSelector(GlobalStateContext, (v) => v.taskStates).current);
-    const shouldTasksReload = useContextSelector(GlobalStateContext, (v) => v.shouldTasksReload);
-    const setCurrentTaskId = useContextSelector(GlobalStateContext, (v) => v.setCurrentTaskId);
-    const setView = useContextSelector(GlobalStateContext, (v) => v.setView);
+    const taskData: [string, Task][] = Object.entries(useAllTasksState().current);
+    const { setCurrentTaskId } = useTaskStatesActions();
+    const setView = (view: Views) => {};
 
     const [filters, setFilters] = useState({ state: [] as string[], id: '', executionTime: '' });
 

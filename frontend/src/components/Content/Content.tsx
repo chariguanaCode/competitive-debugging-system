@@ -6,14 +6,16 @@ import useStyles from './Content.css';
 import DebuggingLayout from './layouts/DebuggingLayout';
 import TasksLayout from './layouts/TasksLayout';
 
-import GlobalStateContext, { Views } from '../../utils/GlobalStateContext';
-import { useContextSelector } from 'use-context-selector';
+export enum Views {
+    Tasks,
+    Outputs,
+    Debugging,
+}
 
 export default function Content(): ReactElement {
     const classes = useStyles();
 
-    const view = useContextSelector(GlobalStateContext, (v) => v.view);
-    const setView = useContextSelector(GlobalStateContext, (v) => v.setView);
+    const [view, setView] = useState<Views>(Views.Debugging);
 
     const [addTabOpen, setAddTabOpen] = useState(false);
 

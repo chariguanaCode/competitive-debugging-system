@@ -7,16 +7,12 @@ import App from './components/App';
 import * as serviceWorker from './serviceWorker';
 
 import { Provider } from 'react-redux';
-import store from './redux/store/index';
-
-import { GlobalStateProvider } from './utils/GlobalStateContext';
+import store from 'reduxState';
 
 ReactDOM.render(
-    <GlobalStateProvider>
-        <Provider store={store}>
-            <App />
-        </Provider>
-    </GlobalStateProvider>,
+    <Provider store={store}>
+        <App />
+    </Provider>,
     document.getElementById('root')
 );
 

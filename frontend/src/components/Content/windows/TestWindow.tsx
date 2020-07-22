@@ -16,11 +16,9 @@ function TestWindow(): ReactElement {
     return (
         <div>
             {value}
-            <ul>
-                {Array.from(Array(1000)).map((val, index) => (
+            <ul>{/*Array.from(Array(1000)).map((val, index) => (
                     <li>{index}</li>
-                ))}
-            </ul>
+                ))*/}</ul>
         </div>
     );
 }

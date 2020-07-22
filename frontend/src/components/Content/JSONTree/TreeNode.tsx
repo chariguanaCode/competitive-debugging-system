@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import { useTheme } from '@material-ui/core';
 import { WatchBlockOptions } from '@material-ui/core/styles/createPalette';
-import { Watchblock, Watch } from '../../../utils/GlobalStateContext';
+import { Watchblock, Watch } from 'reduxState/models';
 
 interface Props {
     node: any;

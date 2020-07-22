@@ -47,7 +47,6 @@
     },
     "homepage": "https://github.com/chariguanaCode/competitive-debugging-system#readme",
     "dependencies": {
-        "chokidar": "^3.4.0",
         "md5": "^2.2.1"
     },
     "devDependencies": {
