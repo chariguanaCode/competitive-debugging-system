@@ -14,7 +14,7 @@ import {
 import { Close as CloseIcon, Settings as SettingsIcon } from '@material-ui/icons';
 import { getPartitionsNames, loadFilesOnDirectory } from '../../backend/filesHandlingFunctions';
 import { checkIfActiveElementIsInput, isNumeric, isRightButton, sortStringCompare } from '../../utils/tools';
-import Alert from '../AlertComponent';
+//import Alert from '../AlertComponent';
 import useStyles from './FileManagerStyles';
 import FoldersTree from './FoldersTree';
 import MainToolbar from './MainToolbar';
@@ -77,11 +77,12 @@ export const FileManager: React.FunctionComponent<FileManagerProps> = ({
      *             MAIN              *
      ********************************/
 
-    const setSelectedFiles = (selectedFilesToSet: Set<string>, idsToRerender: Array<number>) => {
+    const setSelectedFiles = (selectedFilesToSet: Set<string>, idsToRerender: Array<number>,e?: any) => {
         if (selectedFilesToSet.size > maxNumberOfSelectedFiles) {
             setErrorSnackbarMessage(`Maximum number of selected files is ${maxNumberOfSelectedFiles}`);
             return;
         }
+        //if(e) e.target.style.backgroundColor = "red"
         idsToRerender.forEach((id) => {
             renderForceFoo(id);
         });
@@ -160,9 +161,9 @@ export const FileManager: React.FunctionComponent<FileManagerProps> = ({
                 loadDirectory(file.path);
             } else if (!isRightMB && !fileIsAlreadyClicked) {
                 selectedFiles.add(file.path);
-                setSelectedFiles(selectedFiles, [id]);
+                setSelectedFiles(selectedFiles, [id],e);
             } else {
-                setSelectedFiles(selectedFiles, [id]);
+                setSelectedFiles(selectedFiles, [id],e);
             }
         } else if (file.type === 'DIRECTORY') {
             loadDirectory(file.path);
@@ -322,7 +323,7 @@ export const FileManager: React.FunctionComponent<FileManagerProps> = ({
                 fullWidth={true}
                 maxWidth="lg"
                 className={classes.filesManager}
-                open={isFileManagerOpen}
+                open={Boolean(isFileManagerOpen)}
             >
                 <div
                     style={{
@@ -508,14 +509,14 @@ export const FileManager: React.FunctionComponent<FileManagerProps> = ({
                             setErrorSnackbarMessage('');
                         }}
                     >
-                        <Alert
+                        {/*<Alert
                             onClose={() => {
                                 setErrorSnackbarMessage('');
                             }}
                             severity="error"
                         >
                             {errorSnackbarMessage}
-                        </Alert>
+                        </Alert>*/}
                     </Snackbar>
                 </DialogContent>
                 <DialogActions

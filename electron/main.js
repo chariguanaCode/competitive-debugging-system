@@ -6,9 +6,9 @@ let mainWindow;
 
 function createWindow() {
     
-    BrowserWindow.addDevToolsExtension(
+    /*BrowserWindow.addDevToolsExtension(
         path.join('C:\\Users\\LegwanXDL\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\4.6.0_0')
-    )
+    )*/
 
     const startUrl =
         process.env.ELECTRON_START_URL ||

@@ -27,7 +27,7 @@ import TestProgress from './TestProgress';
 import { connect } from 'react-redux';
 import { changeLanguage } from '../redux/actions';
 import TitleBar from './TitleBar';
-
+import { FileManagerProvider } from './FileManager/FileManagerContext'
 const lightTheme = createMuiTheme({
     palette: {
         type: 'light',
@@ -131,50 +131,52 @@ const App: React.FC<sr> = ({ language, changeLanguage }) => {
 
     return (
         <ThemeProvider theme={theme}>
-            <>
-                <div
-                    style={{
-                        width: '100vw',
-                        height: '100vh',
-                    }}
-                >
-                    <CssBaseline />
-                    <TitleBar />
+                <FileManagerProvider>            
+                    <>
+                    <div
+                        style={{
+                            width: '100vw',
+                            height: '100vh',
+                        }}
+                    >
+                        <CssBaseline />
+                        <TitleBar />
 
-                    <Header />
-                    <Sidebar variant="left">
-                        <TestProgress />
-                    </Sidebar>
-                    {/*
-                //@ts-ignore    }
-            <button onClick = {()=>{changeLanguage("pl")}}>LOL</button>
-            {/*<Content />*/}
-                    <Content />
+                        <Header />
+                        <Sidebar variant="left">
+                            <TestProgress />
+                        </Sidebar>
+                        {/*
+                    //@ts-ignore    }
+                <button onClick = {()=>{changeLanguage("pl")}}>LOL</button>
+                {/*<Content />*/}
+                        <Content />
 
-                    <Sidebar variant="right">
-                        <div style={{ margin: 8 }}>
-                            <FormControlLabel
-                                label="Dark mode"
-                                control={
-                                    <Switch
-                                        checked={theme.palette.type === 'dark'}
-                                        onChange={(evt) =>
-                                            setTheme(
-                                                evt.target.checked
-                                                    ? darkTheme
-                                                    : lightTheme
-                                            )
-                                        }
-                                    />
-                                }
-                            />
-                            {[...Array(100)].map((val, index) => (
-                                <p key={index}>Testing</p>
-                            ))}
-                        </div>
-                    </Sidebar>
-                </div>
-            </>
+                        <Sidebar variant="right">
+                            <div style={{ margin: 8 }}>
+                                <FormControlLabel
+                                    label="Dark mode"
+                                    control={
+                                        <Switch
+                                            checked={theme.palette.type === 'dark'}
+                                            onChange={(evt) =>
+                                                setTheme(
+                                                    evt.target.checked
+                                                        ? darkTheme
+                                                        : lightTheme
+                                                )
+                                            }
+                                        />
+                                    }
+                                />
+                                {[...Array(100)].map((val, index) => (
+                                    <p key={index}>Testing</p>
+                                ))}
+                            </div>
+                        </Sidebar>
+                    </div>
+                </>
+            </FileManagerProvider>
         </ThemeProvider>
     );
 };

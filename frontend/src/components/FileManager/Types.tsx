@@ -24,12 +24,12 @@ export interface FileManagerState {
 export interface FileManagerProps {
     minNumberOfSelectedFiles?: number;
     maxNumberOfSelectedFiles?: number;
-    selectFiles: Function;
+    selectFiles: (v: Array<string>) => any;
     loadDirectoryOnStart: string;
     dialogClose: Function;
     availableFilesTypes?: Array<string>;
     acceptableFileTypes?: Array<string>;
-    isFileManagerOpen: boolean;
+    isFileManagerOpen?: boolean;
     config?: FileManagerConfigTypes;
 }
 
@@ -110,4 +110,8 @@ export interface RenderFilesProps {
     onFileKeyDown: Function;
     filesDisplaySize: number;
     acceptableFileTypes: Set<string> | undefined;
+}
+
+export interface ContextTypes {
+    showFileManager: (v: FileManagerProps) => void,
 }

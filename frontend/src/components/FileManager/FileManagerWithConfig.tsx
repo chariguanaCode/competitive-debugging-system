@@ -11,3 +11,5 @@ export const FileManager: React.FunctionComponent<FileManagerProps> = (props) =>
     if (config) FileManagerConfig = config.settings.fileManager;
     return <FileManagerRow {...props} config={props.config ? props.config : FileManagerConfig} />;
 };
+
+export default FileManager;

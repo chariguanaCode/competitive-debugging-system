@@ -4,7 +4,7 @@ import { useContextSelector } from 'use-context-selector';
 import { AppBar, Toolbar, IconButton, Typography } from '@material-ui/core';
 import { Apps, Settings, PlayArrow, Refresh } from '@material-ui/icons';
 import { styled, makeStyles } from '@material-ui/core/styles';
-import { MainMenu } from './MainMenu/index';
+//import { MainMenu } from './MainMenu/MainMenu.tsx';
 import { ReactComponent as Logo } from '../assets/cds_logo.svg';
 
 import { useRunTasks } from '../backend/main';
@@ -82,11 +82,11 @@ export default function Header(): ReactElement {
                     </IconButton>
                 </Toolbar>
             </AppBar>
-            <MainMenu
+            {/*<MainMenu
                 open={menuOpen}
                 isAnyProjectOpen={true}
                 handleClose={() => setMenuOpen(false)}
-            />
+            />*/}
         </>
     );
 }

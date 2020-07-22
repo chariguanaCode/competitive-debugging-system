@@ -8,12 +8,14 @@ import {
     Tabs,
     Tab,
     LinearProgress,
+    Button
 } from '@material-ui/core';
 import { useState } from 'react';
 import SplitterLayout from 'react-splitter-layout';
 import 'react-splitter-layout/lib/index.css';
 import JSONTree from './JSONTree';
-
+import FileManagerContext from './FileManager/FileManagerContext';
+import { FileManager } from './FileManager/FileManagerWithConfig';
 const useStyle = makeStyles((theme) => ({
     root: {
         marginLeft: theme.spacing(6) + 24,
@@ -53,7 +55,11 @@ export default function Content(): ReactElement {
         GlobalStateContext,
         (v) => v.shouldWatchblocksReload
     );
-
+    const openFileManager = useContextSelector(
+        FileManagerContext,
+        (v) => v.showFileManager
+    );
+    //console.log(openFileManager)
     return (
         <div className={classes.root}>
             <AppBar position="static" className={classes.appBar}>
@@ -67,6 +73,13 @@ export default function Content(): ReactElement {
                     <Tab label="Debugging" />
                 </Tabs>
             </AppBar>
+            <Button onClick={()=>{openFileManager({
+                maxNumberOfSelectedFiles: 1,
+                dialogClose: () => {},
+                selectFiles: () => {},
+                loadDirectoryOnStart: '/',
+            })}}>CLICK</Button>
+            {/*<FileManager loadDirectoryOnStart='/' selectFiles={()=>{}} dialogClose={()=>{}} isFileManagerOpen={true}/>*/}
             <div style={{ height: 'calc(100% - 48px)' }}>
                 {view === Views.Debugging && (
                     <SplitterLayout

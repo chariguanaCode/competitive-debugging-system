@@ -4,7 +4,7 @@
     "private": true,
     "description": "",
     "scripts": {
-        "run": "concurrently \"set BROWSER=\"none\" && npm start --prefix ./frontend\" \"wait-on http://localhost:3000 && npm run electron\" ",
+        "run": "concurrently \"cross-env BROWSER=\"none\" npm start --prefix ./frontend\" \"wait-on http://localhost:3000 && npm run electron\" ",
         "electron": "set ELECTRON_START_URL=http://localhost:3000 && electron .",
         "build": "npm run build --prefix frontend && electron-builder"
     },

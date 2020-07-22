@@ -54,7 +54,7 @@ const useAddTestFiles = () => {
         (v) => v.setConfig
     );
 
-    if(!config) return;
+    if(!config) return; 
     return async (testPaths: Array<string>) => {
         let newTests: { [key: string]: { filePath: string } } = {};
         testPaths.forEach((val) => {
