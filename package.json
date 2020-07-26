@@ -5,7 +5,7 @@
     "description": "",
     "scripts": {
         "run": "concurrently \"cross-env BROWSER=\"none\" npm start --prefix ./frontend\" \"wait-on http://localhost:3000 && npm run electron\" ",
-        "electron": "set ELECTRON_START_URL=http://localhost:3000 && electron .",
+        "electron": "cross-env ELECTRON_START_URL=http://localhost:3000 electron .",
         "build": "npm run build --prefix frontend && electron-builder"
     },
     "main": "electron/main.js",
