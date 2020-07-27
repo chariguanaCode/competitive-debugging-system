@@ -11,7 +11,9 @@ export const FoldersTree: React.FunctionComponent<FoldersTreeProps> = memo(
         let treeVisibility = useRef(new Map());
 
         const loadDirectory = async (path: string) => {
+            console.log(path)
             let [files, newPath] = await loadFilesOnDirectory({ directory: path, regex: null, filetypes: ['DIRECTORY'] });
+            console.log(files, newPath);
             if (newPath) {
                 Object.assign(foldersTree.current, { [newPath === '/' ? newPath : newPath.slice(0, -1)]: files });
                 rerenderForce((prevValue) => prevValue + 1);
@@ -19,7 +21,9 @@ export const FoldersTree: React.FunctionComponent<FoldersTreeProps> = memo(
         };
 
         const showDirectory = (dir: string) => {
+            console.log(dir);
             treeVisibility.current.set(dir, !treeVisibility.current.get(dir));
+            console.log(foldersTree.current.hasOwnProperty(dir));
             if (!foldersTree.current.hasOwnProperty(dir)) loadDirectory(dir);
             else rerenderForce((prevValue) => prevValue + 1);
         };
@@ -67,8 +71,8 @@ export const FoldersTree: React.FunctionComponent<FoldersTreeProps> = memo(
                 </span>
             );
             if (treeVisibility.current.get(dir) === true) {
+                console.log(foldersTree.current);
                 for (let i = 0; i < foldersTree.current[dir].length; ++i) {
-                    //@ts-ignore
                     layer = (
                         <>
                             {layer}

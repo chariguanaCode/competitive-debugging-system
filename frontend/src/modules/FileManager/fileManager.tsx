@@ -322,7 +322,7 @@ export const FileManager: React.FunctionComponent<FileManagerProps> = ({
                 classes={{ paper: classes.dialogPaper }}
                 fullWidth={true}
                 maxWidth="lg"
-                className={classes.filesManager}
+                className={classes.fileManager}
                 open={Boolean(isFileManagerOpen)}
             >
                 <div
@@ -552,3 +552,5 @@ export const FileManager: React.FunctionComponent<FileManagerProps> = ({
         </>
     );
 };
+
+export default FileManager;

@@ -6,7 +6,7 @@ export const projectFileReducer = handleActions<ProjectFileModel>(
     {
         [ProjectFileAction.SET_PROJECT_FILE]: (state, action) => action.payload,
     },
-    ''
+    null
 );
 
 export default projectFileReducer;

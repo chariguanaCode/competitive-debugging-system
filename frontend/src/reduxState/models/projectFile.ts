@@ -1,1 +1,7 @@
-export type ProjectFileModel = string;
+export type ProjectFileModel = {
+    path: string;
+    isSaved: boolean;
+    directory: string;
+    filename: string;
+    hasSaveLocation: boolean;
+} | null

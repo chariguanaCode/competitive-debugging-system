@@ -92,7 +92,20 @@ function Content(): ReactElement {
     return (
         <div className={classes.root}>
             <div style={{ position: 'relative', height: '100%' }}>
-                <Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
+                <button
+                    onClick={() => {
+                        fm(true);
+                    }}
+                >
+                    testssss
+                </button>
+                <FileManager
+                    isFileManagerOpen={fms}
+                    selectFiles={() => {}}
+                    loadDirectoryOnStart={'F:/'}
+                    dialogClose={() => fm(false)}
+                />
+                {/*<Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />*/}
                 <DebuggingAddTab open={addTabOpen} onClose={addTab} />
             </div>
         </div>
