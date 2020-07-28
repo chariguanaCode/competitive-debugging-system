@@ -23,9 +23,7 @@ export const HeaderBar: React.FunctionComponent = () => {
     const projectFile = useProjectFile();
     //const reloadProject = useReloadProject()
     const executionState = useExecutionState();
-    useEffect(() => {
-        console.log(projectFile);
-    }, [projectFile]);
+
     return (
         <>
             <AppBar position="relative" className={classes.appBar}>

@@ -2,16 +2,7 @@ const fs = window.require('fs');
 const path = window.require('path');
 const util = window.require('util');
 
-export const fileExist = (filePath: string) => {
-    return new Promise((resolve, reject) => {
-        fs.access(filePath, fs.constants.F_OK, (err: any) => {
-            if (err) {
-                return resolve(false);
-            }
-            resolve(true);
-        });
-    });
-};
+export const fileExist = (filePath: string) => fs.existsSync(filePath);
 /*
 TODO: very strange error, empty file is created, sometimes it works
 https://stackoverflow.com/questions/31572484/node-fs-writefile-creates-a-blank-file (when using not sync)
@@ -31,13 +22,9 @@ export const readFile = (filePath: string) => {
     });
 };
 
-export const isDirectory = async (directory: string) => {
-    try {
-        let stat = await util.promisify(fs.lstat(directory));
-        return stat.isDirectory();
-    } catch (e) {
-        return false;
-    }
+export const isDirectory = async (path: string) => {
+    let stats = fs.statSync(path)
+    return stats.isDirectory();
 };
 
 export const parsePath = (directory: string) => {

@@ -1,6 +1,7 @@
 import useCompilationAndExecution from './cppCompilationAndExecution';
 import * as fileChangeTracking from './fileChangeTracking';
 import * as asyncFileActions from './asyncFileActions';
+import * as syncFileActions from './syncFileActions';
 import defaultConfig from '../data/defaultConfig.json';
 import { ConfigModel, AllTasksModel, Task, TaskState } from 'reduxState/models';
 import { useConfig, useAllTasksState, useCdsConfig, useProjectFile } from 'reduxState/selectors';
@@ -11,12 +12,11 @@ export const useSaveProjectAs = () => {
     const config = useConfig();
 
     return async (directory: string, name: string) => {
-        if (!(await asyncFileActions.isDirectory(directory))) {
+        if (!(await syncFileActions.isDirectory(directory))) {
             return;
         }
-        const path = directory + name;
-        console.log(path);
-        asyncFileActions.saveFile(path, JSON.stringify(config));
+        const path = directory + name + '.cdsp';
+        syncFileActions.saveFile(path, JSON.stringify(config));
         return path;
     };
 };
@@ -30,7 +30,7 @@ export const useSaveProject = () => {
         if (!projectFile) return;
         // TODO: handling errors
         const path = projectFile.directory + projectFile.filename + '.cdsp';
-        asyncFileActions.saveFile(projectFile.directory + projectFile.filename + '.cdsp', JSON.stringify(config));
+        syncFileActions.saveFile(projectFile.directory + projectFile.filename + '.cdsp', JSON.stringify(config));
         setProjectFileSaveState(true);
         return path;
     };
@@ -41,7 +41,7 @@ export const useSaveNotSavedProjectFile = () => {
     const cdsConfig = useCdsConfig();
     return async () => {
         const path = cdsConfig.projects.notSavedProjectDirectory + cdsConfig.projects.nextNotSavedProjectName + '.nsp.cdsp';
-        asyncFileActions.saveFile(path, JSON.stringify(config));
+        syncFileActions.saveFile(path, JSON.stringify(config));
         return path;
     };
 };
@@ -53,16 +53,16 @@ export const useLoadProject = () => {
     const { setProjectFile } = useProjectFileActions();
 
     return async (sourceFilePath: string) => {
-        let path = asyncFileActions.parsePath(sourceFilePath);
+        let path = syncFileActions.parsePath(sourceFilePath);
         path = path.slice(0, path.length - 1);
         console.log('Loading config...', path);
 
         // TODO: errors handling
-        if (!(await asyncFileActions.fileExist(path))) {
+        if (!(await syncFileActions.fileExist(path))) {
             console.error("This file doesn't exist");
             return;
         }
-        console.log(path)
+
         if (!path.match(/.*\.cdsp/)) {
             console.log('This is not a cdsp file');
             return;
@@ -76,7 +76,6 @@ export const useLoadProject = () => {
         let newConfig: ConfigModel = defaultConfig;
 
         await asyncFileActions.readFile(path).then((data: any) => {
-            console.log('xd');
             newConfig = JSON.parse(data);
             console.log('Read config');
             console.log('Loaded config');
@@ -97,8 +96,6 @@ export const useLoadProject = () => {
         }
         newConfig.tests = tests;
         */
-        console.log('xd')
-        console.log(sourceFilePath)
         setConfig(newConfig);
         setProjectFile({
             path: directory + filename + '.temp.cdsp',

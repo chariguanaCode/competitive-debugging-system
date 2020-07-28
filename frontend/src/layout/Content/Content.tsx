@@ -63,8 +63,6 @@ const defaultLayout = {
 
 function Content(): ReactElement {
     const classes = useStyles();
-
-    const [fms, fm] = useState(false);
     const [addTabOpen, setAddTabOpen] = useState(false);
 
     const [model, setModel] = useState(Model.fromJson(defaultLayout));
@@ -92,19 +90,6 @@ function Content(): ReactElement {
     return (
         <div className={classes.root}>
             <div style={{ position: 'relative', height: '100%' }}>
-                <button
-                    onClick={() => {
-                        fm(true);
-                    }}
-                >
-                    testssss
-                </button>
-                <FileManager
-                    isFileManagerOpen={fms}
-                    selectFiles={() => {}}
-                    loadDirectoryOnStart={'F:/'}
-                    dialogClose={() => fm(false)}
-                />
                 {/*<Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />*/}
                 <DebuggingAddTab open={addTabOpen} onClose={addTab} />
             </div>
