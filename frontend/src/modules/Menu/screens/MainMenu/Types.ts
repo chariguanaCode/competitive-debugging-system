@@ -1,8 +1,7 @@
 export interface MainMenuProps {
     open: boolean;
     handleClose: Function;
-    isAnyProjectOpen?: boolean;
-    socket?: any;
+    isAnyProjectOpen: boolean;
 }
 
 export interface OptionsContentProps {

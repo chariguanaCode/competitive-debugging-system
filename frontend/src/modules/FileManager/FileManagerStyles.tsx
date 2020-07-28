@@ -8,7 +8,7 @@ export const useStyles = makeStyles((theme) => ({
         fontWeight: 500,
         justifyContent: 'center',
     },
-    filesManager: {
+    fileManager: {
         WebkitUserSelect: 'none',
         '& button:focus': {
             outline: 'none !import  ant',

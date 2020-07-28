@@ -1,6 +1,6 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
-import { getRectangleRightTopAndLeftBottomCorners, doRectanglesOverclap } from '../../utils/tools';
-import { Rectangle } from '../Rectangle';
+import { getRectangleRightTopAndLeftBottomCorners, doRectanglesOverclap } from 'utils/tools';
+import { Rectangle } from 'components';
 import { SelectionProps } from './Types';
 
 export const Selection: React.FunctionComponent<SelectionProps> = memo(
