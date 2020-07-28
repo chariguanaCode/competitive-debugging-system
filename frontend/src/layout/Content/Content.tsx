@@ -7,6 +7,8 @@ import { Tasks, Watches } from 'modules';
 import { FileManager } from 'modules/FileManager/fileManager';
 import 'flexlayout-react/style/dark.css';
 import DebuggingAddTab from './DebuggingAddTab';
+import TasksProgressBar from 'modules/TasksProgressBar';
+
 export enum Views {
     Tasks,
     Outputs,
@@ -88,12 +90,15 @@ function Content(): ReactElement {
         setAddTabOpen(false);
     };
     return (
-        <div className={classes.root}>
-            <div style={{ position: 'relative', height: '100%' }}>
-                {/*<Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />*/}
-                <DebuggingAddTab open={addTabOpen} onClose={addTab} />
+        <>
+            <div className={classes.root}>
+                <div style={{ position: 'relative', height: '100%' }}>
+                    <Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
+                    <DebuggingAddTab open={addTabOpen} onClose={addTab} />
+                </div>
             </div>
-        </div>
+            <TasksProgressBar />
+        </>
     );
 }
 
