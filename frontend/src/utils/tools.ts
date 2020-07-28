@@ -6,7 +6,7 @@ export const useFocus = () => {
         //@ts-ignore
         htmlElRef.current && htmlElRef.current.focus();
     };
-    return [htmlElRef, setFocus];
+    return [htmlElRef, setFocus] as const;
 };
 
 export const isNumeric = (number: any) => {

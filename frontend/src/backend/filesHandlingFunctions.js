@@ -1,28 +1,10 @@
-import * as asyncFileActions from './asyncFileActions'
-const fs = window.require('fs')
+import * as asyncFileActions from './asyncFileActions';
+import * as syncFileActions from './syncFileActions';
+const fs = window.require('fs');
 //const dirTree = require("directory-tree");
-const path = window.require('path')
+const path = window.require('path');
 const exec = window.require('child_process').exec;
 const util = window.require('util');
-
-//const  os 	= require('os-utils');
-
-const parsePath = (directory) => {
-    if (
-        directory[directory.length - 1] !== '/' &&
-        directory[directory.length - 1] !== '\\'
-    )
-        directory += '/'
-    if (!path.isAbsolute(directory)) {
-        /* if((homePath[homePath.length-1]!=="/" || homePath[homePath.length-1]!=="\") && (directory[0]!=='/' || directory[0]!=='\\'))directory = '/' + directory;
-            directory = homePath + directory;
-            TODO: default home path (in settings), now it's backend directory
-        */
-        directory = path.resolve(directory)
-    }
-    directory = directory.split('\\').join('/')
-    return directory
-}
 
 export const getPartitionsNames = async () => {
     const execPromisified = util.promisify(exec);
@@ -35,132 +17,77 @@ export const getPartitionsNames = async () => {
         console.log('stdout ', stdout);
         console.log('stderr ', stderr);
     });*/
-}
+};
 //
 const loadAllFilesOnDirectory = async (directory = 'C:/') => {
-    let filesToSend = []
-    directory = parsePath(directory)
+    let filesToSend = [];
+    directory = syncFileActions.parsePath(directory);
     fs.readdir(directory, (err, files) => {
         if (err) {
             //break;
         } else {
             if (files) {
                 files.forEach((file) => {
-                    if (!path.extname(directory + file))
-                    filesToSend.push(file)
-                })
+                    if (!path.extname(directory + file)) filesToSend.push(file);
+                });
             }
-           return filesToSend
+            return filesToSend;
         }
-    })
-}
+    });
+};
 
 const selectFileType = (fileType) => {
-    if (
-        ['.img', '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.PNG'].includes(
-            fileType
-        )
-    )
-        return 'IMAGE'
-    else if (
-        [
-            '.avi',
-            '.wmv',
-            '.mp4',
-            '.mov',
-            '.ogg',
-            '.flv',
-            '.wav',
-            '.m4a',
-        ].includes(fileType)
-    )
-        return 'MOVIE'
-    else if (
-        [
-            '.txt',
-            '.doc',
-            '.docx',
-            '.odt',
-            '.pdf',
-            '.wpd',
-            '.tex',
-            '.wps',
-        ].includes(fileType)
-    )
-        return 'DOCUMENT'
-    else if (
-        [
-            '.exe',
-            '.bat',
-            '.bin',
-            '.apk',
-            '.jar',
-            '.py',
-            '.wsf',
-            '.com',
-        ].includes(fileType)
-    )
-        return 'EXECUTABLE'
-    else return 'UNDEFINED'
-}
+    if (fileType === 'DIRECTORY') return 'DIRECTORY';
+    else if (['.img', '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.PNG'].includes(fileType)) return 'IMAGE';
+    else if (['.avi', '.wmv', '.mp4', '.mov', '.ogg', '.flv', '.wav', '.m4a'].includes(fileType)) return 'MOVIE';
+    else if (['.txt', '.doc', '.docx', '.odt', '.pdf', '.wpd', '.tex', '.wps'].includes(fileType)) return 'DOCUMENT';
+    else if (['.exe', '.bat', '.bin', '.apk', '.jar', '.py', '.wsf', '.com'].includes(fileType)) return 'EXECUTABLE';
+    else return 'UNDEFINED';
+};
 
-export const loadFilesOnDirectory = async ({ filetypes, directory, regex }) => {
+export const loadFilesOnDirectory = async ({ filesExtensions, directory, regex }) => {
     let regexExp;
-    console.log(regex)
+    console.log(regex);
     if (regex) {
         try {
-            regexExp = new RegExp(regex)
+            regexExp = new RegExp(regex);
         } catch (err) {
-            return 'Regex error'
+            return 'Regex error';
         }
     }
 
-    let filesToSend = []
-    directory = parsePath(directory)
-    if (!(await asyncFileActions.fileExist(directory))) {
+    let loadedFiles = [];
+    directory = syncFileActions.parsePath(directory);
+
+    if (!(await syncFileActions.fileExist(directory))) {
         //webserver.sendError("The file you provided doesn't exist", '')
-        return [[], directory]
+        return [[], directory];
     }
-    let files = fs.readdirSync(directory)
+
+    let files = fs.readdirSync(directory);
     //if (err) return "Reading directory error"
-    if(!filetypes.length) filetypes = null;
-    let types = new Set()
-    if (filetypes) filetypes.forEach(types.add, types)
-    let loadDirectories = (filetypes && types.has('DIRECTORY'))
+
+    if (!filesExtensions.length) filesExtensions = null;
+    let extensions = new Set();
+    if (filesExtensions) filesExtensions.forEach(extensions.add, extensions);
 
     if (files) {
-        files.forEach((file) => {
-            if (
-                (!regex || (regex && file.match(regexExp))) &&
-                (!filetypes ||
-                    (filetypes &&
-                        types.has(path.extname(directory + file))) ||
-                    (isDir(directory + file) && loadDirectories))
-            )
-                filesToSend.push({
+        files.forEach(async (file) => {
+            const isFileDirectory = await syncFileActions.isDirectory(directory + file);
+            console.log(isFileDirectory);
+            const fileExtension = isFileDirectory ? 'DIRECTORY' : path.extname(directory + file);
+            if ((!regex || file.match(regexExp)) && (!filesExtensions || extensions.has(fileExtension)))
+                loadedFiles.push({
                     name: file,
-                    type: isDir(directory + file)
-                        ? 'DIRECTORY'
-                        : path.extname(directory + file),
+                    type: fileExtension,
                     path: directory + file,
-                    typeGroup: isDir(directory + file)
-                        ? 'DIRECTORY'
-                        : selectFileType(
-                                path.extname(directory + file)
-                            ),
-                })
-        })
+                    typeGroup: selectFileType(fileExtension),
+                });
+        });
     }
-    return [filesToSend, directory];
-}
+    return [loadedFiles, directory];
+};
 
-const isDir = (directory) => {
-    try {
-        return fs.lstatSync(directory).isDirectory()
-    } catch (e) {
-        return false
-    }
-}
 /*
 let files_to_send_g = []
 let running = 0

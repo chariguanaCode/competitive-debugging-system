@@ -23,13 +23,23 @@ export const readFile = (filePath: string) => {
 };
 
 export const isDirectory = async (path: string) => {
-    let stats = fs.statSync(path)
-    return stats.isDirectory();
+    let stats;
+    try {
+        stats = fs.statSync(path);
+    } catch {
+        return false;
+    } finally {
+        if (!stats) return false;
+        return stats.isDirectory();
+    }
 };
 
 export const parsePath = (directory: string) => {
     if (!path.isAbsolute(directory)) directory = path.resolve(directory);
-
+ /* if((homePath[homePath.length-1]!=="/" || homePath[homePath.length-1]!=="\") && (directory[0]!=='/' || directory[0]!=='\\'))directory = '/' + directory;
+            directory = homePath + directory;
+            TODO: default home path (in settings), now it's backend directory
+        */
     if (directory[directory.length - 1] != '/' && directory[directory.length - 1] != '\\') directory += '/';
 
     directory = directory.split('\\').join('/');
