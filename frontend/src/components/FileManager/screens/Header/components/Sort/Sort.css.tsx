@@ -1,29 +1,22 @@
 import { makeStyles } from '@material-ui/core/styles';
 
-export const useStyles = makeStyles((theme) => ({
-    optionType: {
+const useStyles = makeStyles({
+    Sort: {
         padding: '15px',
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'center',
         alignContent: 'center',
         alignItems: 'center',
+        fontSize: '1rem',
     },
-    optionLabel: {
+    SortLabel: {
         overflow: 'visible',
         width: 'max-content',
         marginRight: '10px',
     },
-    optionElement: {
+    SelectContainer: {
         minWidth: 'max-content',
     },
-    checkboxRoot: {
-        color: theme.palette.fileManager.checkboxColor,
-        '&$checked': {
-            color: theme.palette.fileManager.checkboxColor,
-        },
-    },
-    checkboxChecked: {},
-}));
+});
 
 export default useStyles;

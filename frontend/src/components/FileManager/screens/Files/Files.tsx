@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { List } from 'react-virtualized';
+import React, { useState, useRef } from 'react';
+import { List, AutoSizer } from 'react-virtualized';
 import { File } from './components';
-import { FilesPropsModel } from './Files.d';
+import { FilesPropsModel, HiddenSearchRefModel } from './Files.d';
 import { FileModel } from '../../FileManager.d';
 import { checkIfActiveElementIsInput, isNumeric, isRightButton, sortStringCompare } from 'utils/tools';
 import useStyles from './Files.css';
@@ -15,6 +15,17 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
     acceptableFilesExtensions,
 }) => {
     const classes = useStyles();
+    const [hiddenSearchResultIndex, setHiddenSearchResultIndex] = useState<number>(-1);
+    const hiddenSearchData = useRef<HiddenSearchRefModel>({
+        currentHiddenSearchText: '',
+        lastHiddenSearchTime: 0,
+    });
+
+    const onKeyDownOnFiles = (e: any) => {
+        if (e.keyCode >= 49 && e.keyCode <= 125 && /*isHiddenSearchOn.current && */ !checkIfActiveElementIsInput()) {
+            hiddenSearch(e);
+        }
+    };
 
     const handleSelectedFiles = (selectedFilesToSet: Set<string>, idsToRerender: Array<number>, e?: any) => {
         if (selectedFilesToSet.size > maxNumberOfSelectedFiles) {
@@ -48,15 +59,35 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         }
     };
 
+    const hiddenSearch = (e: any) => {
+        /*let currentTime = new Date().getTime();
+        if (currentTime - hiddenSearchData.current.lastHiddenSearchTime >= 1000)
+            hiddenSearchData.current.currentHiddenSearchText = '';
+        hiddenSearchData.current.lastHiddenSearchTime = currentTime;
+        let key = e.keyCode;
+        if (!e.shiftKey && key >= 65 && key <= 90) key += 32;
+        hiddenSearchData.current.currentHiddenSearchText += String.fromCharCode(key);
+        const regexExp = new RegExp(hiddenSearchData.current.currentHiddenSearchText);
+        console.log(regexExp)
+        for (let i = 0; i < files.length; ++i) {
+            if (regexExp.test(files[i].name)) {
+                setHiddenSearchResultIndex(i);
+                //filesRefs.current[i].style.backgroundColor = '#e0e0e0';
+                return;
+            }
+        }*/ // TODO: hidden search
+    };
+
     let renderRow = ({ index, key, style }: { index: number; key: string; style: any }) => {
         const file = files[index];
 
         let isSelected = selectedFiles.has(file.path);
         let isAcceptable = acceptableFilesExtensions ? acceptableFilesExtensions.has(file.type) : true;
-
+        let isFocused = hiddenSearchResultIndex === index;
         return (
-            <div key={key} style={style}>
+            <div onKeyDown={onKeyDownOnFiles} key={key} style={style}>
                 <File
+                    // isFocused={isFocused}
                     isSelected={isSelected}
                     isAcceptable={isAcceptable}
                     file={file}
@@ -66,11 +97,21 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
             </div>
         );
     };
-
     return (
         <>
             <div className={classes.Files}>
-                <List rowRenderer={renderRow} width={300} height={300} rowCount={files.length} rowHeight={50}></List>
+                <AutoSizer>
+                    {({ width, height }) => (
+                        <List
+                            rowRenderer={renderRow}
+                            width={width}
+                            height={height}
+                            rowCount={files.length}
+                            rowHeight={50}
+                            scrollToIndex={hiddenSearchResultIndex}
+                        ></List>
+                    )}
+                </AutoSizer>
             </div>
         </>
     );

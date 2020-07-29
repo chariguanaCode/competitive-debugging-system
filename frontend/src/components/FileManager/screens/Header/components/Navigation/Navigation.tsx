@@ -65,7 +65,9 @@ export const Navigation: React.FunctionComponent<NavigationPropsModel> = ({
     };
 
     const setNewPathOnTextField = (e: any) => {
-        e.preventDefault();
+        e.persist();
+        if (!e.target) return;
+        console.log(e.target);
         setState((prevState) => ({ ...prevState, newPath: e.target.value }));
     };
     const setIsEditMode = (value: boolean) => {
@@ -149,34 +151,38 @@ export const Navigation: React.FunctionComponent<NavigationPropsModel> = ({
                             </MenuItem>
                         )}
                         </Select>*/}
-                        <Breadcrumbs style={{ display: 'inline-block', minWidth: '300px' }} aria-label="breadcrumb">
-                            {currentPath
-                                .split('/')
-                                //.slice(Number(currentRootDirectory !== '/'))
-                                .reduce(
-                                    (valIn: Array<string | null | React.ReactFragment>, val) => {
-                                        let onPath = valIn[0];
-                                        if (val)
-                                            return [
-                                                onPath + val + '/',
-                                                createFragment({
-                                                    a: valIn[1],
-                                                    b: (
-                                                        <Button
-                                                            onClick={() => {
-                                                                loadDirectory({ path: onPath + val + '/' });
-                                                            }}
-                                                        >
-                                                            {val}
-                                                        </Button>
-                                                    ),
-                                                }),
-                                            ];
-                                        else return [onPath + val + '/', valIn[1]];
-                                    },
-                                    ['', null]
-                                )}
-                        </Breadcrumbs>
+                        <div className={classes.BreadcrumbsContainer}>
+                            <Breadcrumbs classes={{ ol: classes.BreadcrumbsOl }}>
+                                {currentPath
+                                    .split('/')
+                                    //.slice(Number(currentRootDirectory !== '/'))
+                                    .reduce(
+                                        (valIn: Array<string | null | React.ReactFragment>, val) => {
+                                            let onPath = valIn[0];
+                                            if (val)
+                                                return [
+                                                    onPath + val + '/',
+                                                    createFragment({
+                                                        a: valIn[1],
+                                                        b: (
+                                                            <Button
+                                                                onClick={() => {
+                                                                    loadDirectory({ path: onPath + val + '/' });
+                                                                }}
+                                                                className={classes.BreadcrumbsButton}
+                                                            >
+                                                                {val}
+                                                            </Button>
+                                                        ),
+                                                    }),
+                                                ];
+                                            else return [onPath + val + '/', valIn[1]];
+                                        },
+                                        ['', null]
+                                    )}
+                            </Breadcrumbs>
+                        </div>
+
                         <IconButton
                             onClick={() => {
                                 setIsEditMode(true);

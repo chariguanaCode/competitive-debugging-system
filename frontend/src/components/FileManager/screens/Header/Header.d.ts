@@ -3,6 +3,9 @@ export interface HeaderPropsModel {
     currentPath: string;
     setRootDirectory: (newRootDirectory: string) => any;
     currentRootDirectory: string;
+    sortMethodNumber: number;
+    setSortMethodNumber: (number) => any;
+    dialogClose: () => any;
 }
 
 export interface HeaderStateModel {

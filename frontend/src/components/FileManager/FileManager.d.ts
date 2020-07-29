@@ -64,17 +64,6 @@ export interface ToolbarProps {
     setHiddenSearch: Function;
 }
 
-export interface FoldersTreeProps {
-    currentPath: string;
-    showLoadingCircular: Function;
-    joinDirectory: Function;
-    currentRootDirectory: string;
-}
-
-export interface FoldersTreeObjectTypes {
-    [key: string]: Array<FileType>;
-}
-
 export interface SelectedFilesProps {
     selectedFiles: Set<string>;
     loadDirectory: Function;

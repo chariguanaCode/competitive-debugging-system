@@ -1,25 +1,28 @@
 import { makeStyles } from '@material-ui/core/styles';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
     FileManager: {
         WebkitUserSelect: 'none',
-    },
-    /*navigation: {
+        height: '900px',
+        width: '1400px',
         display: 'flex',
-        alignContent: 'center',
-        textAlign: 'center',
-        fontWeight: 500,
-        justifyContent: 'center',
+        flexDirection: 'column',
+        padding: '30px 10px 10px 10px',
+        overflow: 'auto',
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'red',
+        },
+        '&::-webkit-scrollbar': {
+            width: '0 !important',
+            height: '0 !important',
+        },
     },
-    dialogPaper: {
-        minHeight: '90vh',
-        maxHeight: '90vh',
-        minWidth: '75vw',
-        maxWidth: '75vw',
-        overflow: 'hidden',
-        overflowX: 'hidden',
-    },
-    dialogRoot: {
+
+    HeaderContainer: { minHeight: '50px', marginBottom: '10px' },
+    ContentContainer: { minHeight: '10px', height: '100%', marginBottom: '10px' },
+    FooterContainer: { minHeight: '50px' },
+
+    /*dialogRoot: {
         backgroundColor: theme.palette.fileManager.backgroundColor,
         color: theme.palette.fileManager.fontColor,
     },
@@ -28,6 +31,6 @@ const useStyles = makeStyles({
             width: '1px',
         },
     },*/
-});
+}));
 
 export default useStyles;

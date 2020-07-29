@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import useStyles from './FileManager.css';
 import { FileManagerPropsModel, FileManagerStateModel, FileModel } from './FileManager.d';
 import { Layout, Model, TabNode } from 'flexlayout-react';
-import { Header, Files, Footer, DirectoryTree, SelectedList } from './screens';
+import { Header, Footer, Content } from './screens';
 import { loadFilesOnDirectory } from 'backend/filesHandlingFunctions';
 import { comparatorForFilesSort } from './utils/tools';
-import { stringify } from 'querystring';
+import { Button, Dialog, DialogContent } from '@material-ui/core';
+import SelectedFiles from 'modules/FileManager/SelectedFiles';
+
 export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     maxNumberOfSelectedFiles = Infinity,
     minNumberOfSelectedFiles = 1,
@@ -30,18 +33,19 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
         areSettingsOpen: false,
     });
 
+    // TODO: zoom
+
     useEffect(() => {
         loadDirectory({ path: directoryOnStart });
     }, [directoryOnStart]);
 
     useEffect(() => {
-        console.log(state.files);
         setState((pvState) => ({
             ...pvState,
             files: Array.from(pvState.files).sort(comparatorForFilesSortProvider),
         }));
     }, [state.sortMethodNumber]);
-    console.log(state.files);
+
     const loadDirectory = async ({ path, regex }: { path: string; regex?: string }) => {
         //setLoadingState(true);
         //showLoadingCircular(true);
@@ -80,33 +84,41 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
 
     return (
         <>
-            <div
-                className={classes.FileManager}
-                style={{
-                    backgroundColor: '#424242',
-                    position: 'relative',
-                    width: '1000px',
-                    height: '1000px',
-                    top: '10px',
-                    left: '10px',
-                }}
-            >
-                <Header
-                    currentPath={state.currentPath}
-                    loadDirectory={loadDirectory}
-                    currentRootDirectory={state.currentRootPath}
-                    setRootDirectory={(newValue: string) => setStateValue('currentRootPath', newValue)}
-                />
-                <Files
-                    files={state.files}
-                    selectedFiles={state.selectedFiles}
-                    acceptableFilesExtensions={state.acceptableFilesExtensions}
-                    setSelectedFiles={(newSelectedFiles) => setStateValue('selectedFiles', newSelectedFiles)}
-                    maxNumberOfSelectedFiles={maxNumberOfSelectedFiles}
-                    loadDirectory={loadDirectory}
-                />
-                <Footer />
-            </div>
+            <Dialog open={true} maxWidth={'xl'}>
+                <div className={classes.FileManager}>
+                    <div className={classes.HeaderContainer}>
+                        <Header
+                            dialogClose={closeFileManager}
+                            currentPath={state.currentPath}
+                            loadDirectory={loadDirectory}
+                            currentRootDirectory={state.currentRootPath}
+                            setRootDirectory={(newValue: string) => setStateValue('currentRootPath', newValue)}
+                            sortMethodNumber={state.sortMethodNumber}
+                            setSortMethodNumber={(newValue: number) => setStateValue('sortMethodNumber', newValue)}
+                        />
+                    </div>
+                    <div className={classes.ContentContainer}>
+                        <Content
+                            files={state.files}
+                            selectedFiles={state.selectedFiles}
+                            acceptableFilesExtensions={state.acceptableFilesExtensions}
+                            setSelectedFiles={(newSelectedFiles) => setStateValue('selectedFiles', newSelectedFiles)}
+                            maxNumberOfSelectedFiles={maxNumberOfSelectedFiles}
+                            loadDirectory={loadDirectory}
+                            currentRootDirectory={state.currentRootPath}
+                            currentPath={state.currentPath}
+                        />
+                    </div>
+                    <div className={classes.FooterContainer}>
+                        <Footer
+                            selectFiles={selectFiles}
+                            dialogClose={closeFileManager}
+                            selectedFiles={state.selectedFiles}
+                            minNumberOfSelectedFiles={minNumberOfSelectedFiles}
+                        />
+                    </div>
+                </div>
+            </Dialog>
         </>
     );
 };

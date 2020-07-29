@@ -53,22 +53,11 @@ export const FileManager: React.FunctionComponent<FileManagerProps> = ({
         | undefined
     >(undefined);
     //const [fieldMode, updateFieldMode] = useState<boolean>(false)
-    let previousHiddenSearch = useRef<any>(null);
-    let lastSearchOnHiddenSearch = useRef<number>(0);
     let searchWord = useRef<string>('');
     let filesRefs = useRef<Array<any>>([]);
     let showFilesRenderForce = useRef<Array<number>>(new Array(10000));
     let isHiddenSearchOn = useRef<boolean>(true);
     let renderFilesLimit = advancedSettings.renderFilesLimit;
-
-    /********************************
-     *           USEEFFECT           *
-     ********************************/
-
-    useEffect(() => {
-        renderForceFoo(-1);
-    }, [state.filesDisplaySize]);
-
    
     const showDeleteFileFromSelectedFilesButton = (overPath: string, currentOverPath = '', id: number) => {
         if (currentOverPath === '' || currentOverPath === state.mouseOverPath) {
@@ -78,10 +67,6 @@ export const FileManager: React.FunctionComponent<FileManagerProps> = ({
                 mouseOverPath: overPath,
             }));
         }
-    };
-
-    const setFilesRefs = (where: number, refValue: any) => {
-        filesRefs.current[where] = refValue;
     };
 
     /********************************
@@ -138,30 +123,10 @@ export const FileManager: React.FunctionComponent<FileManagerProps> = ({
         }));
     };
 
-    /********************************
-     *         HIDDEN SEARCH         *
-     ********************************/
-
-    const hiddenSearch = (regex: string) => {
-        if (previousHiddenSearch.current) previousHiddenSearch.current.style.backgroundColor = 'transparent';
-        const regexExp = new RegExp(regex);
-        for (let i = 0; i < state.files.length; ++i) {
-            if (regexExp.test(state.files[i].name)) {
-                filesRefs.current[i].focus();
-                filesRefs.current[i].style.backgroundColor = '#e0e0e0';
-                previousHiddenSearch.current = filesRefs.current[i];
-                return;
-            }
-        }
-    };
-
+  
     /********************************/
 
     const classes = useStyles();
-    let renderLimesArray = Array.from(
-        { length: Math.ceil(state.files.length / renderFilesLimit) },
-        (v, k) => k * renderFilesLimit
-    );
 
     return (
         <>

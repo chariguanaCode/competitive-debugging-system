@@ -6,6 +6,7 @@ import { Search as SearchIcon } from '@material-ui/icons';
 export const Search: React.FunctionComponent<SearchPropsModel> = ({ loadDirectory, currentPath }) => {
     const classes = useStyles();
     const [state, setState] = useState<SearchStateModel>({ hiddenSearch: true, autoSearch: true, searchFieldText: '' });
+    /* TODO: hidden search and auto search will be in settings */
     const searchFromSearchField = (regexForce?: string) => {
         loadDirectory({ path: currentPath, regex: regexForce || regexForce === '' ? regexForce : state.searchFieldText });
     };
@@ -19,7 +20,7 @@ export const Search: React.FunctionComponent<SearchPropsModel> = ({ loadDirector
     return (
         <>
             <div className={classes.Search}>
-                <FormControl style={{ position: 'absolute', right: '10px', display: 'flex', flexDirection: 'row' }}>
+                <FormControl className={classes.SearchForm}>
                     <TextField
                         InputProps={{
                             endAdornment: (
@@ -46,7 +47,7 @@ export const Search: React.FunctionComponent<SearchPropsModel> = ({ loadDirector
                             e.target.select();
                         }}
                     />
-                    <FormControlLabel
+                    {/*<FormControlLabel
                         style={{ paddingLeft: '10px' }}
                         control={
                             <Checkbox
@@ -60,7 +61,7 @@ export const Search: React.FunctionComponent<SearchPropsModel> = ({ loadDirector
                             />
                         }
                         label={<span style={{ fontSize: '15px' }}>autosearch</span>}
-                    />
+                    />*/}
                 </FormControl>
             </div>
         </>

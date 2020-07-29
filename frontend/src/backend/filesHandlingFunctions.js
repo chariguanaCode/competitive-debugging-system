@@ -63,7 +63,7 @@ export const loadFilesOnDirectory = async ({ filesExtensions, directory, regex }
         //webserver.sendError("The file you provided doesn't exist", '')
         return [[], directory];
     }
-
+    console.log(directory);
     let files = fs.readdirSync(directory);
     //if (err) return "Reading directory error"
 
@@ -74,7 +74,6 @@ export const loadFilesOnDirectory = async ({ filesExtensions, directory, regex }
     if (files) {
         files.forEach(async (file) => {
             const isFileDirectory = await syncFileActions.isDirectory(directory + file);
-            console.log(isFileDirectory);
             const fileExtension = isFileDirectory ? 'DIRECTORY' : path.extname(directory + file);
             if ((!regex || file.match(regexExp)) && (!filesExtensions || extensions.has(fileExtension)))
                 loadedFiles.push({
