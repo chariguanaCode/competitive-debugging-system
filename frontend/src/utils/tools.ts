@@ -47,10 +47,12 @@ export const sortStringCompare = (string1: string, string2: string) => string1 <
 export const isRightButton = (e: any) => ('which' in e ? e.which == 3 : 'button' in e ? e.button == 2 : false);
 // Gecko (Firefox), WebKit (Safari/Chrome) & Opera // IE, Opera
 
-export const parsePath = (path: string) => (path !== '/' && path[path.length-1] === '/' ? path.slice(0, -1) : path);
+export const parsePath = (path: string) => (path !== '/' && path[path.length - 1] === '/' ? path.slice(0, -1) : path);
 
 export const getPathRootDirectory = (path: string) => {
     path = parsePath(path);
     if (path[0] === '/') return '/';
     return path.split('/')[0];
 };
+
+export const mergeArrays = (arr1: Array<any>, arr2: Array<any>) => [...new Set([...arr1, ...arr2])];

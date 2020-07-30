@@ -23,9 +23,11 @@ export interface ConfigModel {
             };
         };
     };
-    tests: {
+    tasks: {
         [key: string]: {
-            filePath: string;
+            [key: string]: {
+                filePath: string;
+            };
         };
     };
 }

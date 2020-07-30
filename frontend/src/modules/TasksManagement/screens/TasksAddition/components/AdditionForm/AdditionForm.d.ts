@@ -1,6 +1,6 @@
 export interface AdditionFormPropsModel {
     title: string | React.ElementType;
-    setSelectedFiles: (arg1: Array<string>) => any;
+    setSelectedFiles: Function;
     selectedFiles: Array<string>;
     setFileManager: Function;
 }

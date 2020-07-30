@@ -7,16 +7,28 @@ export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = (
     const classes = useStyles();
     const [inputsPaths, setInputsPaths] = useState<Array<string>>([]);
     const { setFileManager } = useFileManagerActions();
-    console.log(inputsPaths)
+    console.log(inputsPaths);
     return (
         <>
             <div className={classes.TasksAddition}>
-                <AdditionForm
-                    setFileManager={setFileManager}
-                    title={'SELECT OUTPUTS'}
-                    selectedFiles={inputsPaths}
-                    setSelectedFiles={setInputsPaths}
-                />
+                <div className={classes.additionFormContainers}>
+                    <div className={classes.additionFormContainer}>
+                        <AdditionForm
+                            setFileManager={setFileManager}
+                            title={'SELECT INPUTS'}
+                            selectedFiles={inputsPaths}
+                            setSelectedFiles={setInputsPaths}
+                        />
+                    </div>
+                    <div className={classes.additionFormContainer}>
+                        <AdditionForm
+                            setFileManager={setFileManager}
+                            title={'SELECT OUTPUTS'}
+                            selectedFiles={inputsPaths}
+                            setSelectedFiles={setInputsPaths}
+                        />
+                    </div>
+                </div>
             </div>
         </>
     );
