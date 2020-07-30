@@ -3,7 +3,7 @@ import useStyles from './Content.css';
 import * as Contents from '../Contents';
 import { ContentProps, FileManagerConfig } from './Types';
 import { Sector } from '../SectorsButtons';
-import FileManager from 'modules/FileManager/fileManager';
+import { FileManager } from 'components';
 
 export const Content: React.FunctionComponent<ContentProps> = memo(({ selectedSector, closeMainMenu }) => {
     const classes = useStyles();
@@ -22,13 +22,13 @@ export const Content: React.FunctionComponent<ContentProps> = memo(({ selectedSe
                 <FileManager
                     maxNumberOfSelectedFiles={fileManagerConfig.maxNumberOfFiles}
                     selectFiles={fileManagerConfig.onSelectFiles}
-                    loadDirectoryOnStart={'/'}
-                    isFileManagerOpen={fileManagerConfig.isOpen}
-                    dialogClose={() => {
+                    directoryOnStart={'/'}
+                    open={fileManagerConfig.isOpen}
+                    closeFileManager={() => {
                         setFileManagerConfig(defaultFileManagerConfig);
                     }}
-                    availableFilesTypes={fileManagerConfig.availableFilesTypes}
-                    acceptableFileTypes={fileManagerConfig.acceptableFileTypes}
+                    visibleFilesExtensions={fileManagerConfig.availableFilesTypes}
+                    acceptableFilesExtensions={fileManagerConfig.acceptableFileTypes}
                 />
             ) : null}
         </div>

@@ -1,10 +1,10 @@
 import React, { ReactElement, useState, useRef } from 'react';
-import { AppBar, Tabs, Tab, IconButton, Zoom } from '@material-ui/core';
+import { AppBar, Tabs, Tab, IconButton, Zoom, Button } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import useStyles from './Content.css';
 import { Layout, Model, TabNode } from 'flexlayout-react';
 import { Tasks, Watches } from 'modules';
-import { FileManager } from 'modules/FileManager/fileManager';
+import FileManager from 'components/FileManager';
 import 'flexlayout-react/style/dark.css';
 import DebuggingAddTab from './DebuggingAddTab';
 import TasksProgressBar from 'modules/TasksProgressBar';
@@ -14,6 +14,7 @@ export enum Views {
     Outputs,
     Debugging,
 }
+
 const defaultLayout = {
     global: {
         tabSetHeaderHeight: 30,
@@ -82,7 +83,6 @@ function Content(): ReactElement {
                 return <>Invalid tab</>;
         }
     };
-
     const addTab = (result: any) => {
         if (layout.current !== null && result !== null) {
             layout.current.addTabWithDragAndDrop('Add panel<br>(Drag to location)', result, () => null);

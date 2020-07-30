@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
             minHeight: 32 + 8,
         },
         '::-webkit-scrollbar-thumb:hover': {
-            backgroundColor: theme.palette.scrollbar.thumbHover,
+            backgroundColor: theme.palette.scrollbar.thumbHover, // TODO: pointer cursor
         },
     },
 }));

@@ -35,7 +35,6 @@ export const SaveAs: React.FunctionComponent<ContentProps> = memo(({ setFileMana
             const projectPath = await saveProjectAs(formValues.projectLocation, formValues.projectFilename).catch((err) => {
                 console.log(err);
             });
-            console.log(projectPath)
             if (!projectPath) return;
             // TODO: handle errors
             loadProject(projectPath);

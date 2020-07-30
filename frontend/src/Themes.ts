@@ -130,7 +130,7 @@ export const darkTheme = createMuiTheme({
             [TaskState.Killed]: grey[400],
         },
         scrollbar: {
-            thumb: grey[800],
+            thumb: grey[700], //grey[800], // it doesn't work like you want to
             thumbHover: grey[700],
         },
     },
