@@ -18,11 +18,11 @@ export const OpenProject: React.FunctionComponent<ContentProps> = memo(({ setFil
 
     const openProject = () => {
         return setFileManagerConfig({
-            maxNumberOfFiles: 1,
-            onSelectFiles: loadNewConfig,
-            isOpen: true,
-            acceptableFileTypes: ['.cdsp'],
-            availableFilesTypes: ['DIRECTORY', '.cdsp'],
+            maxNumberOfSelectedFiles: 1,
+            selectFiles: loadNewConfig,
+            open: true,
+            acceptableFilesExtensions: ['.cdsp'],
+            visibleFilesExtensions: ['DIRECTORY', '.cdsp'],
         });
     };
     return (

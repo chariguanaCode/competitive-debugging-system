@@ -5,7 +5,7 @@ import { Header, Content, Footer } from './layout';
 import GlobalStyles from './GlobalStyles';
 import Daemons from './Daemons';
 import { lightTheme, darkTheme } from './Themes';
-import FileManager from 'components/FileManager/FileManager';
+import { FileManagerContainer } from 'components';
 
 export default function App({}): ReactElement {
     const [theme, setTheme] = useState(darkTheme);
@@ -22,6 +22,7 @@ export default function App({}): ReactElement {
                 >
                     <CssBaseline />
                     <GlobalStyles />
+                    <FileManagerContainer />
                     <Daemons />
                     <Header />
                     <Content />
