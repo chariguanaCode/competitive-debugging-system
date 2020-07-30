@@ -14,14 +14,13 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     open,
     visibleFilesExtensions,
     acceptableFilesExtensions,
-    selectFiles,
-    directoryOnStart,
-    closeFileManager,
+    selectFiles = () => {},
+    directoryOnStart = '/',
+    closeFileManager = () => {},
     //config,
 }) => {
     // TODO: add loading circular to file manager
     // TODO: add selection to file manager
-
     const classes = useStyles();
     const [state, setState] = useState<FileManagerStateModel>({
         files: [],
@@ -33,7 +32,6 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
         sortMethodNumber: 0,
         areSettingsOpen: false,
     });
-
     // TODO: zoom
 
     useEffect(() => {
@@ -85,7 +83,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
 
     return (
         <>
-            <Dialog open={true} maxWidth={'xl'}>
+            <Dialog open={!!open} maxWidth={'xl'}>
                 <div className={classes.FileManager}>
                     <div className={classes.HeaderContainer}>
                         <Header
@@ -102,7 +100,9 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                             files={state.files}
                             selectedFiles={state.selectedFiles}
                             acceptableFilesExtensions={state.acceptableFilesExtensions}
-                            setSelectedFiles={(newSelectedFiles) => setStateValue('selectedFiles', newSelectedFiles)}
+                            setSelectedFiles={(newSelectedFiles: Set<string>) =>
+                                setStateValue('selectedFiles', newSelectedFiles)
+                            }
                             maxNumberOfSelectedFiles={maxNumberOfSelectedFiles}
                             loadDirectory={loadDirectory}
                             currentPath={state.currentPath}

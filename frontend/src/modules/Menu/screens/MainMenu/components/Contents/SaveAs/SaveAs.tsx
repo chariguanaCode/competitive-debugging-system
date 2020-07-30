@@ -59,11 +59,11 @@ export const SaveAs: React.FunctionComponent<ContentProps> = memo(({ setFileMana
 
     let selectProjectLocation = () =>
         setFileManagerConfig({
-            maxNumberOfFiles: 1,
-            onSelectFiles: (files) => setFormValue({ target: { value: files[0], name: 'projectLocation' } }),
-            isOpen: true,
-            acceptableFileTypes: ['DIRECTORY'],
-            availableFilesTypes: ['DIRECTORY'],
+            maxNumberOfSelectedFiles: 1,
+            selectFiles: (files: Array<string>) => setFormValue({ target: { value: files[0], name: 'projectLocation' } }),
+            open: true,
+            acceptableFilesExtensions: ['DIRECTORY'],
+            visibleFilesExtensions: ['DIRECTORY'],
         });
 
     let setFormValue = (e: any) => {

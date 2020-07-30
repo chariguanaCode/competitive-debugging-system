@@ -4,7 +4,6 @@ import AddIcon from '@material-ui/icons/Add';
 import useStyles from './Content.css';
 import { Layout, Model, TabNode } from 'flexlayout-react';
 import { Tasks, Watches } from 'modules';
-import FileManager from 'components/FileManager';
 import 'flexlayout-react/style/dark.css';
 import DebuggingAddTab from './DebuggingAddTab';
 import TasksProgressBar from 'modules/TasksProgressBar';

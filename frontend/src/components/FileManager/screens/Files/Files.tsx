@@ -15,6 +15,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
     files,
     acceptableFilesExtensions,
 }) => {
+    console.error(acceptableFilesExtensions)
     const classes = useStyles();
     const [hiddenSearchResultIndex, setHiddenSearchResultIndex] = useState<number>(0);
     const hiddenSearchData = useRef<HiddenSearchRefModel>({
