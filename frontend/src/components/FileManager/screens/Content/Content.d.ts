@@ -8,7 +8,6 @@ export interface ContentPropsModel {
     setSelectedFiles: (arg1: Set<string>) => any;
     maxNumberOfSelectedFiles: number;
     currentPath: string;
-    currentRootDirectory: string;
 }
 
 export interface ContentStateModel {}

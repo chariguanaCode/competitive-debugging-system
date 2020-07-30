@@ -2,7 +2,6 @@ export interface HeaderPropsModel {
     loadDirectory: (arg1: { path: string; regex?: string }) => any;
     currentPath: string;
     setRootDirectory: (newRootDirectory: string) => any;
-    currentRootDirectory: string;
     sortMethodNumber: number;
     setSortMethodNumber: (number) => any;
     dialogClose: () => any;

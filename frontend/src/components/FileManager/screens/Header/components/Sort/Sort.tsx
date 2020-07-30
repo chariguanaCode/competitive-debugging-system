@@ -4,7 +4,6 @@ import { SortPropsModel, SortStateModel } from './Sort.d';
 import { Select, MenuItem } from '@material-ui/core';
 export const Sort: React.FunctionComponent<SortPropsModel> = memo(({ sortMethodNumber, setSortMethodNumber }) => {
     const classes = useStyles();
-    console.log(sortMethodNumber);
 
     return (
         <>

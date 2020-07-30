@@ -47,7 +47,6 @@ const selectFileType = (fileType) => {
 
 export const loadFilesOnDirectory = async ({ filesExtensions, directory, regex }) => {
     let regexExp;
-    console.log(regex);
     if (regex) {
         try {
             regexExp = new RegExp(regex);
@@ -63,7 +62,6 @@ export const loadFilesOnDirectory = async ({ filesExtensions, directory, regex }
         //webserver.sendError("The file you provided doesn't exist", '')
         return [[], directory];
     }
-    console.log(directory);
     let files = fs.readdirSync(directory);
     //if (err) return "Reading directory error"
 

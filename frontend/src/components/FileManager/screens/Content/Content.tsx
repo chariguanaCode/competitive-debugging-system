@@ -13,7 +13,6 @@ export const Content: React.FunctionComponent<ContentPropsModel> = ({
     maxNumberOfSelectedFiles,
     loadDirectory,
     currentPath,
-    currentRootDirectory,
 }) => {
     const classes = useStyles();
     return (
@@ -21,11 +20,7 @@ export const Content: React.FunctionComponent<ContentPropsModel> = ({
             <div className={classes.Content}>
                 <SplitPane split="vertical" className={classes.SplitPane} minSize={[0, 200, 0]} defaultSizes={[100, 500, 100]}>
                     <div className={classes.DirectoryTreeLayout}>
-                        <DirectoryTree
-                            currentPath={currentPath}
-                            joinDirectory={loadDirectory}
-                            currentRootDirectory={currentRootDirectory}
-                        />
+                        <DirectoryTree currentPath={currentPath} joinDirectory={loadDirectory} />
                     </div>
                     <div className={classes.FilesLayout}>
                         <Files

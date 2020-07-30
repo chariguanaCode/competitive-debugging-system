@@ -46,7 +46,6 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
     const onFileClick = (file: FileModel, e: any, fileIsAlreadyClicked = false, id: number) => {
         if (e.persist) e.persist();
         let isRightMB = isRightButton(e);
-        console.log(isRightMB);
         if (!acceptableFilesExtensions || acceptableFilesExtensions.has(file.type)) {
             let selectedFilesSet = new Set(selectedFiles);
             if ((fileIsAlreadyClicked && isRightMB) || (fileIsAlreadyClicked && file.type !== 'DIRECTORY')) {

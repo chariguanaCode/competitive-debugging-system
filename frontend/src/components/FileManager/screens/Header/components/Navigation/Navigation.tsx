@@ -22,12 +22,7 @@ import useStyles from './Navigation.css';
 import { NavigationPropsModel, NavigationStateModel } from './Navigation.d';
 import { useFocus } from 'utils/tools';
 
-export const Navigation: React.FunctionComponent<NavigationPropsModel> = ({
-    currentPath,
-    loadDirectory,
-    currentRootDirectory,
-    setRootDirectory,
-}) => {
+export const Navigation: React.FunctionComponent<NavigationPropsModel> = ({ currentPath, loadDirectory, setRootDirectory }) => {
     const classes = useStyles();
     const [state, setState] = useState<NavigationStateModel>({
         historyList: [],
@@ -67,7 +62,6 @@ export const Navigation: React.FunctionComponent<NavigationPropsModel> = ({
     const setNewPathOnTextField = (e: any) => {
         e.persist();
         if (!e.target) return;
-        console.log(e.target);
         setState((prevState) => ({ ...prevState, newPath: e.target.value }));
     };
     const setIsEditMode = (value: boolean) => {

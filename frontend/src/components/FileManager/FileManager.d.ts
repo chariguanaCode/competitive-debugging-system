@@ -5,11 +5,25 @@ export interface FileModel {
     typeGroup: string;
 }
 
+export class Path {
+    constructor(newPath: string) {
+        if (newPath !== '/' && newPath[-1] === '/') newPath.slice(0, -1);
+        this.path = newPath;
+    }
+    private path = '';
+    public getPath = () => {
+        return this.path;
+    };
+    public getRootDirectory = () => {
+        if (this.path[0] === '/') return '/';
+        return this.path.split('/')[0];
+    };
+}
+
 export interface FileManagerStateModel {
     files: Array<FileModel>;
     selectedFiles: Set<string>;
     currentPath: string;
-    currentRootPath: string;
     managerError: any;
     visibleFilesExtensions: Array<string>;
     acceptableFilesExtensions: Set<string> | undefined;
@@ -66,23 +80,6 @@ export interface ToolbarProps {
 export interface SelectedFilesProps {
     selectedFiles: Set<string>;
     loadDirectory: Function;
-}
-
-export interface RenderFilesProps {
-    files: Array<FileType>;
-    selectedFiles: Set<string>;
-    onFileClick: Function;
-    mouseOverPath: string;
-    renderForce: number;
-    showDeleteFileFromSelectedFilesButton: Function;
-    //displaySettings: { numberOfColumns: number };
-    startIndex?: number;
-    renderFilesLimit: number;
-    setFilesRefs: any;
-    saveRefs?: boolean;
-    onFileKeyDown: Function;
-    filesDisplaySize: number;
-    acceptableFileTypes: Set<string> | undefined;
 }
 
 export interface ContextTypes {

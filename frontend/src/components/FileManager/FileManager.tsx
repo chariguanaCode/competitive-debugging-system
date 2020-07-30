@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import useStyles from './FileManager.css';
-import { FileManagerPropsModel, FileManagerStateModel, FileModel } from './FileManager.d';
-import { Layout, Model, TabNode } from 'flexlayout-react';
+import { FileManagerPropsModel, FileManagerStateModel, FileModel, Path } from './FileManager.d';
 import { Header, Footer, Content } from './screens';
 import { loadFilesOnDirectory } from 'backend/filesHandlingFunctions';
 import { comparatorForFilesSort } from './utils/tools';
 import { Button, Dialog, DialogContent } from '@material-ui/core';
-import SelectedFiles from 'modules/FileManager/SelectedFiles';
+import { parsePath } from 'utils/tools';
 
 export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     maxNumberOfSelectedFiles = Infinity,
@@ -26,8 +25,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     const classes = useStyles();
     const [state, setState] = useState<FileManagerStateModel>({
         files: [],
-        currentPath: '',
-        currentRootPath: '/',
+        currentPath: '/',
         managerError: null,
         selectedFiles: new Set(),
         visibleFilesExtensions: visibleFilesExtensions ? visibleFilesExtensions : [],
@@ -52,6 +50,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     const loadDirectory = async ({ path, regex }: { path: string; regex?: string }) => {
         //setLoadingState(true);
         //showLoadingCircular(true);
+        path = parsePath(path);
         let [files, newPath] = await loadFilesOnDirectory({
             directory: path,
             regex: regex ? regex : null,
@@ -63,7 +62,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
         //setLoadingState(false);
         setState((prevState) => ({
             ...prevState,
-            currentPath: newPath,
+            currentPath: parsePath(newPath),
             managerError: files.length
                 ? null
                 : {
@@ -72,7 +71,6 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                       number: '404',
                   },
             files: files,
-            currentRootPath: newPath.split('/')[0],
         }));
     };
 
@@ -94,7 +92,6 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                             dialogClose={closeFileManager}
                             currentPath={state.currentPath}
                             loadDirectory={loadDirectory}
-                            currentRootDirectory={state.currentRootPath}
                             setRootDirectory={(newValue: string) => setStateValue('currentRootPath', newValue)}
                             sortMethodNumber={state.sortMethodNumber}
                             setSortMethodNumber={(newValue: number) => setStateValue('sortMethodNumber', newValue)}
@@ -108,7 +105,6 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                             setSelectedFiles={(newSelectedFiles) => setStateValue('selectedFiles', newSelectedFiles)}
                             maxNumberOfSelectedFiles={maxNumberOfSelectedFiles}
                             loadDirectory={loadDirectory}
-                            currentRootDirectory={state.currentRootPath}
                             currentPath={state.currentPath}
                         />
                     </div>

@@ -93,10 +93,8 @@ function Content(): ReactElement {
         <>
             <div className={classes.root}>
                 <div style={{ position: 'relative', height: '100%' }}>
-                    {/*<Button onClick={() => win.loadURL('https://github.com')}>test</Button>
-                    {/*<Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
-                    <DebuggingAddTab open={addTabOpen} onClose={addTab} />*/}
-                    <FileManager open ={true}directoryOnStart="F:/" selectFiles={() => {}} closeFileManager={() => {}} />
+                    <Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
+                    <DebuggingAddTab open={addTabOpen} onClose={addTab} />
                 </div>
             </div>
             <TasksProgressBar />

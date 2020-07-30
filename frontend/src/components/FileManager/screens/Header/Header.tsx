@@ -5,23 +5,11 @@ import { Navigation, Search, Sort } from './components';
 import OperationalButtons from './components/OperationalButtons';
 
 const arePropsEqual = (prevProps: HeaderPropsModel, nextProps: HeaderPropsModel) => {
-    return (
-        prevProps.currentPath === nextProps.currentPath &&
-        prevProps.sortMethodNumber === nextProps.sortMethodNumber &&
-        prevProps.currentRootDirectory === nextProps.currentRootDirectory
-    );
+    return prevProps.currentPath === nextProps.currentPath && prevProps.sortMethodNumber === nextProps.sortMethodNumber;
 };
 
 export const Header: React.FunctionComponent<HeaderPropsModel> = memo(
-    ({
-        loadDirectory,
-        dialogClose,
-        currentPath,
-        setRootDirectory,
-        currentRootDirectory,
-        setSortMethodNumber,
-        sortMethodNumber,
-    }) => {
+    ({ loadDirectory, dialogClose, currentPath, setRootDirectory, setSortMethodNumber, sortMethodNumber }) => {
         const classes = useStyles();
 
         return (
@@ -35,7 +23,6 @@ export const Header: React.FunctionComponent<HeaderPropsModel> = memo(
                             loadDirectory={loadDirectory}
                             currentPath={currentPath}
                             setRootDirectory={setRootDirectory}
-                            currentRootDirectory={currentRootDirectory}
                         />
                     </div>
                     <div className={classes.SearchContainer}>
