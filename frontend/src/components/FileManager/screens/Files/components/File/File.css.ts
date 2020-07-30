@@ -28,18 +28,18 @@ const useStyles = makeStyles((theme) => ({
     selectedFileButton: {
         backgroundColor: theme.palette.fileManager.selectionColor + '!important',
     },
-    FileButtonContent: {
+    fileButtonContent: {
         display: 'flex',
         // flexDirection: (props: any) => props.fileView.flexDirection, //"column",
         // justifyContent: (props: any) => props.fileView.alignContent, //"center",
         alignContent: 'center',
         alignItems: 'center',
     },
-    FileIconContainer: {
+    fileIconContainer: {
         display: 'flex',
         alignContent: 'center',
         justifyContent: 'center',
-        marginRight: '4px'
+        marginRight: '4px',
     },
     filenameContainer: {
         //fontSize: displaySettingsStyle.fileTextSize, TODO: dynamic font size
@@ -48,8 +48,13 @@ const useStyles = makeStyles((theme) => ({
         alignContent: 'center',
         justifyContent: 'center',
     },
+    fileButtonContainer: {
+        display: 'inline',
+        position: 'relative',
+        padding: '2px',
+    },
     // TODO:
-    iconButtonButton: {
+    deleteFileFromSelectedFilesButton: {
         width: '14px !important',
         height: '14px !important',
         color: 'red',
@@ -60,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
         top: 2,
     },
     // TODO:
-    iconButtonIcon: {
+    deleteFileFromSelectedFilesIcon: {
         fontSize: 20,
     },
 }));

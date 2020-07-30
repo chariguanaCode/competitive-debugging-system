@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import useStyles from './File.css';
 import { FilePropsModel } from './File.d';
 import FileIcon from '../FileIcon';
-export const File: React.FunctionComponent<FilePropsModel> = ({ file, isSelected, isAcceptable, onFileClick, fileIndex }) => {
+import { IconButton } from '@material-ui/core';
+import { Clear as ClearIcon } from '@material-ui/icons';
+
+export const File: React.FunctionComponent<FilePropsModel> = ({
+    file,
+    isSelected,
+    isAcceptable,
+    onFileClick,
+    fileIndex,
+    onKeyDownOnFile,
+}) => {
     const classes = useStyles(/*displaySettingsStyle*/);
+    const [isMouseOverFile, setMouseIsOverFile] = useState<boolean>(false);
+    // TODO: maybe create state in parent
+    // TODO: close button
+
     /* let displaySettingsStyle = {
         fileButtonWidth: filesDisplaySize > 90 ? '100%' : Math.ceil(filesDisplaySize * 3.2).toString() + 'px',
         fileTextSize: Math.ceil(filesDisplaySize / (100 / 13)).toString() + 'px !important',
@@ -17,57 +31,41 @@ export const File: React.FunctionComponent<FilePropsModel> = ({ file, isSelected
 
     return (
         <div
-            style={{ display: 'inline', position: 'relative', padding: '2px' }}
-            /*onKeyDown={
-                file.type === 'DIRECTORY'
-                    ? (e) => {
-                          onFileKeyDown(e, file.path);
-                      }
-                    : () => {}
-            }
-            onMouseEnter={
-                file.type === 'DIRECTORY' && isSelected
-                    ? () => {
-                          showDeleteFileFromSelectedFilesButton(file.path, '', startIndex / renderDividor);
-                      }
-                    : () => {}
-            }
-            onMouseLeave={
-                file.type === 'DIRECTORY' && isSelected
-                    ? () => {
-                          showDeleteFileFromSelectedFilesButton('', file.path, startIndex / renderDividor);
-                      }
-                    : () => {}
-            }*/
+            className={classes.fileButtonContainer}
+            onKeyDown={(e) => onKeyDownOnFile(file, e, isSelected, fileIndex)}
+            onMouseEnter={() => file.type === 'DIRECTORY' && isSelected && setMouseIsOverFile(true)}
+            onMouseLeave={() => file.type === 'DIRECTORY' && setMouseIsOverFile(false)}
         >
-            {/* (file.type === "DIRECTORY" && file.path === mouseOverPath) ? 
-                    <Fade in={true}>
-                        <IconButton
-                            className = {classes.iconButtonButton}
-                            onClick = {() => {showDeleteFileFromSelectedFilesButton("", file.path, startIndex/renderDividor); onFileClick(file, {which: 3}, true, startIndex/renderDividor)}}
-                        >
-                            <ClearIcon className ={classes.iconButtonIcon}/>
-                        </IconButton>
-                    </Fade> : null
-    */}
             <button
                 className={clsx(classes.FileButton, {
                     [`${classes.selectedFileButton} file-selected`]: isSelected,
                     'file-acceptable': isAcceptable,
                 })}
-                onClick={(e) => {
+                onMouseDown={(e) => {
                     onFileClick(file, e, isSelected, fileIndex);
                 }}
                 disabled={file.type !== 'DIRECTORY' && !isAcceptable}
                 data-path={file.path}
             >
-                <div className={classes.FileButtonContent}>
-                    <div className={classes.FileIconContainer}>
+                <div className={classes.fileButtonContent}>
+                    <div className={classes.fileIconContainer}>
                         <FileIcon fileType={file.typeGroup} />
                     </div>
                     <div className={classes.filenameContainer}>{file.name}</div>
                 </div>
             </button>
+            {isMouseOverFile && (
+                // <Fade in={true}>
+                <IconButton
+                    className={classes.deleteFileFromSelectedFilesButton}
+                    onClick={() => {
+                        onFileClick(file, { which: 3 }, true, fileIndex);
+                    }}
+                >
+                    <ClearIcon className={classes.deleteFileFromSelectedFilesIcon} />
+                </IconButton>
+                /// </Fade>
+            )}
         </div>
     );
 };

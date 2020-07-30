@@ -96,7 +96,7 @@ function Content(): ReactElement {
                     {/*<Button onClick={() => win.loadURL('https://github.com')}>test</Button>
                     {/*<Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
                     <DebuggingAddTab open={addTabOpen} onClose={addTab} />*/}
-                    {/*<FileManager directoryOnStart="F:/" selectFiles={() => {}} closeFileManager={() => {}} />*/}
+                    <FileManager open ={true}directoryOnStart="F:/" selectFiles={() => {}} closeFileManager={() => {}} />
                 </div>
             </div>
             <TasksProgressBar />

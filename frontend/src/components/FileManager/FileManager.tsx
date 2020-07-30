@@ -20,6 +20,9 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     closeFileManager,
     //config,
 }) => {
+    // TODO: add loading circular to file manager
+    // TODO: add selection to file manager
+
     const classes = useStyles();
     const [state, setState] = useState<FileManagerStateModel>({
         files: [],

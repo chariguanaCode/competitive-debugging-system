@@ -13,7 +13,6 @@ export interface FileManagerStateModel {
     managerError: any;
     visibleFilesExtensions: Array<string>;
     acceptableFilesExtensions: Set<string> | undefined;
-    //mouseOverPath: string;
     sortMethodNumber: number;
     areSettingsOpen: boolean;
     //filesDisplaySize: number;
