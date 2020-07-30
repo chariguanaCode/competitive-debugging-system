@@ -8,6 +8,7 @@ import FileManager from 'components/FileManager';
 import 'flexlayout-react/style/dark.css';
 import DebuggingAddTab from './DebuggingAddTab';
 import TasksProgressBar from 'modules/TasksProgressBar';
+import TasksAddition from 'modules/TasksManagement/screens/TasksAddition';
 
 export enum Views {
     Tasks,
@@ -93,8 +94,9 @@ function Content(): ReactElement {
         <>
             <div className={classes.root}>
                 <div style={{ position: 'relative', height: '100%' }}>
-                    <Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
-                    <DebuggingAddTab open={addTabOpen} onClose={addTab} />
+                    {/*<Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
+                    <DebuggingAddTab open={addTabOpen} onClose={addTab} />*/}
+                    <TasksAddition />
                 </div>
             </div>
             <TasksProgressBar />
