@@ -35,9 +35,9 @@ export interface FileManagerStateModel {
 export interface FileManagerPropsModel {
     minNumberOfSelectedFiles?: number;
     maxNumberOfSelectedFiles?: number;
-    selectFiles: (arg1: Array<string>) => any;
-    directoryOnStart: string;
-    closeFileManager: () => any;
+    selectFiles?: (arg1: Array<string>) => any;
+    directoryOnStart?: string;
+    closeFileManager?: () => any;
     visibleFilesExtensions?: Array<string>;
     acceptableFilesExtensions?: Array<string>;
     open?: boolean;

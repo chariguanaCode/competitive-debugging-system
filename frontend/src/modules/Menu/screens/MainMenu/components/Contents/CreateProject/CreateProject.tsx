@@ -2,7 +2,6 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import { Button } from '@material-ui/core';
 import { useSaveNotSavedProjectFile, useLoadProject } from 'backend/projectManagement';
 import { getDefaultConfig } from 'data';
-import { FileType } from 'modules/FileManager/Types';
 import { useConfigActions } from 'reduxState/actions';
 import { useConfig } from 'reduxState/selectors';
 import { ContentProps } from '../Types';
@@ -42,20 +41,20 @@ export const CreateProject: React.FunctionComponent<ContentProps> = memo(({ setF
 
     const newProjectFromOneCppFile = () => {
         return setFileManagerConfig({
-            maxNumberOfFiles: 1,
-            onSelectFiles: setNewConfig,
-            isOpen: true,
-            acceptableFileTypes: ['.cpp'],
-            availableFilesTypes: ['DIRECTORY', '.cpp'],
+            maxNumberOfSelectedFiles: 1,
+            selectFiles: setNewConfig,
+            open: true,
+            acceptableFilesExtensions: ['.cpp'],
+            visibleFilesExtensions: ['DIRECTORY', '.cpp'],
         });
     };
     const newProjectFromManyCppFiles = () => {
         return setFileManagerConfig({
-            maxNumberOfFiles: Infinity,
-            onSelectFiles: newProjectFromManyCppFiles,
-            isOpen: true,
-            acceptableFileTypes: ['.cpp'],
-            availableFilesTypes: ['DIRECTORY', '.cpp'],
+            maxNumberOfSelectedFiles: Infinity,
+            selectFiles: newProjectFromManyCppFiles,
+            open: true,
+            acceptableFilesExtensions: ['.cpp'],
+            visibleFilesExtensions: ['DIRECTORY', '.cpp'],
         });
     };
     const newEmptyProject = () => setNewConfig(null);
