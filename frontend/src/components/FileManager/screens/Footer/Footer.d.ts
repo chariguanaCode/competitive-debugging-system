@@ -1,8 +1,11 @@
+import { FileManagerStateModel, FileManagerPropsModel } from 'components/FileManager/FileManager.d';
+
 export interface FooterPropsModel {
-    minNumberOfSelectedFiles: number;
-    selectedFiles: Set<string>;
-    selectFiles: (arg1: Array<string>) => any;
-    dialogClose: () => any;
+    minNumberOfSelectedFiles: FileManagerPropsModel.minNumberOfSelectedFiles;
+    selectedFiles: FileManagerPropsModel.selectedFiles;
+    selectFiles: FileManagerPropsModel.selectFiles;
+    dialogClose: FileManagerPropsModel.closeFileManager;
+    withFilesStats: FileManagerPropsModel.withFilesStats
 }
 
 export interface FooterStateModel {}

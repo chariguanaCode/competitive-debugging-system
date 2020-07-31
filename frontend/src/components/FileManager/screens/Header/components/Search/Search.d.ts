@@ -1,6 +1,6 @@
 export interface SearchPropsModel {
-    loadDirectory: (arg1: { path: string; regex?: string }) => any;
     currentPath: string;
+    setSearchText: (arg1: string) => any;
 }
 export interface SearchStateModel {
     hiddenSearch: boolean;

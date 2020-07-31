@@ -22,25 +22,27 @@ export class Path {
 
 export interface FileManagerStateModel {
     files: Array<FileModel>;
-    selectedFiles: Set<string>;
+    selectedFiles: Map<string, FileModel>;
     currentPath: string;
     managerError: any;
     visibleFilesExtensions: Array<string>;
     acceptableFilesExtensions: Set<string> | undefined;
     sortMethodNumber: number;
     areSettingsOpen: boolean;
+    searchText: string;
     //filesDisplaySize: number;
 }
 
 export interface FileManagerPropsModel {
     minNumberOfSelectedFiles?: number;
     maxNumberOfSelectedFiles?: number;
-    selectFiles?: (arg1: Array<string>) => any;
+    selectFiles?: ((arg1: Array<string>) => any) | ((arg1: Array<FileModel>) => any);
     directoryOnStart?: string;
     closeFileManager?: () => any;
     visibleFilesExtensions?: Array<string>;
     acceptableFilesExtensions?: Array<string>;
     open?: boolean;
+    withFilesStats?: boolean;
     //config?: FileManagerConfigTypes;
 }
 
@@ -56,33 +58,4 @@ export interface SelectionProps {
     setSelectedFiles: Function;
     endSelection: Function;
     maxNumberOfSelectedFiles: number;
-}
-
-export interface SettingsProps {
-    open: boolean;
-    dialogClose: Function;
-    loadedSettings?: any;
-}
-
-export interface SettingsState {
-    homeDirectory: string;
-    renderFilesBlockSize: number;
-}
-
-export interface ToolbarProps {
-    changeSortMethodNumber: Function;
-    changeFilesDisplaySize: Function;
-    filesDisplaySize: number;
-    sortMethodNumber: number;
-    setHiddenSearch: Function;
-}
-
-export interface SelectedFilesProps {
-    selectedFiles: Set<string>;
-    loadDirectory: Function;
-}
-
-export interface ContextTypes {
-    showFileManager: (v: FileManagerProps) => void;
-}
-*/
+}*/

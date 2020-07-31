@@ -13,6 +13,7 @@ export const Content: React.FunctionComponent<ContentPropsModel> = ({
     maxNumberOfSelectedFiles,
     loadDirectory,
     currentPath,
+    searchText,
 }) => {
     const classes = useStyles();
     return (
@@ -24,6 +25,7 @@ export const Content: React.FunctionComponent<ContentPropsModel> = ({
                     </div>
                     <div className={classes.FilesLayout}>
                         <Files
+                            searchText={searchText}
                             files={files}
                             selectedFiles={selectedFiles}
                             acceptableFilesExtensions={acceptableFilesExtensions}

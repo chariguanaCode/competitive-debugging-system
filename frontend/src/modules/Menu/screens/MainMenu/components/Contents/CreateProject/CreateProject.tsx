@@ -45,7 +45,7 @@ export const CreateProject: React.FunctionComponent<ContentProps> = memo(({ setF
             selectFiles: setNewConfig,
             open: true,
             acceptableFilesExtensions: ['.cpp'],
-            visibleFilesExtensions: ['DIRECTORY', '.cpp'],
+            visibleFilesExtensions: ['DIRECTORY', '.cpp', '.txt'],
         });
     };
     const newProjectFromManyCppFiles = () => {
