@@ -5,7 +5,9 @@ import { List, AutoSizer } from 'react-virtualized';
 import { AdditionFormPropsModel, AdditionFormStateModel } from './AdditionForm.d';
 import { Button, TextField } from '@material-ui/core';
 import { Forward as ForwardIcon } from '@material-ui/icons';
-import { mergeArrays } from 'utils/tools';
+import { mergeArrays, asyncForEach } from 'utils/tools';
+import { FileModel } from 'components/FileManager/FileManager.d';
+import { loadFilesOnDirectoryAncestors } from 'backend/filesHandlingFunctions';
 export const AdditionForm: React.FunctionComponent<AdditionFormPropsModel> = ({
     title,
     setSelectedFiles,
@@ -26,8 +28,20 @@ export const AdditionForm: React.FunctionComponent<AdditionFormPropsModel> = ({
     };
     // TODO: directories handle: two modes: all predecessors or just child
     // now can't handle directories
-    const selectFiles = (files: Array<string>) =>
-        setPendingFiles((pvPendingFiles: Array<string>) => mergeArrays(pvPendingFiles, files));
+    // DO IT MORE EFFICIENT WAY
+    const selectFiles = async (files: Array<FileModel>) => {
+        let filesToSet: Array<string> = [];
+        await asyncForEach(files, async (file: FileModel) => {
+            if (file.type === 'DIRECTORY') {
+                return (filesToSet = filesToSet.concat(
+                    (await loadFilesOnDirectoryAncestors({ directory: file.path, lim: 1 }))[0].map((file: FileModel) => file.path)
+                ));
+            }
+
+            return filesToSet.push(file.path);
+        });
+        setPendingFiles((pvPendingFiles: Array<string>) => mergeArrays(pvPendingFiles, filesToSet));
+    };
 
     const addFilteredFiles = () => {
         // TODO: possible async error
@@ -47,7 +61,9 @@ export const AdditionForm: React.FunctionComponent<AdditionFormPropsModel> = ({
                 <div className={classes.titleContainer}>{title}</div>
                 <div className={classes.selectFilesForm}>
                     {/* TODO: MOVE TO ANOTHER COMPONENT TOO AVOID RERENDERS*/}
-                    <Button onClick={() => setFileManager({ open: true, selectFiles: selectFiles })}>Select files</Button>
+                    <Button onClick={() => setFileManager({ open: true, selectFiles: selectFiles, withFilesStats: true })}>
+                        Select files
+                    </Button>
                     <TextField
                         value={regex}
                         onChange={(e) => {

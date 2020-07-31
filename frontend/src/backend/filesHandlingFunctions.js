@@ -1,5 +1,7 @@
 import * as asyncFileActions from './asyncFileActions';
 import * as syncFileActions from './syncFileActions';
+import { asyncForEach } from 'utils/tools';
+import { FiberPin } from '@material-ui/icons';
 const fs = window.require('fs');
 //const dirTree = require("directory-tree");
 const path = window.require('path');
@@ -66,7 +68,7 @@ export const loadFilesOnDirectory = async ({ filesExtensions, directory, regex }
     if (!filesExtensions.length) filesExtensions = null;
     let extensions = new Set(filesExtensions);
     if (files) {
-        files.forEach(async (file) => {
+        files.forEach((file) => {
             const isFileDirectory = file.isDirectory();
             const fileName = file.name;
             const fileExtension = isFileDirectory ? 'DIRECTORY' : path.extname(directory + fileName);
@@ -82,7 +84,74 @@ export const loadFilesOnDirectory = async ({ filesExtensions, directory, regex }
     return [loadedFiles, directory];
 };
 
-/*
+const recursivelyGoThruDirectoryTree = async (
+    currentLevel,
+    maxLevel,
+    directory,
+    { regexExp, extensions, filesExtensions, regex }
+) => {
+    if (currentLevel > maxLevel) return [];
+    let files;
+    try {
+        files = fs.readdirSync(directory, { withFileTypes: true });
+    } catch {
+        return [];
+    }
+
+    let loadedFiles = [];
+    if (files) {
+        await asyncForEach(files, async (file) => {
+            const isFileDirectory = file.isDirectory();
+            if (isFileDirectory) {
+                let filesOnDirectory = await recursivelyGoThruDirectoryTree(currentLevel + 1, maxLevel, directory + file.name, {
+                    regexExp,
+                    filesExtensions,
+                    regex,
+                });
+                loadedFiles = loadedFiles.concat(filesOnDirectory);
+            } else {
+                const fileName = file.name;
+                const fileExtension = path.extname(directory + fileName);
+                if ((!regex || fileName.match(regexExp)) && (!filesExtensions || extensions.has(fileExtension)))
+                    loadedFiles.push({
+                        name: fileName,
+                        type: fileExtension,
+                        path: directory + fileName,
+                        typeGroup: selectFileType(fileExtension),
+                    });
+            }
+        });
+    }
+    return loadedFiles;
+};
+
+// TODO: write it better
+export const loadFilesOnDirectoryAncestors = async ({ filesExtensions = [], directory, regex = undefined, lim = Infinity }) => {
+    let regexExp;
+    if (regex) {
+        try {
+            regexExp = new RegExp(regex);
+        } catch (err) {
+            return [[], directory, { message: 'Regex is invalid' }];
+        }
+    }
+
+    directory = syncFileActions.parsePath(directory);
+
+    if (!(await syncFileActions.fileExist(directory))) {
+        //webserver.sendError("The file you provided doesn't exist", '')
+        return [[], directory, { message: "Directory doesn't exist", directory: directory }];
+    }
+    if (!filesExtensions.length) filesExtensions = null;
+    let extensions = new Set(filesExtensions);
+    const loadedFiles = await recursivelyGoThruDirectoryTree(0, lim, directory, {
+        filesExtensions,
+        regexExp,
+        extensions,
+        regex,
+    });
+    return [loadedFiles, directory];
+}; /*
 let files_to_send_g = []
 let running = 0
 let started = 0
