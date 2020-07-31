@@ -30,7 +30,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         try {
             searchRegex = new RegExp(searchText);
         } catch {}
-        setFilesFilteredBySearch(files.filter((file) => file.name.match(searchRegex)));
+        setFilesFilteredBySearch(files.filter((file: FileModel) => file.name.match(searchRegex)));
     }, [files, searchText]);
 
     const onKeyDownOnFiles = (e: any) => {
@@ -39,7 +39,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         }
     };
 
-    const handleSelectedFiles = (selectedFilesToSet: Set<string>, idsToRerender: Array<number>, e?: any) => {
+    const handleSelectedFiles = (selectedFilesToSet: typeof selectedFiles, idsToRerender: Array<number>, e?: any) => {
         if (selectedFilesToSet.size > maxNumberOfSelectedFiles) {
             //setErrorSnackbarMessage(`Maximum number of selected files is ${maxNumberOfSelectedFiles}`);
             return;
@@ -58,19 +58,19 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         if (e.persist) e.persist();
         let isRightMB = isRightButton(e);
         if (!acceptableFilesExtensions || acceptableFilesExtensions.has(file.type)) {
-            let selectedFilesSet = new Set(selectedFiles);
+            let selectedFilesMap = new Map(selectedFiles);
             if ((fileIsAlreadyClicked && isRightMB) || (fileIsAlreadyClicked && file.type !== 'DIRECTORY')) {
-                selectedFilesSet.delete(file.path);
+                selectedFilesMap.delete(file.path);
             }
             if (fileIsAlreadyClicked && file.type === 'DIRECTORY' && !isRightMB) {
-                selectedFilesSet.delete(file.path);
-                handleSelectedFiles(selectedFilesSet, []);
+                selectedFilesMap.delete(file.path);
+                handleSelectedFiles(selectedFilesMap, []);
                 loadDirectory({ path: file.path });
             } else if (!isRightMB && !fileIsAlreadyClicked) {
-                selectedFilesSet.add(file.path);
-                handleSelectedFiles(selectedFilesSet, [id], e);
+                selectedFilesMap.set(file.path, file);
+                handleSelectedFiles(selectedFilesMap, [id], e);
             } else {
-                handleSelectedFiles(selectedFilesSet, [id], e);
+                handleSelectedFiles(selectedFilesMap, [id], e);
             }
         } else if (file.type === 'DIRECTORY') {
             loadDirectory({ path: file.path });

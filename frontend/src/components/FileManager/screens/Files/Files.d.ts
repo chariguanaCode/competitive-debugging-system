@@ -1,13 +1,13 @@
-import { FileModel } from 'components/FileManager/FileManager.d';
+import { FileModel, FileManagerStateModel, FileManagerPropsModel } from 'components/FileManager/FileManager.d';
 
 export interface FilesPropsModel {
-    files: Array<FileModel>;
-    selectedFiles: Set<string>;
-    acceptableFilesExtensions: Set<string> | undefined;
+    files: FileManagerStateModel.files;
+    selectedFiles: FileManagerStateModel.selectedFiles;
+    acceptableFilesExtensions: FileManagerStateModel.acceptableFilesExtensions;
     loadDirectory: (arg1: { path: string; regex?: string }) => any;
-    setSelectedFiles: (arg1: Set<string>) => any;
-    maxNumberOfSelectedFiles: number;
-    searchText: string;
+    setSelectedFiles: (arg1: FileManagerStateModel.selectedFiles) => any;
+    maxNumberOfSelectedFiles: FileManagerPropsModel.maxNumberOfSelectedFiles;
+    searchText: FileManagerStateModel.searchText;
 }
 
 export interface HiddenSearchRefModel {

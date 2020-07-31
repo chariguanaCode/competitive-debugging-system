@@ -17,6 +17,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     selectFiles = () => {},
     directoryOnStart = '/',
     closeFileManager = () => {},
+    withFilesStats = false
     //config,
 }) => {
     // TODO: add loading circular to file manager
@@ -26,7 +27,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
         files: [],
         currentPath: '/',
         managerError: null,
-        selectedFiles: new Set(),
+        selectedFiles: new Map(),
         visibleFilesExtensions: visibleFilesExtensions ? visibleFilesExtensions : [],
         acceptableFilesExtensions: acceptableFilesExtensions ? new Set(acceptableFilesExtensions) : undefined,
         sortMethodNumber: 0,
@@ -103,7 +104,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                             searchText={state.searchText}
                             selectedFiles={state.selectedFiles}
                             acceptableFilesExtensions={state.acceptableFilesExtensions}
-                            setSelectedFiles={(newSelectedFiles: Set<string>) =>
+                            setSelectedFiles={(newSelectedFiles: Map<string, FileModel>) =>
                                 setStateValue('selectedFiles', newSelectedFiles)
                             }
                             maxNumberOfSelectedFiles={maxNumberOfSelectedFiles}
@@ -116,6 +117,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                             selectFiles={selectFiles}
                             dialogClose={closeFileManager}
                             selectedFiles={state.selectedFiles}
+                            withFilesStats={withFilesStats}
                             minNumberOfSelectedFiles={minNumberOfSelectedFiles}
                         />
                     </div>
