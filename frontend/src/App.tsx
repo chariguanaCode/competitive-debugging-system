@@ -5,7 +5,9 @@ import { Header, Content, Footer } from './layout';
 import GlobalStyles from './GlobalStyles';
 import Daemons from './Daemons';
 import { lightTheme, darkTheme } from './Themes';
-import { FileManagerContainer } from 'components';
+import { FileManagerContainer } from 'components/FileManager';
+import { useFileManager } from 'reduxState/selectors';
+import { useFileManagerActions } from 'reduxState/actions';
 
 export default function App({}): ReactElement {
     const [theme, setTheme] = useState(darkTheme);
@@ -22,7 +24,7 @@ export default function App({}): ReactElement {
                 >
                     <CssBaseline />
                     <GlobalStyles />
-                    <FileManagerContainer />
+                    <FileManagerContainer useFileManager={useFileManager} useFileManagerActions={useFileManagerActions}/>
                     <Daemons />
                     <Header />
                     <Content />

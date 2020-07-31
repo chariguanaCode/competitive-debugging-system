@@ -51,7 +51,7 @@ export const loadFilesOnDirectory = async ({ filesExtensions, directory, regex }
         try {
             regexExp = new RegExp(regex);
         } catch (err) {
-            return 'Regex error';
+            return [[], directory, { message: 'Regex is invalid' }];
         }
     }
 
@@ -60,24 +60,21 @@ export const loadFilesOnDirectory = async ({ filesExtensions, directory, regex }
 
     if (!(await syncFileActions.fileExist(directory))) {
         //webserver.sendError("The file you provided doesn't exist", '')
-        return [[], directory];
+        return [[], directory, { message: "Directory doesn't exist" }];
     }
-    let files = fs.readdirSync(directory);
-    //if (err) return "Reading directory error"
-
+    let files = fs.readdirSync(directory, { withFileTypes: true });
     if (!filesExtensions.length) filesExtensions = null;
-    let extensions = new Set();
-    if (filesExtensions) filesExtensions.forEach(extensions.add, extensions);
-
+    let extensions = new Set(filesExtensions);
     if (files) {
         files.forEach(async (file) => {
-            const isFileDirectory = await syncFileActions.isDirectory(directory + file);
-            const fileExtension = isFileDirectory ? 'DIRECTORY' : path.extname(directory + file);
-            if ((!regex || file.match(regexExp)) && (!filesExtensions || extensions.has(fileExtension)))
+            const isFileDirectory = file.isDirectory();
+            const fileName = file.name;
+            const fileExtension = isFileDirectory ? 'DIRECTORY' : path.extname(directory + fileName);
+            if ((!regex || fileName.match(regexExp)) && (!filesExtensions || extensions.has(fileExtension)))
                 loadedFiles.push({
-                    name: file,
+                    name: fileName,
                     type: fileExtension,
-                    path: directory + file,
+                    path: directory + fileName,
                     typeGroup: selectFileType(fileExtension),
                 });
         });

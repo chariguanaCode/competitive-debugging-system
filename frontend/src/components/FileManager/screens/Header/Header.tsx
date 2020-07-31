@@ -9,7 +9,7 @@ const arePropsEqual = (prevProps: HeaderPropsModel, nextProps: HeaderPropsModel)
 };
 
 export const Header: React.FunctionComponent<HeaderPropsModel> = memo(
-    ({ loadDirectory, dialogClose, currentPath, setRootDirectory, setSortMethodNumber, sortMethodNumber }) => {
+    ({ loadDirectory, dialogClose, currentPath, setRootDirectory, setSortMethodNumber, sortMethodNumber, setSearchText }) => {
         const classes = useStyles();
 
         return (
@@ -26,7 +26,7 @@ export const Header: React.FunctionComponent<HeaderPropsModel> = memo(
                         />
                     </div>
                     <div className={classes.SearchContainer}>
-                        <Search loadDirectory={loadDirectory} currentPath={currentPath} />
+                        <Search setSearchText={setSearchText} currentPath={currentPath} />
                     </div>
                     <div className={classes.OperationalButtonsContainer}>
                         <OperationalButtons dialogClose={dialogClose} />
