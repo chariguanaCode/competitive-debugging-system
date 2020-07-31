@@ -31,6 +31,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
         acceptableFilesExtensions: acceptableFilesExtensions ? new Set(acceptableFilesExtensions) : undefined,
         sortMethodNumber: 0,
         areSettingsOpen: false,
+        searchText: '',
     });
     // TODO: zoom
 
@@ -49,7 +50,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
         //setLoadingState(true);
         //showLoadingCircular(true);
         path = parsePath(path);
-        let [files, newPath] = await loadFilesOnDirectory({
+        let [files, newPath, err] = await loadFilesOnDirectory({
             directory: path,
             regex: regex ? regex : null,
             filesExtensions: state.visibleFilesExtensions,
@@ -90,6 +91,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                             dialogClose={closeFileManager}
                             currentPath={state.currentPath}
                             loadDirectory={loadDirectory}
+                            setSearchText={(newValue: string) => setStateValue('searchText', newValue)}
                             setRootDirectory={(newValue: string) => setStateValue('currentRootPath', newValue)}
                             sortMethodNumber={state.sortMethodNumber}
                             setSortMethodNumber={(newValue: number) => setStateValue('sortMethodNumber', newValue)}
@@ -98,6 +100,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                     <div className={classes.ContentContainer}>
                         <Content
                             files={state.files}
+                            searchText={state.searchText}
                             selectedFiles={state.selectedFiles}
                             acceptableFilesExtensions={state.acceptableFilesExtensions}
                             setSelectedFiles={(newSelectedFiles: Set<string>) =>

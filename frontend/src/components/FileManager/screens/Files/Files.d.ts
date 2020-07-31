@@ -7,6 +7,7 @@ export interface FilesPropsModel {
     loadDirectory: (arg1: { path: string; regex?: string }) => any;
     setSelectedFiles: (arg1: Set<string>) => any;
     maxNumberOfSelectedFiles: number;
+    searchText: string;
 }
 
 export interface HiddenSearchRefModel {

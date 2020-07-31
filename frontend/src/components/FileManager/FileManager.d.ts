@@ -29,6 +29,7 @@ export interface FileManagerStateModel {
     acceptableFilesExtensions: Set<string> | undefined;
     sortMethodNumber: number;
     areSettingsOpen: boolean;
+    searchText: string;
     //filesDisplaySize: number;
 }
 

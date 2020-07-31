@@ -8,6 +8,7 @@ export interface ContentPropsModel {
     setSelectedFiles: (arg1: Set<string>) => any;
     maxNumberOfSelectedFiles: number;
     currentPath: string;
+    searchText: string;
 }
 
 export interface ContentStateModel {}

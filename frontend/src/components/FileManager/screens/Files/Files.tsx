@@ -14,14 +14,24 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
     loadDirectory,
     files,
     acceptableFilesExtensions,
+    searchText,
 }) => {
-    console.error(acceptableFilesExtensions)
     const classes = useStyles();
     const [hiddenSearchResultIndex, setHiddenSearchResultIndex] = useState<number>(0);
     const hiddenSearchData = useRef<HiddenSearchRefModel>({
         currentHiddenSearchText: '',
         lastHiddenSearchTime: 0,
     });
+    const [filesFilteredBySearch, setFilesFilteredBySearch] = useState<typeof files>([]);
+
+    useEffect(() => {
+        if (!searchText) return setFilesFilteredBySearch(files);
+        let searchRegex = new RegExp('');
+        try {
+            searchRegex = new RegExp(searchText);
+        } catch {}
+        setFilesFilteredBySearch(files.filter((file) => file.name.match(searchRegex)));
+    }, [files, searchText]);
 
     const onKeyDownOnFiles = (e: any) => {
         if (e.keyCode >= 49 && e.keyCode <= 125 && /*isHiddenSearchOn.current && */ !checkIfActiveElementIsInput()) {
@@ -76,8 +86,8 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         if (!e.shiftKey && key >= 65 && key <= 90) key += 32;
         hiddenSearchData.current.currentHiddenSearchText += String.fromCharCode(key);
         const regexExp = new RegExp(hiddenSearchData.current.currentHiddenSearchText);
-        for (let i = 0; i < files.length; ++i) {
-            if (regexExp.test(files[i].name)) {
+        for (let i = 0; i < filesFilteredBySearch.length; ++i) {
+            if (regexExp.test(filesFilteredBySearch[i].name)) {
                 setHiddenSearchResultIndex(i);
                 //filesRefs.current[i].style.backgroundColor = '#e0e0e0';
                 return;
@@ -87,7 +97,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
     };
 
     let renderRow = ({ index, key, style }: { index: number; key: string; style: any }) => {
-        const file = files[index];
+        const file = filesFilteredBySearch[index];
         // TODO: focus file if shouldBeFocused is true
         let isSelected = selectedFiles.has(file.path);
         let isAcceptable = acceptableFilesExtensions ? acceptableFilesExtensions.has(file.type) : true;
@@ -106,6 +116,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
             </div>
         );
     };
+
     return (
         <>
             <div className={classes.Files}>
@@ -115,7 +126,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
                             rowRenderer={renderRow}
                             width={width}
                             height={height}
-                            rowCount={files.length}
+                            rowCount={filesFilteredBySearch.length}
                             rowHeight={50}
                             scrollToIndex={hiddenSearchResultIndex}
                         ></List>

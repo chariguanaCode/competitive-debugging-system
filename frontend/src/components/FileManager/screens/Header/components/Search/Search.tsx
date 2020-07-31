@@ -3,12 +3,12 @@ import useStyles from './Search.css';
 import { SearchPropsModel, SearchStateModel } from './Search.d';
 import { TextField, FormControl, InputAdornment, IconButton, FormControlLabel, Checkbox } from '@material-ui/core';
 import { Search as SearchIcon } from '@material-ui/icons';
-export const Search: React.FunctionComponent<SearchPropsModel> = ({ loadDirectory, currentPath }) => {
+export const Search: React.FunctionComponent<SearchPropsModel> = ({ setSearchText, currentPath }) => {
     const classes = useStyles();
     const [state, setState] = useState<SearchStateModel>({ hiddenSearch: true, autoSearch: true, searchFieldText: '' });
     /* TODO: hidden search and auto search will be in settings */
     const searchFromSearchField = (regexForce?: string) => {
-        loadDirectory({ path: currentPath, regex: regexForce || regexForce === '' ? regexForce : state.searchFieldText });
+        setSearchText(regexForce || regexForce === '' ? regexForce : state.searchFieldText );
     };
 
     let setStateValue = (key: string, newValue: any) => setState((pvState) => ({ ...pvState, [key]: newValue }));
