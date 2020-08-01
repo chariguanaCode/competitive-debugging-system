@@ -8,11 +8,12 @@ export enum ConfigActions {
     SET_CONFIG = 'SET_CONFIG',
 }
 
+const actions = {
+    setConfig: createAction<ConfigModel>(ConfigActions.SET_CONFIG),
+};
+
 export const useConfigActions = () => {
     const dispatch = useDispatch();
-    const actions = {
-        setConfig: createAction<ConfigModel>(ConfigActions.SET_CONFIG),
-    };
 
     return useMemo(() => bindActionCreators(actions as any, dispatch), [dispatch]) as typeof actions;
 };

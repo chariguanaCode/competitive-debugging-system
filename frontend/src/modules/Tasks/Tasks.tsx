@@ -1,9 +1,15 @@
 import React from 'react';
 import useStyles from './Tasks.css';
 import { Tasks as TasksScreen } from './screens';
-export const Tasks = () => {
+import { TabNode } from 'flexlayout-react';
+
+interface Props {
+    node: TabNode;
+}
+
+export const Tasks = ({ node }: Props) => {
     const classes = useStyles();
-    return <TasksScreen />;
+    return <TasksScreen node={node} />;
 };
 
 export default Tasks;

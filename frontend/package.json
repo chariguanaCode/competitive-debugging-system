@@ -30,6 +30,7 @@
         "react-virtualized-tree": "^3.4.0",
         "redux": "^4.0.5",
         "redux-actions": "^2.6.5",
+        "typeface-roboto": "0.0.75",
         "typescript": "^3.9.6"
     },
     "homepage": "./",

@@ -1,23 +1,19 @@
 import React, { ReactElement, useState, useRef } from 'react';
-import { AppBar, Tabs, Tab, IconButton, Zoom } from '@material-ui/core';
+import { Zoom, Fab } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import useStyles from './Content.css';
 import { Layout, Model, TabNode } from 'flexlayout-react';
 import { Tasks, Watches } from 'modules';
 
 import 'flexlayout-react/style/dark.css';
-import DebuggingAddTab from './DebuggingAddTab';
+import AddTab from './AddTabDialog';
 import TasksProgressBar from 'modules/TasksProgressBar';
 
-export enum Views {
-    Tasks,
-    Outputs,
-    Debugging,
-}
 const defaultLayout = {
     global: {
         tabSetHeaderHeight: 30,
         tabSetTabStripHeight: 30,
+        borderBarSize: 30,
     },
     layout: {
         type: 'row',
@@ -30,8 +26,8 @@ const defaultLayout = {
                 children: [
                     {
                         type: 'tab',
-                        name: 'Test',
-                        component: 'test',
+                        name: 'Tasks',
+                        component: 'tasks',
                     },
                 ],
             },
@@ -61,6 +57,20 @@ const defaultLayout = {
             },
         ],
     },
+    borders: [
+        {
+            type: 'border',
+            location: 'bottom',
+            children: [
+                {
+                    type: 'tab',
+                    enableClose: false,
+                    name: 'Tasks',
+                    component: 'tasks',
+                },
+            ],
+        },
+    ],
 };
 
 function Content(): ReactElement {
@@ -75,8 +85,8 @@ function Content(): ReactElement {
         const type = node.getComponent();
 
         switch (type) {
-            case 'test':
-                return <Tasks />;
+            case 'tasks':
+                return <Tasks node={node} />;
             case 'watch':
                 return <Watches />;
             default:
@@ -90,15 +100,30 @@ function Content(): ReactElement {
         }
         setAddTabOpen(false);
     };
+
     return (
         <>
             <div className={classes.root}>
-                <div style={{ position: 'relative', height: '100%' }}>
+                <div className={classes.layoutWrapper}>
                     <Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
-                    <DebuggingAddTab open={addTabOpen} onClose={addTab} />
+                    <AddTab open={addTabOpen} onClose={addTab} />
+                    <Fab
+                        variant="extended"
+                        color="primary"
+                        size="medium"
+                        style={{
+                            position: 'absolute',
+                            bottom: 16,
+                            right: 16,
+                        }}
+                        onClick={() => setAddTabOpen(true)}
+                    >
+                        <AddIcon style={{ marginRight: 8 }} />
+                        Add new tab
+                    </Fab>
                 </div>
+                <TasksProgressBar />
             </div>
-            <TasksProgressBar />
         </>
     );
 }

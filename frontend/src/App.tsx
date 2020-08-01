@@ -21,11 +21,13 @@ import { Header, Content, Footer } from './layout';
 import { TaskState } from 'reduxState/models';
 import GlobalStyles from './GlobalStyles';
 import Daemons from './Daemons';
+import 'typeface-roboto';
 
 const lightTheme = createMuiTheme({
     palette: {
         type: 'light',
         primary: amber,
+        secondary: cyan,
         watchblocks: {
             //do ogarniecia bo srednio wyglada
             line: orange[500],
@@ -63,6 +65,7 @@ const lightTheme = createMuiTheme({
         },
         contentLayout: {
             panelHeader: grey[100],
+            panelHeaderText: cyan[600],
             panelBackground: '#ffffff',
             borders: grey[200],
         },
@@ -86,6 +89,7 @@ const darkTheme = createMuiTheme({
     palette: {
         type: 'dark',
         primary: amber,
+        secondary: cyan,
         watchblocks: {
             line: yellow[600],
             name: lightGreen['A400'],
@@ -122,6 +126,7 @@ const darkTheme = createMuiTheme({
         },
         contentLayout: {
             panelHeader: grey[800],
+            panelHeaderText: cyan['A400'],
             panelBackground: grey['A400'],
             borders: grey[800],
         },
@@ -143,6 +148,7 @@ const darkTheme = createMuiTheme({
 
 export default function App({}): ReactElement {
     const [theme, setTheme] = useState(darkTheme);
+    //const [theme, setTheme] = useState(lightTheme);
 
     return (
         <ThemeProvider theme={theme}>

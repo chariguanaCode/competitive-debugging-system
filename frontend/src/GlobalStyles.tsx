@@ -21,6 +21,9 @@ const useStyles = makeStyles((theme) => ({
         '::-webkit-scrollbar-thumb:hover': {
             backgroundColor: theme.palette.scrollbar.thumbHover,
         },
+        '::-webkit-scrollbar-corner': {
+            background: 'transparent',
+        },
     },
 }));
 

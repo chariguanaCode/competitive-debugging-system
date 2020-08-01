@@ -20,6 +20,7 @@ import { Close, FilterList, BugReport, Assessment } from '@material-ui/icons';
 import { useAllTasksState } from 'reduxState/selectors';
 import { Task, TaskState } from 'reduxState/models';
 import { useTaskStatesActions } from 'reduxState/actions';
+import { TabNode } from 'flexlayout-react';
 
 export enum Views {
     Tasks,
@@ -27,7 +28,11 @@ export enum Views {
     Debugging,
 }
 
-const Tasks = () => {
+interface Props {
+    node: TabNode;
+}
+
+const Tasks = ({ node }: Props) => {
     const theme = useTheme();
 
     const killTest = useKillTest();
@@ -48,32 +53,10 @@ const Tasks = () => {
 
     const tableRef = useRef<null | HTMLTableElement>(null);
     const [page, setPage] = useState(0);
-    const [pageHeight, setPageHeight] = useState(0);
+    const pageHeight = node.getRect().height - 56 - 68 - 53 - 1;
     const rowsPerPage = Math.floor(pageHeight / 53);
 
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, taskStates.length - page * rowsPerPage);
-
-    useEffect(() => {
-        if (!tableRef.current || !tableRef.current.parentElement) return () => {};
-
-        const handleResize = () => {
-            if (!tableRef.current || !tableRef.current.parentElement) return;
-
-            const height = tableRef.current.parentElement.offsetHeight;
-
-            setPageHeight(height - 56 - 65 - 53 - 16);
-            console.log(height);
-        };
-
-        handleResize();
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            if (!tableRef.current || !tableRef.current.parentElement) return;
-
-            window.removeEventListener('resize', handleResize);
-        };
-    }, [tableRef.current]);
 
     const debugTask = (id: string) => {
         setCurrentTaskId(id);
