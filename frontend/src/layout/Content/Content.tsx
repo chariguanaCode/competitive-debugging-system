@@ -1,13 +1,13 @@
 import React, { ReactElement, useState, useRef } from 'react';
-import { Zoom, Fab } from '@material-ui/core';
+import { AppBar, Tabs, Tab, IconButton, Zoom, Button, Fab } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import useStyles from './Content.css';
 import { Layout, Model, TabNode } from 'flexlayout-react';
 import { Tasks, Watches } from 'modules';
-
 import 'flexlayout-react/style/dark.css';
 import AddTab from './AddTabDialog';
 import TasksProgressBar from 'modules/TasksProgressBar';
+import { useFileManagerActions } from 'reduxState/actions';
 
 const defaultLayout = {
     global: {
@@ -75,8 +75,8 @@ const defaultLayout = {
 
 function Content(): ReactElement {
     const classes = useStyles();
-
     const [addTabOpen, setAddTabOpen] = useState(false);
+    const { setFileManager } = useFileManagerActions();
 
     const [model, setModel] = useState(Model.fromJson(defaultLayout));
     const layout = useRef<Layout>(null);
@@ -93,7 +93,6 @@ function Content(): ReactElement {
                 return <>Invalid tab</>;
         }
     };
-
     const addTab = (result: any) => {
         if (layout.current !== null && result !== null) {
             layout.current.addTabWithDragAndDrop('Add panel<br>(Drag to location)', result, () => null);

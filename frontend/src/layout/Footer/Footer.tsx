@@ -25,7 +25,7 @@ export const Footer = () => {
         second: 'numeric',
     }).format(currentTime);
 
-    const projectName = useConfig().projectInfo.path;
+    const projectName = useConfig().projectInfo.name;
 
     const leftElements = [<>{projectName}</>];
     const rightElements = [

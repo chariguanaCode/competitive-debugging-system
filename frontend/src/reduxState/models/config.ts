@@ -1,15 +1,15 @@
+export interface ProjectInfoModel {
+    files: Array<string>;
+    name: string;
+    author: string;
+    createDate: string;
+    lastEditDate: string;
+    totalTimeSpent: string;
+    description: string;
+}
+
 export interface ConfigModel {
-    projectInfo: {
-        files: Array<string>;
-        saveName: string;
-        path: string;
-        name: string;
-        author: string;
-        createDate: string;
-        lastEditDate: string;
-        totalTimeSpent: string;
-        description: string;
-    };
+    projectInfo: ProjectInfoModel;
     settings: {
         main: {
             darkMode: boolean;
