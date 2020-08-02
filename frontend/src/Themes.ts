@@ -21,6 +21,7 @@ export const lightTheme = createMuiTheme({
     palette: {
         type: 'light',
         primary: amber,
+        secondary: cyan,
         watchblocks: {
             //do ogarniecia bo srednio wyglada
             line: orange[500],
@@ -58,6 +59,7 @@ export const lightTheme = createMuiTheme({
         },
         contentLayout: {
             panelHeader: grey[100],
+            panelHeaderText: cyan[600],
             panelBackground: '#ffffff',
             borders: grey[200],
         },
@@ -81,6 +83,7 @@ export const darkTheme = createMuiTheme({
     palette: {
         type: 'dark',
         primary: amber,
+        secondary: cyan,
         watchblocks: {
             line: yellow[600],
             name: lightGreen['A400'],
@@ -117,6 +120,7 @@ export const darkTheme = createMuiTheme({
         },
         contentLayout: {
             panelHeader: grey[800],
+            panelHeaderText: cyan['A400'],
             panelBackground: grey['A400'],
             borders: grey[800],
         },
@@ -130,7 +134,7 @@ export const darkTheme = createMuiTheme({
             [TaskState.Killed]: grey[400],
         },
         scrollbar: {
-            thumb: grey[700], //grey[800], // it doesn't work like you want to
+            thumb: grey[800],
             thumbHover: grey[700],
         },
     },

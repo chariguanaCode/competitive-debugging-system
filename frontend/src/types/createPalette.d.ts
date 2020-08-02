@@ -43,6 +43,7 @@ declare module '@material-ui/core/styles/createPalette' {
         panelHeader: string;
         panelBackground: string;
         borders: string;
+        panelHeaderText: string;
     }
 
     type TaskStateOptions = {

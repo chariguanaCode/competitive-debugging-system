@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AppBar, Toolbar, IconButton, Typography } from '@material-ui/core';
 import { Apps, Settings, PlayArrow, Refresh } from '@material-ui/icons';
 import { styled } from '@material-ui/core/styles';

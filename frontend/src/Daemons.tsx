@@ -42,7 +42,14 @@ export default function Daemons(): ReactElement {
                 }
             );
         }
-    }, [currentTask.id, currentTaskProgress]);
+    }, [
+        currentTask.id,
+        currentTaskProgress,
+        setCurrentTaskStdout,
+        setCurrentTaskStdoutSize,
+        setCurrentTaskWatchblocks,
+        setCurrentTaskWatchblocksSize,
+    ]);
 
     return <></>;
 }

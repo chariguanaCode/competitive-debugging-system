@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles, useTheme, Tooltip } from '@material-ui/core';
+import { useTheme, Tooltip } from '@material-ui/core';
 import { Task, TaskState } from 'reduxState/models';
 import { useAllTasksState } from 'reduxState/selectors';
 import useStyles from './TasksProgressBar.css';
@@ -46,7 +46,7 @@ const TasksProgressBar = () => {
                             {stateOverview[key]}/{states.length}
                         </>
                     }
-                    placement="right"
+                    placement="left"
                     arrow
                 >
                     <div
