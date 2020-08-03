@@ -1,7 +1,8 @@
+import { FileModel } from 'components/FileManager/FileManager.d';
 export interface TasksAdditionPropsModel {
-    inputsPaths: Array<string>;
+    inputsFiles: Array<FileModel>;
     setInputsPaths: Function;
-    outputsPaths: Array<string>;
+    outputsFiles: Array<FileModel>;
     setOutputsPaths: Function;
 }
 

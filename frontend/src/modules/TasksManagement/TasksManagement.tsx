@@ -5,7 +5,7 @@ import { TasksManagementPropsModel, TasksManagementStateModel } from './TasksMan
 
 export const TasksManagement: React.FunctionComponent<TasksManagementPropsModel> = ({}) => {
     const classes = useStyles();
-    const [state, _setState] = useState<TasksManagementStateModel>({ inputPaths: [], outputPaths: [] });
+    const [state, _setState] = useState<TasksManagementStateModel>({ inputsFiles: [], outputsFiles: [] });
     const setState = (type: string, value: any | ((arg1: any) => any)) => {
         _setState((pvState: any) => ({
             ...pvState,
@@ -16,16 +16,16 @@ export const TasksManagement: React.FunctionComponent<TasksManagementPropsModel>
         <>
             <div className={classes.TasksManagement}>
                 <TasksAddition
-                    inputsPaths={state.inputPaths}
-                    outputsPaths={state.outputPaths}
+                    inputsFiles={state.inputsFiles}
+                    outputsFiles={state.outputsFiles}
                     setInputsPaths={(newPaths: Array<string>) => {
-                        setState('inputPaths', newPaths);
+                        setState('inputsFiles', newPaths);
                     }}
                     setOutputsPaths={(newPaths: Array<string>) => {
-                        setState('outputPaths', newPaths);
+                        setState('outputsFiles', newPaths);
                     }}
                 />
-                <TasksMerge inputsPaths={state.inputPaths} outputsPaths={state.outputPaths} />
+                <TasksMerge showLists={false} inputsFiles={state.inputsFiles} outputsFiles={state.outputsFiles} />
             </div>
         </>
     );

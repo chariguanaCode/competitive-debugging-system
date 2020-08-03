@@ -7,7 +7,6 @@ export const PathsList: React.FunctionComponent<PathsListPropsModel> = ({ paths 
     const classes = useStyles();
     // TODO: search and deletion from selected files list
     const renderRow = ({ index, key, style }: { index: number; key: string; style: any }, sourceArray: Array<string>) => {
-        console.log(index,sourceArray)
         return (
             <div key={key} style={style} className={classes.pathRow}>
                 {/*// TODO: do it better way */}

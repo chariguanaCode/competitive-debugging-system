@@ -1,6 +1,19 @@
+import { TasksManagementStateModel } from '../../TasksManagement.d';
+
 export interface TasksMergePropsModel {
-    inputsPaths: Array<string>;
-    outputsPaths: Array<string>;
+    inputsFiles: TasksManagementStateModel.inputsPaths;
+    outputsFiles: TasksManagementStateModel.outputsPaths;
+    showLists?: boolean;
 }
 
-export interface TasksMergeStateModel {}
+export type mergedFilesModel = {
+    [key: string]: {
+        inputPath: string;
+        outputPath: string | null;
+    };
+};
+export interface TasksMergeStateModel {
+    selectedMergeFunction: string;
+    doAddInputsWithoutOutputs: boolean;
+    mergedFiles: mergedFilesModel;
+}

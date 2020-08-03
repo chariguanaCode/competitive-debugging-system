@@ -1,19 +1,19 @@
 import { makeStyles } from '@material-ui/core/styles';
+import { fileExist } from 'backend/syncFileActions';
 
 const useStyles = makeStyles({
     TasksMerge: {
         height: '50%',
-        width: '100%'
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'row',
     },
-    pathRow: {
-        // TODO: reversed ellipsis
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        '&:hover': {
-            overflow: 'visible',
-            zIndex: 20000,
-        },
-        whiteSpace: 'nowrap',
+    pathsListContainer: {
+        border: '1px solid black',
+        width: '50%'
+    },
+    mergeSettingContainer: {
+
     },
 });
 

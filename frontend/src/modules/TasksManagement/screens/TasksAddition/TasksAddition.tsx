@@ -3,7 +3,12 @@ import useStyles from './TasksAddition.css';
 import { TasksAdditionPropsModel, TasksAdditionStateModel } from './TasksAddition.d';
 import { AdditionForm } from './components';
 import { useFileManagerActions } from 'reduxState/actions';
-export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = ({inputsPaths, setInputsPaths, outputsPaths, setOutputsPaths}) => {
+export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = ({
+    inputsFiles,
+    setInputsPaths,
+    outputsFiles,
+    setOutputsPaths,
+}) => {
     const classes = useStyles();
     const { setFileManager } = useFileManagerActions();
     return (
@@ -14,7 +19,7 @@ export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = (
                         <AdditionForm
                             setFileManager={setFileManager}
                             title={'SELECT INPUTS'}
-                            selectedFiles={inputsPaths}
+                            selectedFiles={inputsFiles}
                             setSelectedFiles={setInputsPaths}
                         />
                     </div>
@@ -22,8 +27,9 @@ export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = (
                         <AdditionForm
                             setFileManager={setFileManager}
                             title={'SELECT OUTPUTS'}
-                            selectedFiles={outputsPaths}
+                            selectedFiles={outputsFiles}
                             setSelectedFiles={setOutputsPaths}
+                            mirrored={true}
                         />
                     </div>
                 </div>

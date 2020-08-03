@@ -1,7 +1,8 @@
-export interface TasksManagementPropsModel {
+import { FileModel } from 'components/FileManager/FileManager.d';
 
-}
+export interface TasksManagementPropsModel {}
 
 export interface TasksManagementStateModel {
-    inputPaths: Array<string>, outputPaths: Array<string>
+    inputsFiles: Array<FileModel>;
+    outputsFiles: Array<FileModel>;
 }
