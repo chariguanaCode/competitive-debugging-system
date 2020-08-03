@@ -1,7 +1,7 @@
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
-    AdditionForm: { width: '10  0%', height: '100%' },
+    AdditionForm: { width: '100%', height: '100%' },
     titleContainer: {},
     selectFilesForm: {},
     selectedFilesListContainer: { width: '50%', height: '100%' },
@@ -23,6 +23,7 @@ const useStyles = makeStyles({
         display: 'flex',
         flexDirection: 'column',
     },
+
 });
 
 export default useStyles;

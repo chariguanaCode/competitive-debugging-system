@@ -7,7 +7,7 @@ import { Tasks, Watches } from 'modules';
 import 'flexlayout-react/style/dark.css';
 import AddTab from './AddTabDialog';
 import TasksProgressBar from 'modules/TasksProgressBar';
-import TasksAddition from 'modules/TasksManagement/screens/TasksAddition';
+import TasksManagement from 'modules/TasksManagement';
 
 const defaultLayout = {
     global: {
@@ -105,7 +105,7 @@ function Content(): ReactElement {
                 <div style={{ position: 'relative', height: '100%' }}>
                     {/*<Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
                     <DebuggingAddTab open={addTabOpen} onClose={addTab} />*/}
-                    <TasksAddition />
+                    <TasksManagement />
                 {/*<div className={classes.layoutWrapper}>
                     <Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
                     <AddTab open={addTabOpen} onClose={addTab} />

@@ -2,10 +2,8 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
     TasksAddition: {
-        width: '1000px', // DEV
-        height: '700px', // DEV
-        margin: '50px', // DEV
-        backgroundColor: '#424242', // DEV
+        height: '50%',
+        width: '100%'
     },
     additionFormContainers: {
         display: 'flex',
@@ -16,6 +14,8 @@ const useStyles = makeStyles({
     additionFormContainer: {
         width: '50%',
         height: '100%',
+        margin: '10px'
+
     },
 });
 

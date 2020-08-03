@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import useStyles from './Form.css';
 import { FormPropsModel, FormStateModel } from './Form.d';
 import { Button, TextField } from '@material-ui/core';
 
 export const Form: React.FunctionComponent<FormPropsModel> = ({
     setFileManager,
-    addFilteredFiles,
+    setFilteredFiles,
     filteredFiles,
     setSelectedFiles,
 }) => {

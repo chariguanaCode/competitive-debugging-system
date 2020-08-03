@@ -3,6 +3,7 @@ export interface AdditionFormPropsModel {
     setSelectedFiles: Function;
     selectedFiles: Array<string>;
     setFileManager: Function;
+    mirrored: boolean;
 }
 
 export interface AdditionFormStateModel {}
