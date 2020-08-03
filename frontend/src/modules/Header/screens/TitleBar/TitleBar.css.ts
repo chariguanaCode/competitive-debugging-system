@@ -4,7 +4,7 @@ export const useStyles = makeStyles((theme) => ({
     titleBar: {
         zIndex: 11000,
         position: 'relative',
-        height: 32,
+        height: 24,
         paddingBottom: '8px',
         backgroundColor: theme.palette.header.background,
         display: 'flex',

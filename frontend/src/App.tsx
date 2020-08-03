@@ -9,8 +9,11 @@ import { FileManagerContainer } from 'components/FileManager';
 import { useFileManager } from 'reduxState/selectors';
 import { useFileManagerActions } from 'reduxState/actions';
 
+import 'typeface-roboto';
+
 export default function App({}): ReactElement {
     const [theme, setTheme] = useState(darkTheme);
+    //const [theme, setTheme] = useState(lightTheme);
 
     return (
         <ThemeProvider theme={theme}>
@@ -19,12 +22,11 @@ export default function App({}): ReactElement {
                     style={{
                         width: '100vw',
                         height: '100vh',
-                        backgroundColor: 'black',
                     }}
                 >
                     <CssBaseline />
                     <GlobalStyles />
-                    <FileManagerContainer useFileManager={useFileManager} useFileManagerActions={useFileManagerActions}/>
+                    <FileManagerContainer useFileManager={useFileManager} useFileManagerActions={useFileManagerActions} />
                     <Daemons />
                     <Header />
                     <Content />

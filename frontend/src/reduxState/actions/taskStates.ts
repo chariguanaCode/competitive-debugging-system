@@ -57,5 +57,6 @@ export const useTaskStatesActions = () => {
             ...boundActions,
             reloadTasks,
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch]);
 };
