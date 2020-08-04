@@ -59,6 +59,7 @@ export const mergeArrays = (arr1: Array<any>, arr2: Array<any>) => [...new Set([
 
 export const asyncForEach = async (array: Array<any>, callback: Function) => {
     for (let index = 0; index < array.length; index++) {
-      await callback(array[index], index, array);
+        await callback(array[index], index, array);
     }
-  }
+};
+

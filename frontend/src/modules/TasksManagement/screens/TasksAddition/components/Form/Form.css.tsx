@@ -3,7 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles({
     Form: {
         display: 'flex',
-        flexDirection: 'row',
+        // @ts-ignore TODO: fix ts
+        flexDirection: props=> props.mirrored ? 'row-reverse' : 'row',
         alignItems: 'center',
         paddingBottom: '10px',
     },

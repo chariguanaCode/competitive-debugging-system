@@ -2,8 +2,12 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
     TasksAddition: {
-        height: '50%',
-        width: '100%'
+        height: '900px',
+        width: '1400px',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '20px 20px 5px 20px',
+        overflow: 'hidden',
     },
     additionFormContainers: {
         display: 'flex',
@@ -12,11 +16,14 @@ const useStyles = makeStyles({
         height: '100%',
     },
     additionFormContainer: {
-        width: '50%',
-        height: '100%',
-        margin: '10px'
-
+        flexGrow: 1,
     },
+    mergedFilesTableContainer: {
+        flexGrow: 20,
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    submitButton: { minHeight: '30px' },
 });
 
 export default useStyles;

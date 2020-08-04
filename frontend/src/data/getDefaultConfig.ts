@@ -26,7 +26,7 @@ const getDefaultConfig = () => {
                 },
             },
         },
-        tasks: {},
+        tests: [],
     } as ConfigModel;
 };
 

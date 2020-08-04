@@ -8,8 +8,4 @@ export interface AdditionFormPropsModel {
     mirrored?: boolean;
 }
 
-export interface AdditionFormStateModel {
-    pendingFiles: Array<FileModel>;
-    filteredFiles: Array<FileModel>;
-    regex: string;
-}
+export interface AdditionFormStateModel {}

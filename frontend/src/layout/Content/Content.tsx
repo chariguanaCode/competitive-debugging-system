@@ -3,77 +3,13 @@ import { AppBar, Tabs, Tab, IconButton, Zoom, Button, Fab } from '@material-ui/c
 import AddIcon from '@material-ui/icons/Add';
 import useStyles from './Content.css';
 import { Layout, Model, TabNode } from 'flexlayout-react';
-import { Tasks, Watches } from 'modules';
+import { Tasks, Watches, TasksManagement } from 'modules';
 import 'flexlayout-react/style/dark.css';
 import AddTab from './AddTabDialog';
 import TasksProgressBar from 'modules/TasksProgressBar';
-import TasksManagement from 'modules/TasksManagement';
+import defaultLayout from './defaultLayout';
 
-const defaultLayout = {
-    global: {
-        tabSetHeaderHeight: 30,
-        tabSetTabStripHeight: 30,
-        borderBarSize: 30,
-    },
-    layout: {
-        type: 'row',
-        weight: 100,
-        children: [
-            {
-                type: 'tabset',
-                weight: 50,
-                selected: 0,
-                children: [
-                    {
-                        type: 'tab',
-                        name: 'Tasks',
-                        component: 'tasks',
-                    },
-                ],
-            },
-            {
-                type: 'tabset',
-                weight: 50,
-                selected: 0,
-                children: [
-                    {
-                        type: 'tab',
-                        name: 'Watches',
-                        component: 'watch',
-                    },
-                ],
-            },
-            {
-                type: 'tabset',
-                weight: 50,
-                selected: 0,
-                children: [
-                    {
-                        type: 'tab',
-                        name: 'Watches2',
-                        component: 'watch',
-                    },
-                ],
-            },
-        ],
-    },
-    borders: [
-        {
-            type: 'border',
-            location: 'bottom',
-            children: [
-                {
-                    type: 'tab',
-                    enableClose: false,
-                    name: 'Tasks',
-                    component: 'tasks',
-                },
-            ],
-        },
-    ],
-};
-
-function Content(): ReactElement {
+const Content: React.FunctionComponent = () => {
     const classes = useStyles();
     const [addTabOpen, setAddTabOpen] = useState(false);
 
@@ -88,6 +24,8 @@ function Content(): ReactElement {
                 return <Tasks node={node} />;
             case 'watch':
                 return <Watches />;
+            case 'tasks management':
+                return <TasksManagement />;
             default:
                 return <>Invalid tab</>;
         }
@@ -102,11 +40,7 @@ function Content(): ReactElement {
     return (
         <>
             <div className={classes.root}>
-                <div style={{ position: 'relative', height: '100%' }}>
-                    {/*<Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
-                    <DebuggingAddTab open={addTabOpen} onClose={addTab} />*/}
-                    <TasksManagement />
-                {/*<div className={classes.layoutWrapper}>
+                <div className={classes.layoutWrapper}>
                     <Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
                     <AddTab open={addTabOpen} onClose={addTab} />
                     <Fab
@@ -122,12 +56,12 @@ function Content(): ReactElement {
                     >
                         <AddIcon style={{ marginRight: 8 }} />
                         Add new tab
-                    </Fab>*/}
-                    </div>
-                {/*<TasksProgressBar />*/}
+                    </Fab>
+                </div>
+                <TasksProgressBar />
             </div>
         </>
     );
-}
+};
 
 export default Content;

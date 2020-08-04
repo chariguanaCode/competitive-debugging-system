@@ -31,11 +31,13 @@ export default function AddTabDialog({ open, onClose }: Props): ReactElement {
                     style={{ paddingBottom: 8 }}
                     onChange={(event) => setName(event.target.value)}
                 />
+                {/* TODO: IT SHOULD BE AUTO GENERATED */}
                 <FormControl>
                     <InputLabel>Type</InputLabel>
                     <Select value={type} onChange={(event) => setType(event.target.value as string)}>
                         <MenuItem value="watch">Watches</MenuItem>
                         <MenuItem value="tasks">Tasks</MenuItem>
+                        <MenuItem value="tasks management">Tasks management</MenuItem>
                     </Select>
                 </FormControl>
             </DialogContent>

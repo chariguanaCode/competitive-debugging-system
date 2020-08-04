@@ -8,6 +8,11 @@ export interface ProjectInfoModel {
     description: string;
 }
 
+export interface TestModel {
+    inputPath: string;
+    outputPath: string | null;
+}
+
 export interface ConfigModel {
     projectInfo: ProjectInfoModel;
     settings: {
@@ -23,11 +28,5 @@ export interface ConfigModel {
             };
         };
     };
-    tasks: {
-        [key: string]: {
-            [key: string]: {
-                filePath: string;
-            };
-        };
-    };
+    tests: Array<TestModel>;
 }
