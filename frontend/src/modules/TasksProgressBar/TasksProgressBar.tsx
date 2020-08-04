@@ -37,6 +37,7 @@ const TasksProgressBar = () => {
                 TaskState.Pending,
             ].map((key) => (
                 <Tooltip
+                key={`TasksProgressBar-Tooltip-${key}`}
                     title={
                         <>
                             {TaskState[key]}
