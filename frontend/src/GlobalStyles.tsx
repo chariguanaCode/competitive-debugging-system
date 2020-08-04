@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
         },
         '::-webkit-scrollbar-thumb': {
             borderRadius: 12,
-            backgroundColor: theme.palette.scrollbar.thumb,
+            backgroundColor: theme.palette.scrollbar.thumbHover,
             backgroundClip: 'content-box',
             border: 'transparent 4px solid',
             minHeight: 32 + 8,

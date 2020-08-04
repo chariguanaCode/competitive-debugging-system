@@ -22,7 +22,7 @@ export const Footer = () => {
         day: 'numeric',
         hour: 'numeric',
         minute: 'numeric',
-        second: 'numeric',
+        //second: 'numeric', VERY DISTRACTING
     }).format(currentTime);
 
     const projectName = useConfig().projectInfo.name;
