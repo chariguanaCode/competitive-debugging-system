@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
     Table,
     TableBody,
@@ -37,17 +37,14 @@ const Tasks = ({ node }: Props) => {
 
     const killTest = useKillTest();
 
-    const taskData: [string, Task][] = Object.entries(useAllTasksState().current);
+    const taskData = Object.entries(useAllTasksState().current);
     const { setCurrentTaskId } = useTaskStatesActions();
     const setView = (view: Views) => {};
 
     const [filters, setFilters] = useState({ state: [] as string[], id: '', executionTime: '' });
-
     let taskStates = taskData;
     if (filters.state.length > 0) taskStates = taskStates.filter((val) => filters.state.includes(TaskState[val[1].state]));
-
     if (filters.id.length > 0) taskStates = taskStates.filter((val) => val[0].includes(filters.id));
-
     if (filters.executionTime.length > 0)
         taskStates = taskStates.filter((val) => val[1].executionTime.includes(filters.executionTime));
 

@@ -5,7 +5,9 @@ import executionState from './executionState';
 import taskStates from './taskStates';
 import cdsConfig from './cdsConfig';
 import fileManager from './fileManager';
-import watchesActionsHistory from './watchesActionsHistory'
+import watchesActionsHistory from './watchesActionsHistory';
+import trackedObjects from './trackedObjects';
+import addTrackedObjectDialog from './addTrackedObjectDialog';
 
 export default combineReducers({
     projectFile,
@@ -14,5 +16,7 @@ export default combineReducers({
     taskStates,
     cdsConfig,
     fileManager,
-    watchesActionsHistory
+    watchesActionsHistory,
+    trackedObjects,
+    addTrackedObjectDialog,
 });

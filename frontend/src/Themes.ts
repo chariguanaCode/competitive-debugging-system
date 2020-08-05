@@ -1,4 +1,4 @@
-import { CssBaseline, createMuiTheme, Switch, FormControlLabel, Button } from '@material-ui/core';
+import { createMuiTheme } from '@material-ui/core';
 import {
     amber,
     yellow,

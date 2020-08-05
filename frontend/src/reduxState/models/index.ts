@@ -4,4 +4,6 @@ export * from './executionState';
 export * from './taskStates';
 export * from './cdsConfig';
 export * from './fileManager';
-export * from './watchesActionsHistory'
+export * from './watchesActionsHistory';
+export * from './trackedObjects';
+export * from './addTrackedObjectDialog';

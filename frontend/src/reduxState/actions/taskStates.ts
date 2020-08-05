@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { useMemo } from 'react';
 import { bindActionCreators } from 'redux';
-import { createAction, ActionFunction1, Action } from 'redux-actions';
+import { createAction, Action } from 'redux-actions';
 import { Watchblock, Watch } from '../models';
 import { useAllTasksState } from 'reduxState/selectors';
 

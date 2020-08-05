@@ -1,13 +1,15 @@
 import React, { ReactElement, useState, useRef } from 'react';
-import { AppBar, Tabs, Tab, IconButton, Zoom, Button, Fab } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
+import { Fab } from '@material-ui/core';
 import useStyles from './Content.css';
 import { Layout, Model, TabNode } from 'flexlayout-react';
 import { Tasks, Watches } from 'modules';
 import 'flexlayout-react/style/dark.css';
-import AddTab from './AddTabDialog';
+import AddTab from 'modules/AddTabDialog';
 import TasksProgressBar from 'modules/TasksProgressBar';
-import { useFileManagerActions } from 'reduxState/actions';
+import { useFileManagerActions, useAddTrackedObjectDialogActions } from 'reduxState/actions';
+import { ContextMenu } from 'components';
+import { Add, AddBox } from '@material-ui/icons';
+import TrackedObject from 'modules/TrackedObject';
 
 const defaultLayout = {
     global: {
@@ -38,8 +40,19 @@ const defaultLayout = {
                 children: [
                     {
                         type: 'tab',
-                        name: 'Watches',
-                        component: 'watch',
+                        name: '2D array',
+                        component: 'trackedObject',
+                        config: {
+                            object: 'bbb',
+                        },
+                    },
+                    {
+                        type: 'tab',
+                        name: '1D array',
+                        component: 'trackedObject',
+                        config: {
+                            object: 'aaa',
+                        },
                     },
                 ],
             },
@@ -50,7 +63,7 @@ const defaultLayout = {
                 children: [
                     {
                         type: 'tab',
-                        name: 'Watches2',
+                        name: 'Watches',
                         component: 'watch',
                     },
                 ],
@@ -75,6 +88,7 @@ const defaultLayout = {
 
 function Content(): ReactElement {
     const classes = useStyles();
+    const { openAddTrackedObjectDialog } = useAddTrackedObjectDialogActions();
     const [addTabOpen, setAddTabOpen] = useState(false);
     const { setFileManager } = useFileManagerActions();
 
@@ -89,6 +103,8 @@ function Content(): ReactElement {
                 return <Tasks node={node} />;
             case 'watch':
                 return <Watches />;
+            case 'trackedObject':
+                return <TrackedObject config={node.getConfig()} />;
             default:
                 return <>Invalid tab</>;
         }
@@ -101,29 +117,26 @@ function Content(): ReactElement {
     };
 
     return (
-        <>
-            <div className={classes.root}>
-                <div className={classes.layoutWrapper}>
-                    <Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
-                    <AddTab open={addTabOpen} onClose={addTab} />
-                    <Fab
-                        variant="extended"
-                        color="primary"
-                        size="medium"
-                        style={{
-                            position: 'absolute',
-                            bottom: 16,
-                            right: 16,
-                        }}
-                        onClick={() => setAddTabOpen(true)}
-                    >
-                        <AddIcon style={{ marginRight: 8 }} />
-                        Add new tab
-                    </Fab>
-                </div>
-                <TasksProgressBar />
+        <ContextMenu
+            className={classes.root}
+            items={[{ label: 'Add Tracked Object', onClick: () => openAddTrackedObjectDialog(), icon: <AddBox /> }]}
+        >
+            <div className={classes.layoutWrapper}>
+                <Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
+                <AddTab open={addTabOpen} onClose={addTab} />
+                <Fab
+                    variant="extended"
+                    color="primary"
+                    size="medium"
+                    className={classes.addTabButton}
+                    onClick={() => setAddTabOpen(true)}
+                >
+                    <Add style={{ marginRight: 8 }} />
+                    Add new tab
+                </Fab>
             </div>
-        </>
+            <TasksProgressBar />
+        </ContextMenu>
     );
 }
 

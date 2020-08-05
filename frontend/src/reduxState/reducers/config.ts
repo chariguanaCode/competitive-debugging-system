@@ -2,7 +2,6 @@ import { handleActions } from 'redux-actions';
 import { ConfigActions } from '../actions';
 import { ConfigModel } from '../models';
 import getDefaultConfig from 'data/getDefaultConfig';
-import { Action } from 'flexlayout-react';
 
 export const configReducer = handleActions<ConfigModel>(
     {
