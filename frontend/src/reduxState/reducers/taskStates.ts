@@ -10,7 +10,7 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
         [TaskStateAction.SET_CURRENT_TASK_ID]: (state, action) => ({
             ...state,
             currentTask: {
-                id: (action.payload as unknown) as string,
+                id: (action.payload as unknown) as number,
                 stdout: '',
                 stdoutFileSize: 0,
                 watchblocks: { children: [] as Array<Watchblock | Watch> } as Watchblock,
@@ -58,13 +58,13 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
     },
     {
         allTasks: {
-            current: {} as AllTasksModel,
+            current: [] as AllTasksModel,
             timeout: null,
             shouldReload: false,
             reload: 0,
         },
         currentTask: {
-            id: '',
+            id: -1,
             stdout: '',
             stdoutFileSize: 0,
             //watchblocks: { children: [] as Array<Watchblock | Watch> } as Watchblock,

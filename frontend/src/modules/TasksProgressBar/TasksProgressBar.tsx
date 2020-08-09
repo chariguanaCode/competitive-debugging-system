@@ -9,7 +9,7 @@ const TasksProgressBar = () => {
     const theme = useTheme();
 
     const taskStates = useAllTasksState().current;
-    const states = Object.values(taskStates).map((task: Task) => task.state);
+    const states = taskStates.map((task: Task) => task.state);
 
     const stateOverview = {
         [TaskState.Pending]: 0,

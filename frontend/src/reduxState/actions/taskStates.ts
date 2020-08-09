@@ -16,7 +16,7 @@ export enum TaskStateAction {
 }
 
 const actions = {
-    setCurrentTaskId: createAction<string>(TaskStateAction.SET_CURRENT_TASK_ID),
+    setCurrentTaskId: createAction<number>(TaskStateAction.SET_CURRENT_TASK_ID),
     setCurrentTaskStdout: createAction<string>(TaskStateAction.SET_CURRENT_TASK_STDOUT),
     setCurrentTaskStdoutSize: createAction<number>(TaskStateAction.SET_CURRENT_TASK_STDOUT_SIZE),
     setCurrentTaskWatchblocks: createAction<Watchblock>(TaskStateAction.SET_CURRENT_TASK_WATCHBLOCKS),

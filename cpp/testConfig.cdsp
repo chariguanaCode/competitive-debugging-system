@@ -25,12 +25,14 @@
             }
         }
     },
-    "tests": {
-        "test1": {
-            "filePath": "./cpp/tests/test1.in"
+    "tests": [
+        {
+            "name": "./cpp/tests/test1.in",
+            "inputPath": "./cpp/tests/test1.in"
         },
-        "test2": {
-            "filePath": "./cpp/tests/test2.in"
+        {
+            "name": "./cpp/tests/test2.in",
+            "inputPath": "./cpp/tests/test2.in"
         }
-    }
+    ]
 }

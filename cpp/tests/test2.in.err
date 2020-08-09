@@ -1,0 +1,26 @@
+ğñ1ômainô0ö
+ğñ2ôfirst watchblockô18ö
+ğò3ôaô19ôlong longôconfigôn889123õôö
+ğò4ômy_structô29ôexampleôconfigôosaõn1337õstestõssome cool valueõsarrayõan1218544640õn-672427307õn127õn233õn8õn0õn1õn0õn32768õn0õAOôö
+ğò5ôstring("test message")ô30ôstd::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >ôconfigôstest messageõôö
+test 
+test2ğò6ôtestingô32ôstd::bitset<30ul>ôconfigôb000000000000000000000000000000õôö
+ğñ7ômy not long loopô33ö
+ğò8ôiô35ôintôconfigôn0õôö
+ğò9ôiô35ôintôconfigôn1õôö
+ğò10ôiô35ôintôconfigôn2õôö
+ğò11ôiô35ôintôconfigôn3õôö
+ğò12ôiô35ôintôconfigôn4õôö
+ğò13ôiô35ôintôconfigôn5õôö
+ğò14ôiô35ôintôconfigôn6õôö
+ğò15ôiô35ôintôconfigôn7õôö
+ğò16ôiô35ôintôconfigôn8õôö
+ğò17ôiô35ôintôconfigôn9õôö
+ğómy not long loopö
+ğò18ômy_mapô38ôstd::map<int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<int>, std::allocator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >ôconfigôapn10õstestõAôö
+ğñ19ô2nd watchblockô39ö
+ğò20ôdynamic_arrayô40ôint*ôconfigô*n1885990432õôö
+ğò21ôvector_2dô41ôstd::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > >ôconfigôaan1337õAan1337õAan1337õAan1337õAan1337õAan1337õAan1337õAan1337õAan1337õAan1337õAan1337õAan1337õAan1337õAAôö
+ğó2nd watchblockö
+ğófirst watchblockö
+ğómainö

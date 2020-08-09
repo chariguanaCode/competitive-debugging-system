@@ -36,7 +36,7 @@ export default function Daemons(): ReactElement {
         if (![TaskState.Pending, TaskState.Running, undefined].includes(currentTaskProgress)) {
             console.log(currentTask.id, currentTaskProgress);
             readFileStream(
-                config.tests[currentTask.id].filePath + '.out',
+                config.tests[currentTask.id].inputPath + '.out',
                 false,
                 (data: Uint8Array) => setCurrentTaskStdout(new TextDecoder('utf-8').decode(data)),
                 setCurrentTaskStdoutSize,
@@ -45,7 +45,7 @@ export default function Daemons(): ReactElement {
             );
 
             readFileStream(
-                config.tests[currentTask.id].filePath + '.err',
+                config.tests[currentTask.id].inputPath + '.err',
                 true,
                 (data: Uint8Array) => parseWatchblocks(data),
                 setCurrentTaskWatchblocksSize,

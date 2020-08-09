@@ -31,7 +31,7 @@ function Watches(): ReactElement {
 
     return (
         <div onKeyUp={handleKey} className={classes.wrapper}>
-            <JSONTree data={currentTask.watchblocks.children || []} updateData={updateWatchblocks} />;
+            <JSONTree data={currentTask.watchblocks.children || []} updateData={updateWatchblocks} />
         </div>
     );
 }

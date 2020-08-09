@@ -1,109 +1,19 @@
-import React, { ReactElement, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Fab } from '@material-ui/core';
-import useStyles from './Content.css';
-import { Layout, Model, TabNode } from 'flexlayout-react';
-import { Tasks, Watches } from 'modules';
-import 'flexlayout-react/style/dark.css';
-import AddTab from 'modules/AddTabDialog';
-import TasksProgressBar from 'modules/TasksProgressBar';
-import { useFileManagerActions, useAddTrackedObjectDialogActions } from 'reduxState/actions';
-import { ContextMenu } from 'components';
 import { Add, AddBox } from '@material-ui/icons';
-import TrackedObject from 'modules/TrackedObject';
+import { Layout, Model, TabNode } from 'flexlayout-react';
+import 'flexlayout-react/style/dark.css';
+import useStyles from './Content.css';
+import { Tasks, Watches, TasksManagement, AddTabDialog, TrackedObject, TasksProgressBar } from 'modules';
+import { useAddTrackedObjectDialogActions } from 'reduxState/actions';
+import { ContextMenu } from 'components';
 
-const defaultLayout = {
-    global: {
-        tabSetHeaderHeight: 30,
-        tabSetTabStripHeight: 30,
-        borderBarSize: 30,
-    },
-    layout: {
-        type: 'row',
-        weight: 100,
-        children: [
-            {
-                type: 'tabset',
-                weight: 50,
-                selected: 0,
-                children: [
-                    {
-                        type: 'tab',
-                        name: 'Tasks',
-                        component: 'tasks',
-                    },
-                ],
-            },
-            {
-                type: 'column',
-                weight: 50,
-                children: [
-                    {
-                        type: 'tabset',
-                        weight: 50,
-                        selected: 0,
-                        children: [
-                            {
-                                type: 'tab',
-                                name: '2D array',
-                                component: 'trackedObject',
-                                config: {
-                                    object: 'bbb',
-                                },
-                            },
-                        ],
-                    },
-                    {
-                        type: 'tabset',
-                        weight: 50,
-                        selected: 0,
-                        children: [
-                            {
-                                type: 'tab',
-                                name: '1D array',
-                                component: 'trackedObject',
-                                config: {
-                                    object: 'aaa',
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
-            {
-                type: 'tabset',
-                weight: 50,
-                selected: 0,
-                children: [
-                    {
-                        type: 'tab',
-                        name: 'Watches',
-                        component: 'watch',
-                    },
-                ],
-            },
-        ],
-    },
-    borders: [
-        {
-            type: 'border',
-            location: 'bottom',
-            children: [
-                {
-                    type: 'tab',
-                    enableClose: false,
-                    name: 'Tasks',
-                    component: 'tasks',
-                },
-            ],
-        },
-    ],
-};
+import defaultLayout from './defaultLayout';
 
-function Content(): ReactElement {
+const Content: React.FunctionComponent = () => {
     const classes = useStyles();
     const { openAddTrackedObjectDialog } = useAddTrackedObjectDialogActions();
     const [addTabOpen, setAddTabOpen] = useState(false);
-    const { setFileManager } = useFileManagerActions();
 
     const [model, setModel] = useState(Model.fromJson(defaultLayout));
     const layout = useRef<Layout>(null);
@@ -118,6 +28,8 @@ function Content(): ReactElement {
                 return <Watches />;
             case 'trackedObject':
                 return <TrackedObject config={node.getConfig()} />;
+            case 'tasks management':
+                return <TasksManagement />;
             default:
                 return <>Invalid tab</>;
         }
@@ -136,7 +48,7 @@ function Content(): ReactElement {
         >
             <div className={classes.layoutWrapper}>
                 <Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
-                <AddTab open={addTabOpen} onClose={addTab} />
+                <AddTabDialog open={addTabOpen} onClose={addTab} />
                 <Fab
                     variant="extended"
                     color="primary"
@@ -151,6 +63,6 @@ function Content(): ReactElement {
             <TasksProgressBar />
         </ContextMenu>
     );
-}
+};
 
 export default Content;

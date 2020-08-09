@@ -74,7 +74,7 @@ export default React.memo(function TreeNode({ node, style, onChange }: Props): R
             return result;
         }
 
-        if (line) {
+        if (line !== undefined) {
             result.push(
                 <span style={{ cursor: 'pointer' }}>
                     {colored({ line })}: {colored({ name })} ={' '}

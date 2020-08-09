@@ -2,7 +2,6 @@ import useCompilationAndExecution from './cppCompilationAndExecution';
 import * as fileChangeTracking from './fileChangeTracking';
 import * as asyncFileActions from './asyncFileActions';
 import * as syncFileActions from './syncFileActions';
-import defaultConfig from '../data/defaultConfig.json';
 import { ConfigModel, AllTasksModel, Task, TaskState } from 'reduxState/models';
 import { useConfig, useAllTasksState, useCdsConfig, useProjectFile } from 'reduxState/selectors';
 import { useConfigActions, useTaskStatesActions, useProjectFileActions } from 'reduxState/actions';
@@ -73,7 +72,7 @@ export const useLoadProject = () => {
         }
 
         const hasSaveLocation = !path.match(/.*\.nsp.cdsp/);
-        let newConfig: ConfigModel = defaultConfig;
+        let newConfig: ConfigModel = {} as ConfigModel;
 
         await asyncFileActions.readFile(path).then((data: any) => {
             newConfig = JSON.parse(data);

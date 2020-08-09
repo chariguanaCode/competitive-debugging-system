@@ -33,10 +33,10 @@ export default () => {
             console.log('Found tests:', tests);
             const testPromises = new PromiseQueue(4);
             await Promise.all(
-                Object.entries(tests).map(([id, { filePath }]) =>
+                tests.map(({ inputPath }, id) =>
                     testPromises
                         .enqueue(
-                            () => cppActions.executeTest(binaryName, filePath, filePath + '.out', filePath + '.err'),
+                            () => cppActions.executeTest(binaryName, inputPath, inputPath + '.out', inputPath + '.err'),
                             beginTest(id)
                         )
                         .then(finishTest(id), testError(id))
