@@ -53,10 +53,10 @@ export const AddTrackedObjectDialog = () => {
                         closeAddTrackedObjectDialog();
                         switch (type) {
                             case 'array_1d':
-                                setSingleTrackedObject(name, { type, value: { value: [1, 2, 3], color: [] } });
+                                setSingleTrackedObject(name, { type, value: [] as string[], color: [] as string[] });
                                 break;
                             case 'array_2d':
-                                setSingleTrackedObject(name, { type, value: { value: [[]], color: [[]] } });
+                                setSingleTrackedObject(name, { type, value: [[]] as string[][], color: [[]] as string[][] });
                                 break;
                         }
                     }}

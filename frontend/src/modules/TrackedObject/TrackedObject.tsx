@@ -16,9 +16,9 @@ export const TrackedObject = ({ config }: Props) => {
 
     switch (trackedObject.type) {
         case 'array_1d':
-            return <OneDimensionArray value={trackedObject.value} />;
+            return <OneDimensionArray value={trackedObject} />;
         case 'array_2d':
-            return <TwoDimensionArray value={trackedObject.value} />;
+            return <TwoDimensionArray value={trackedObject} />;
         default:
             return <>Invalid tracked object</>;
     }

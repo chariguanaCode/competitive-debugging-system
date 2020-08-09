@@ -2,6 +2,8 @@ import React, { ReactElement } from 'react';
 import { useTheme } from '@material-ui/core';
 import { WatchBlockOptions } from '@material-ui/core/styles/createPalette';
 import { Watchblock, Watch } from 'reduxState/models';
+import { useWatchHistoryLocation } from 'reduxState/selectors';
+import { useWatchActionsHistoryActions } from 'reduxState/actions';
 
 interface Props {
     node: any;
@@ -28,6 +30,9 @@ function Colored({ type, children }: ColoredProps): ReactElement {
 }
 
 export default React.memo(function TreeNode({ node, style, onChange }: Props): ReactElement {
+    const { setWatchHistoryLocation } = useWatchActionsHistoryActions();
+    const theme = useTheme();
+
     const data = node as Watchblock | Watch;
 
     const colored = (val: { [key in keyof WatchBlockOptions]: any }) => {
@@ -42,17 +47,51 @@ export default React.memo(function TreeNode({ node, style, onChange }: Props): R
         pair: ['(', ')'],
     };
 
+    const expandable = () => {
+        if (data.type === 'array' || data.type === 'struct' || data.type === 'pair' || data.type === 'watchblock') {
+            return data.children.length - 1 !== 0;
+        }
+        return false;
+    };
+
+    const selected = useWatchHistoryLocation() === data.id;
+    const selectable = data.line !== undefined;
+    const selectTracking = () => {
+        setWatchHistoryLocation(data.id);
+    };
+
     const { line, name } = data;
     const getContents = () => {
-        const result = {
-            onClick: () => {},
-            body: [] as ReactElement[],
-        };
+        const result = [] as ReactElement[];
 
         let open = false;
         if (data.type === 'watchblock' || data.type === 'array' || data.type === 'struct' || data.type === 'pair') {
             open = data.state?.expanded;
-            result.onClick = () =>
+        }
+
+        if (data.type === 'closing') {
+            result.push(<>{colored({ [data.closingType]: bracketMap[data.closingType][1] })}</>);
+            return result;
+        }
+
+        if (line) {
+            result.push(
+                <span style={{ cursor: 'pointer' }}>
+                    {colored({ line })}: {colored({ name })} ={' '}
+                </span>
+            );
+        } else {
+            result.push(<>{colored({ array: name })} : </>);
+        }
+
+        if (data.type !== 'watchblock' && data.pointer) result.push(<>{colored({ pointer: '*' })}</>);
+
+        if (data.type === 'string') result.push(<>{colored({ string: `"${data.value}"` })}</>);
+        if (data.type === 'bitset') result.push(<>{colored({ bitset: `${data.value}` })}</>);
+        if (data.type === 'number') result.push(<>{colored({ number: data.value })}</>);
+
+        if (data.type === 'array' || data.type === 'struct' || data.type === 'pair' || data.type === 'watchblock') {
+            const toggleExpand = () =>
                 onChange({
                     node: {
                         ...data,
@@ -63,66 +102,22 @@ export default React.memo(function TreeNode({ node, style, onChange }: Props): R
                     },
                     type: 2,
                 });
-        }
 
-        if (data.type === 'closing') {
-            result.body.push(<>{colored({ [data.closingType]: bracketMap[data.closingType][1] })}</>);
-            return result;
-        }
-
-        if (data.type === 'watchblock') {
-            result.body.push(
-                <>
-                    {colored({ line })}: {colored({ name })} ={' '}
-                </>
-            );
-        } else if (!line && !data.data_type) {
-            result.body.push(<>{colored({ array: name })} : </>);
-        } else {
-            result.body.push(
-                <>
-                    {colored({ line })}: {colored({ name })} ={' '}
-                </>
-            );
-        }
-
-        if (data.type !== 'watchblock' && data.pointer) {
-            result.body.push(<>{colored({ pointer: '*' })}</>);
-        }
-
-        if (data.type === 'string') {
-            result.body.push(<>{colored({ string: `"${data.value}"` })}</>);
-        }
-
-        if (data.type === 'bitset') {
-            result.body.push(<>{colored({ bitset: `${data.value}` })}</>);
-        }
-
-        if (data.type === 'number') {
-            result.body.push(<>{colored({ number: data.value })}</>);
-        }
-
-        if (data.type === 'array' || data.type === 'struct' || data.type === 'pair' || data.type === 'watchblock') {
-            result.body.push(
-                open && data.children.length - 1 ? (
-                    <>{colored({ [data.type]: bracketMap[data.type][0] })}</>
-                ) : (
-                    <>
-                        {colored({ [data.type]: bracketMap[data.type][0] })} {data.children.length - 1}{' '}
-                        {colored({ [data.type]: bracketMap[data.type][1] })}
-                    </>
-                )
+            result.push(
+                <span onClick={toggleExpand} style={{ cursor: expandable() ? 'pointer' : 'auto' }}>
+                    {open && data.children.length - 1 ? (
+                        <>{colored({ [data.type]: bracketMap[data.type][0] })}</>
+                    ) : (
+                        <>
+                            {colored({ [data.type]: bracketMap[data.type][0] })} {data.children.length - 1}{' '}
+                            {colored({ [data.type]: bracketMap[data.type][1] })}
+                        </>
+                    )}
+                </span>
             );
         }
 
         return result;
-    };
-
-    const clickable = () => {
-        if (data.type === 'array' || data.type === 'struct' || data.type === 'pair' || data.type === 'watchblock') {
-            return data.children.length - 1 !== 0;
-        }
-        return false;
     };
 
     const contents = getContents();
@@ -137,11 +132,12 @@ export default React.memo(function TreeNode({ node, style, onChange }: Props): R
 
                 wordSpacing: 4,
                 transform: `translate(${data.type === 'closing' ? -30 : 0}px)`,
-                cursor: clickable() ? 'pointer' : 'auto',
+                minWidth: '100%',
+                backgroundColor: selected ? theme.palette.watchblocks.selected : 'transparent',
             }}
-            onClick={contents.onClick}
+            onClick={selectable ? selectTracking : () => {}}
         >
-            {contents.body}
+            {contents}
         </div>
     );
 });

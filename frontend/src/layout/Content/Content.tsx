@@ -34,25 +34,38 @@ const defaultLayout = {
                 ],
             },
             {
-                type: 'tabset',
+                type: 'column',
                 weight: 50,
-                selected: 0,
                 children: [
                     {
-                        type: 'tab',
-                        name: '2D array',
-                        component: 'trackedObject',
-                        config: {
-                            object: 'bbb',
-                        },
+                        type: 'tabset',
+                        weight: 50,
+                        selected: 0,
+                        children: [
+                            {
+                                type: 'tab',
+                                name: '2D array',
+                                component: 'trackedObject',
+                                config: {
+                                    object: 'bbb',
+                                },
+                            },
+                        ],
                     },
                     {
-                        type: 'tab',
-                        name: '1D array',
-                        component: 'trackedObject',
-                        config: {
-                            object: 'aaa',
-                        },
+                        type: 'tabset',
+                        weight: 50,
+                        selected: 0,
+                        children: [
+                            {
+                                type: 'tab',
+                                name: '1D array',
+                                component: 'trackedObject',
+                                config: {
+                                    object: 'aaa',
+                                },
+                            },
+                        ],
                     },
                 ],
             },

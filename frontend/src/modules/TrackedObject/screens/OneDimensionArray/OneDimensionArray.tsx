@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import useStyles from './OneDimensionArray.css';
 import { TrackedArray1d } from 'reduxState/models';
 import { AutoSizer, MultiGrid } from 'react-virtualized';
 
 interface Props {
-    value: TrackedArray1d['value'];
+    value: TrackedArray1d;
 }
 
 export const OneDimensionArray = ({ value: { value, color } }: Props) => {
@@ -13,24 +13,34 @@ export const OneDimensionArray = ({ value: { value, color } }: Props) => {
     const columnWidth = ({ index }: { index: number }) => {
         let res = 0;
         if (index === 0) {
-            res = (value.length - 1).toString().length;
+            res = ((value.length || 1) - 1).toString().length;
         } else {
-            res = 0;
+            res = 1;
             for (let i = 0; i < value.length; i++) {
-                res = Math.max(res, ('' + (value[i] || '') + '').length);
+                res = Math.max(res, (value[i] || '').length);
             }
         }
-        return 8.555 * res + 16 + (index === 0 ? 2 : 0);
+        return Math.max(19, 8.555 * res) + 16 + (index === 0 ? 2 : 0);
     };
+
+    const gridRef = useRef<MultiGrid | null>(null);
+
+    useEffect(() => {
+        if (gridRef.current) {
+            gridRef.current.recomputeGridSize();
+        }
+    }, [value, color]);
 
     return (
         <AutoSizer>
             {({ height, width }) => (
                 <MultiGrid
+                    ref={gridRef}
                     fixedColumnCount={1}
                     fixedRowCount={1}
                     classNameTopRightGrid={classes.topRightGrid}
                     classNameTopLeftGrid={classes.topLeftGrid}
+                    classNameBottomRightGrid={classes.bottomRightGrid}
                     classNameBottomLeftGrid={classes.bottomLeftGrid}
                     height={height}
                     width={width}
