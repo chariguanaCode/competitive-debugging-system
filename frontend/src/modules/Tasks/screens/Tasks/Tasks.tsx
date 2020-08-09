@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
     Table,
     TableBody,
@@ -17,16 +17,10 @@ import {
 } from '@material-ui/core';
 import { useKillTest } from 'backend/testManagement';
 import { Close, FilterList, BugReport, Assessment } from '@material-ui/icons';
-import { useAllTasksState } from 'reduxState/selectors';
-import { Task, TaskState } from 'reduxState/models';
+import { useAllTasksState, useConfig } from 'reduxState/selectors';
+import { TaskState } from 'reduxState/models';
 import { useTaskStatesActions } from 'reduxState/actions';
 import { TabNode } from 'flexlayout-react';
-
-export enum Views {
-    Tasks,
-    Outputs,
-    Debugging,
-}
 
 interface Props {
     node: TabNode;
@@ -37,19 +31,17 @@ const Tasks = ({ node }: Props) => {
 
     const killTest = useKillTest();
 
-    const taskData: [string, Task][] = Object.entries(useAllTasksState().current);
+    const taskData = useAllTasksState().current;
     const { setCurrentTaskId } = useTaskStatesActions();
-    const setView = (view: Views) => {};
 
-    const [filters, setFilters] = useState({ state: [] as string[], id: '', executionTime: '' });
+    const testConfig = useConfig().tests;
 
+    const [filters, setFilters] = useState({ state: [] as string[], name: '', executionTime: '' });
     let taskStates = taskData;
-    if (filters.state.length > 0) taskStates = taskStates.filter((val) => filters.state.includes(TaskState[val[1].state]));
-
-    if (filters.id.length > 0) taskStates = taskStates.filter((val) => val[0].includes(filters.id));
-
+    if (filters.state.length > 0) taskStates = taskStates.filter((val) => filters.state.includes(TaskState[val.state]));
+    if (filters.name.length > 0) taskStates = taskStates.filter((val, index) => testConfig[index].name.includes(filters.name));
     if (filters.executionTime.length > 0)
-        taskStates = taskStates.filter((val) => val[1].executionTime.includes(filters.executionTime));
+        taskStates = taskStates.filter((val) => val.executionTime.includes(filters.executionTime));
 
     const tableRef = useRef<null | HTMLTableElement>(null);
     const [page, setPage] = useState(0);
@@ -58,14 +50,8 @@ const Tasks = ({ node }: Props) => {
 
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, taskStates.length - page * rowsPerPage);
 
-    const debugTask = (id: string) => {
+    const debugTask = (id: number) => {
         setCurrentTaskId(id);
-        setView(Views.Debugging);
-    };
-
-    const viewTaskOutput = (id: string) => {
-        setCurrentTaskId(id);
-        setView(Views.Outputs);
     };
 
     const handleFilterChange = (
@@ -106,7 +92,7 @@ const Tasks = ({ node }: Props) => {
             <TableHead>
                 <TableRow>
                     <TableCell>State</TableCell>
-                    <TableCell>ID</TableCell>
+                    <TableCell>Name</TableCell>
                     <TableCell>Execution Time</TableCell>
                     <TableCell>Actions</TableCell>
                 </TableRow>
@@ -140,10 +126,10 @@ const Tasks = ({ node }: Props) => {
                         <TextField
                             fullWidth
                             color="secondary"
-                            name="id"
-                            value={filters.id}
+                            name="name"
+                            value={filters.name}
                             onChange={handleFilterChange}
-                            InputProps={generateAdornments(filters.id, () => setFilters((prev) => ({ ...prev, id: '' })))}
+                            InputProps={generateAdornments(filters.name, () => setFilters((prev) => ({ ...prev, name: '' })))}
                         />
                     </TableCell>
                     <TableCell>
@@ -162,7 +148,7 @@ const Tasks = ({ node }: Props) => {
                 </TableRow>
             </TableHead>
             <TableBody>
-                {taskStates.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map(([id, { state, executionTime }]) => (
+                {taskStates.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map(({ state, executionTime }, id) => (
                     <TableRow>
                         <TableCell
                             style={{
@@ -172,7 +158,7 @@ const Tasks = ({ node }: Props) => {
                         >
                             {TaskState[state]}
                         </TableCell>
-                        <TableCell>{id}</TableCell>
+                        <TableCell>{testConfig[id].name}</TableCell>
                         <TableCell>{executionTime}</TableCell>
                         <TableCell style={{ paddingTop: 8, paddingBottom: 8 }}>
                             {state === TaskState.Running && (
@@ -184,11 +170,6 @@ const Tasks = ({ node }: Props) => {
                             )}
                             {state !== TaskState.Pending && state !== TaskState.Running && (
                                 <>
-                                    <Tooltip title="View output" placement="bottom" arrow>
-                                        <IconButton style={{ padding: 6 }} onClick={() => viewTaskOutput(id)}>
-                                            <Assessment fontSize="small" />
-                                        </IconButton>
-                                    </Tooltip>
                                     <Tooltip title="Debug" placement="bottom" arrow>
                                         <IconButton style={{ padding: 6 }} onClick={() => debugTask(id)}>
                                             <BugReport fontSize="small" />

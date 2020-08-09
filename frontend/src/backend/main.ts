@@ -24,7 +24,7 @@ const useRunTasks = () => {
             return;
         }
 
-        Object.keys(taskStates.current).forEach((id) => {
+        for (let id = 0; id < taskStates.current.length; id++) {
             if (taskStates.current[id].childProcess) {
                 taskStates.current[id].childProcess.kill();
             }
@@ -32,7 +32,7 @@ const useRunTasks = () => {
             taskStates.current[id] = {
                 state: TaskState.Pending,
             } as Task;
-        });
+        }
 
         reloadTasks();
         compilationAndExecution();
@@ -43,7 +43,7 @@ const useAddTestFiles = () => {
     const config = useConfig();
     const { setConfig } = useConfigActions();
 
-    if(!config) return; 
+    if (!config) return;
     return async (testPaths: Array<string>) => {
         let newTests: { [key: string]: { filePath: string } } = {};
         testPaths.forEach((val) => {

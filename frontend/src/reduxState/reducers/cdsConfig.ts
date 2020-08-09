@@ -2,7 +2,6 @@ import { handleActions } from 'redux-actions';
 import { CdsConfigActions } from '../actions';
 import { CdsConfigModel } from '../models';
 import defaultCdsConfig from 'data/defaultCdsConfig.json';
-import { Action } from 'flexlayout-react';
 
 export const csdConfigReducer = handleActions<CdsConfigModel>(
     {

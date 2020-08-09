@@ -9,6 +9,7 @@ export interface ProjectInfoModel {
 }
 
 export interface TestModel {
+    name: string;
     inputPath: string;
     outputPath: string | null;
 }

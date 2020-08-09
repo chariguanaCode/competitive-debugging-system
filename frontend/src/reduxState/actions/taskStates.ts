@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { useMemo } from 'react';
 import { bindActionCreators } from 'redux';
-import { createAction, ActionFunction1, Action } from 'redux-actions';
+import { createAction, Action } from 'redux-actions';
 import { Watchblock, Watch } from '../models';
 import { useAllTasksState } from 'reduxState/selectors';
 
@@ -16,7 +16,7 @@ export enum TaskStateAction {
 }
 
 const actions = {
-    setCurrentTaskId: createAction<string>(TaskStateAction.SET_CURRENT_TASK_ID),
+    setCurrentTaskId: createAction<number>(TaskStateAction.SET_CURRENT_TASK_ID),
     setCurrentTaskStdout: createAction<string>(TaskStateAction.SET_CURRENT_TASK_STDOUT),
     setCurrentTaskStdoutSize: createAction<number>(TaskStateAction.SET_CURRENT_TASK_STDOUT_SIZE),
     setCurrentTaskWatchblocks: createAction<Watchblock>(TaskStateAction.SET_CURRENT_TASK_WATCHBLOCKS),

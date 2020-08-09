@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { useMemo } from 'react';
 import { bindActionCreators } from 'redux';
-import { createAction } from 'redux-actions';
+import { createAction, Action } from 'redux-actions';
 import { ConfigModel, ProjectInfoModel, TestModel } from '../models';
 
 export enum ConfigActions {
@@ -15,6 +15,8 @@ const actions = {
     setProjectInfo: createAction<ProjectInfoModel>(ConfigActions.SET_PROJECT_INFO),
     addTests: createAction<Array<TestModel>>(ConfigActions.ADD_TESTS),
 };
+
+export type ConfigActionPayload = typeof actions[keyof typeof actions] extends (...args: any[]) => Action<infer R> ? R : never;
 
 export const useConfigActions = () => {
     const dispatch = useDispatch();

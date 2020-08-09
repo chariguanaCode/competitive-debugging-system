@@ -33,11 +33,11 @@ const createWindow = async () => {
     //mainWindow.setMenu(null)
     /*
     await session.defaultSession.loadExtension(
-        '/home/charodziej/.config/chromium/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.8.1_0/'
+        '/home/charodziej/snap/chromium/common/chromium/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.8.2_0/'
     );
 
     await session.defaultSession.loadExtension(
-        '/home/charodziej/.config/chromium/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0/'
+        '/home/charodziej/snap/chromium/common/chromium/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0/'
     );
     */
 

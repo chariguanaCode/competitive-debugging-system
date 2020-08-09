@@ -59,6 +59,7 @@ export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = (
                         onClick={() =>
                             addTests(
                                 state.mergedFiles.map((file) => ({
+                                    name: file.inputPath.path,
                                     inputPath: file.inputPath.path,
                                     outputPath: file.outputPath ? file.outputPath.path : null,
                                 }))

@@ -8,7 +8,7 @@ export const useBeginTest = () => {
     const { reloadTasks } = useTaskStatesActions();
     const taskStates = useAllTasksState();
 
-    return (id: string) => (childProcess: any) => {
+    return (id: number) => (childProcess: any) => {
         taskStates.current[id] = {
             state: TaskState.Running,
             childProcess,
@@ -25,7 +25,7 @@ export const useFinishTest = () => {
     const { reloadTasks } = useTaskStatesActions();
     const taskStates = useAllTasksState();
 
-    return (id: string) => () => {
+    return (id: number) => () => {
         const execTime = window.process.hrtime(taskStates.current[id].startTime);
         console.log(taskStates.current[id]);
 
@@ -43,7 +43,7 @@ export const useKillTest = () => {
     const { reloadTasks } = useTaskStatesActions();
     const taskStates = useAllTasksState();
 
-    return (id: string) => () => {
+    return (id: number) => () => {
         if (taskStates.current[id].state !== TaskState.Running) return;
 
         console.log(window.process.hrtime(hrstart), 'killed', id);
@@ -65,7 +65,7 @@ export const useTestError = () => {
     const { reloadTasks } = useTaskStatesActions();
     const taskStates = useAllTasksState();
 
-    return (id: string) => (err: any) => {
+    return (id: number) => (err: any) => {
         if (taskStates.current[id].state === TaskState.Running) {
             const execTime = window.process.hrtime(taskStates.current[id].startTime);
 

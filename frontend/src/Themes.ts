@@ -1,4 +1,4 @@
-import { CssBaseline, createMuiTheme, Switch, FormControlLabel, Button } from '@material-ui/core';
+import { createMuiTheme } from '@material-ui/core';
 import {
     amber,
     yellow,
@@ -37,6 +37,8 @@ export const lightTheme = createMuiTheme({
             bitset: deepOrange[500],
             number: indigo[500],
             pointer: '#FF80FF',
+
+            selected: grey[200],
         },
         header: {
             background: amber[500],
@@ -98,6 +100,8 @@ export const darkTheme = createMuiTheme({
             bitset: teal['A400'],
             number: cyan['A400'],
             pointer: '#FF80FF',
+
+            selected: grey[800],
         },
         header: {
             background: grey[800],

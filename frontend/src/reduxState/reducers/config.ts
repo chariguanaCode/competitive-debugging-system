@@ -1,18 +1,15 @@
 import { handleActions } from 'redux-actions';
-import { ConfigActions } from '../actions';
+import { ConfigActions, ConfigActionPayload } from '../actions';
 import { ConfigModel, TestModel } from '../models';
 import getDefaultConfig from 'data/getDefaultConfig';
-import { Action } from 'flexlayout-react';
-import { mergeArrays } from 'utils/tools';
 
-export const configReducer = handleActions<ConfigModel>(
+export const configReducer = handleActions<ConfigModel, ConfigActionPayload>(
     {
-        [ConfigActions.SET_CONFIG]: (state, action) => action.payload,
+        [ConfigActions.SET_CONFIG]: (state, action) => (action.payload as unknown) as ConfigModel,
         [ConfigActions.SET_PROJECT_INFO]: (state, action) => ({ ...state, ...action.payload } as ConfigModel),
         [ConfigActions.ADD_TESTS]: (state, action) => ({
             ...state,
-            //@ts-ignore TODO: fix ts
-            tasks: ([] as TaskModel[]).concat(state.tasks, action.payload),
+            tests: ([] as TestModel[]).concat(state.tests, (action.payload as unknown) as TestModel[]),
         }),
     },
     getDefaultConfig()

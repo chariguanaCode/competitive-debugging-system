@@ -2,7 +2,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        height: 'calc(100vh - 64px - 24px - 24px)',
+        height: 'calc(100vh - 50px - 24px - 24px)',
         display: 'flex',
         flexDirection: 'row',
     },
@@ -14,6 +14,11 @@ const useStyles = makeStyles((theme) => ({
         borderColor: theme.palette.contentLayout.borders,
         borderStyle: 'solid',
         borderWidth: 1,
+    },
+    addTabButton: {
+        position: 'absolute',
+        bottom: 16,
+        right: 16,
     },
     '@global': {
         '.flexlayout__splitter': {
@@ -46,6 +51,7 @@ const useStyles = makeStyles((theme) => ({
             borderBottom: `2px solid ${theme.palette.contentLayout.panelHeader}`,
             padding: '3px 14px',
             margin: 0,
+            height: 30,
             boxShadow: 'none',
         },
         '.flexlayout__tab_button--selected, .flexlayout__tab_button:hover, \
@@ -70,6 +76,7 @@ const useStyles = makeStyles((theme) => ({
         },
         '.flexlayout__border_left, .flexlayout__border_right, .flexlayout__border_top, .flexlayout__border_bottom': {
             backgroundColor: theme.palette.contentLayout.panelBackground,
+            border: 'none',
         },
         '.flexlayout__border_inner_left': {
             right: 29,

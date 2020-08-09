@@ -16,6 +16,8 @@ declare module '@material-ui/core/styles/createPalette' {
         bitset?: string;
         number?: string;
         pointer?: string;
+
+        selected?: string;
     }
 
     interface HeaderOptions {

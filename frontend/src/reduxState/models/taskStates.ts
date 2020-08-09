@@ -41,12 +41,10 @@ export interface Task {
     };
 }
 
-export interface AllTasksModel {
-    [key: string]: Task;
-}
+export type AllTasksModel = Array<Task>;
 
 export interface CurrentTaskModel {
-    id: string;
+    id: number;
     stdout: string;
     stdoutFileSize: number;
     watchblocks: Watchblock;

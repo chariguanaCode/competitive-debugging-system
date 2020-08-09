@@ -27,7 +27,7 @@ export const HeaderBar: React.FunctionComponent = () => {
     return (
         <>
             <AppBar position="relative" className={classes.appBar}>
-                <Toolbar>
+                <Toolbar variant="dense">
                     <IconButton onClick={() => setMenuOpen((previousState) => !previousState)} color="inherit">
                         <Apps color="inherit" />
                     </IconButton>

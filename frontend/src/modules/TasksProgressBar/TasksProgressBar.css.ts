@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
     wrapper: {
         width: 32,
-        height: 'calc(100vh - 64px - 24px - 24px)',
+        height: '100%',
         zIndex: theme.zIndex.drawer,
 
         backgroundColor: theme.palette.background.default,
