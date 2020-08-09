@@ -75,7 +75,7 @@ export const defaultLayout = {
                 children: [
                     {
                         type: 'tab',
-                        name: 'Watches',
+                        name: 'Watches2',
                         component: 'watch',
                     },
                 ],
