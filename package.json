@@ -30,7 +30,8 @@
             "target": [
                 {
                     "target": "AppImage",
-                    "arch": "x64"
+                    "arch": "x64",
+                    "artifactName": "${name}-${version}-${os}.${ext}"
                 }
             ]
         },
@@ -38,11 +39,13 @@
             "target": [
                 {
                     "target": "nsis",
-                    "arch": "x64"
+                    "arch": "x64",
+                    "artifactName": "${name}-${version}-${os}-installer.${ext}"
                 },
                 {
                     "target": "portable",
-                    "arch": "x64"
+                    "arch": "x64",
+                    "artifactName": "${name}-${version}-${os}-portable.${ext}"
                 }
             ]
         }
