@@ -20,7 +20,7 @@ const createWindow = async () => {
             nodeIntegration: true,
             nodeIntegrationInWorker: true,
             nativeWindowOpen: true,
-            enableRemoteModule: true
+            enableRemoteModule: true,
         },
         show: false,
         frame: false,
