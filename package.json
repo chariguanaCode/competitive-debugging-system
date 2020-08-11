@@ -7,7 +7,7 @@
         "run": "concurrently \"npm run frontend\" \"wait-on http://localhost:3000 && npm run electron\" ",
         "frontend": "cross-env BROWSER=\"none\" REACT_APP_VERSION=\"$npm_package_version\" REACT_APP_NAME=\"$npm_package_name\" npm start --prefix ./frontend",
         "electron": "cross-env ELECTRON_START_URL=http://localhost:3000 electron .",
-        "build": "npm install --no-bin-links --prefix frontend && cross-env CI=\"false\" BROWSER=\"none\" REACT_APP_VERSION=\"$npm_package_version\" REACT_APP_NAME=\"$npm_package_name\" npm run build --prefix frontend ",
+        "build": "npm install --prefix frontend && cross-env CI=\"false\" BROWSER=\"none\" REACT_APP_VERSION=\"$npm_package_version\" REACT_APP_NAME=\"$npm_package_name\" npm run build --prefix frontend ",
         "fullBuild": "npm run build && electron-builder",
         "postinstall": "electron-builder install-app-deps"
     },
