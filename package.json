@@ -14,6 +14,7 @@
     "main": "electron/main.js",
     "build": {
         "productName": "Competitive Debugging System",
+        "artifactName": "${name}-${version}-${os}.${ext}",
         "files": [
             "frontend/build/**/*",
             "electron/**/*"
@@ -30,24 +31,25 @@
             "target": [
                 {
                     "target": "AppImage",
-                    "arch": "x64",
-                    "artifactName": "${name}-${version}-${os}.${ext}"
+                    "arch": "x64"
                 }
             ]
         },
         "win": {
+            "artifactName": "${name}-${version}-${os}-portable.${ext}",
             "target": [
                 {
                     "target": "nsis",
-                    "arch": "x64",
-                    "artifactName": "${name}-${version}-${os}-installer.${ext}"
+                    "arch": "x64"
                 },
                 {
                     "target": "portable",
-                    "arch": "x64",
-                    "artifactName": "${name}-${version}-${os}-portable.${ext}"
+                    "arch": "x64"
                 }
             ]
+        },
+        "nsis": {
+            "artifactName": "${name}-${version}-${os}-installer.${ext}"
         }
     },
     "repository": {
