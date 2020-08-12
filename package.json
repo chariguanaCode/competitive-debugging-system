@@ -22,6 +22,9 @@
         "extraFiles": [
             "cpp/**/*"
         ],
+        "directories": {
+            "buildResources": "electron/buildResources"
+        },
         "publish": {
             "provider": "github",
             "releaseType": "draft"

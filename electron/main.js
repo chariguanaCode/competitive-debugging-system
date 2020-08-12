@@ -8,7 +8,7 @@ const createWindow = async () => {
     const startUrl =
         process.env.ELECTRON_START_URL ||
         url.format({
-            pathname: path.join(__dirname, '../frontend/build/index.html'),
+            pathname: path.join(__dirname, '..', 'frontend', 'build', 'index.html'),
             protocol: 'file:',
             slashes: true,
         });
@@ -24,6 +24,7 @@ const createWindow = async () => {
         },
         show: false,
         frame: false,
+        icon: path.join(__dirname, 'buildResources', 'icon.png'),
     });
 
     mainWindow.loadURL(startUrl);
