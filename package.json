@@ -14,6 +14,7 @@
     "main": "electron/main.js",
     "build": {
         "productName": "Competitive Debugging System",
+        "artifactName": "${name}-${version}-${os}.${ext}",
         "files": [
             "frontend/build/**/*",
             "electron/**/*"
@@ -21,10 +22,14 @@
         "extraFiles": [
             "cpp/**/*"
         ],
+        "directories": {
+            "buildResources": "electron/buildResources"
+        },
         "publish": {
             "provider": "github",
             "releaseType": "draft"
         },
+        "electronUpdaterCompatibility": ">= 2.16",
         "linux": {
             "category": "Programming",
             "target": [
@@ -35,6 +40,7 @@
             ]
         },
         "win": {
+            "artifactName": "${name}-${version}-${os}-portable.${ext}",
             "target": [
                 {
                     "target": "nsis",
@@ -45,6 +51,9 @@
                     "arch": "x64"
                 }
             ]
+        },
+        "nsis": {
+            "artifactName": "${name}-${version}-${os}-installer.${ext}"
         }
     },
     "repository": {
@@ -69,6 +78,7 @@
     },
     "homepage": "https://github.com/chariguanaCode/competitive-debugging-system#readme",
     "dependencies": {
+        "electron-updater": "^4.3.4",
         "md5": "^2.2.1"
     },
     "devDependencies": {

@@ -1,6 +1,7 @@
-const { app, BrowserWindow, session } = require('electron');
+const { app, BrowserWindow, session, dialog } = require('electron');
 const path = require('path');
 const url = require('url');
+const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
 
@@ -8,7 +9,7 @@ const createWindow = async () => {
     const startUrl =
         process.env.ELECTRON_START_URL ||
         url.format({
-            pathname: path.join(__dirname, '../frontend/build/index.html'),
+            pathname: path.join(__dirname, '..', 'frontend', 'build', 'index.html'),
             protocol: 'file:',
             slashes: true,
         });
@@ -24,6 +25,7 @@ const createWindow = async () => {
         },
         show: false,
         frame: false,
+        icon: path.join(__dirname, 'buildResources', 'icon.png'),
     });
 
     mainWindow.loadURL(startUrl);
@@ -50,7 +52,40 @@ const createWindow = async () => {
     });
 };
 
-app.on('ready', createWindow);
+autoUpdater.on('update-available', async (info) => {
+    const { response } = await dialog.showMessageBox({
+        type: 'question',
+        message: `An update is available. Would you like to download version ${info.version} from ${info.releaseDate}?`,
+        buttons: ['Yes', 'No'],
+        cancelId: 1,
+    });
+
+    if (response === 0) {
+        autoUpdater.downloadUpdate();
+    }
+});
+
+autoUpdater.on('update-downloaded', async (info) => {
+    const { response } = await dialog.showMessageBox({
+        type: 'question',
+        message: `Update downloaded. It will be installed after you quit the app. Quit now?`,
+        buttons: ['Yes', 'No'],
+        cancelId: 1,
+    });
+
+    if (response === 0) {
+        autoUpdater.quitAndInstall();
+    }
+});
+
+autoUpdater.on('error', (error) => {
+    console.log(error);
+});
+
+app.on('ready', () => {
+    autoUpdater.checkForUpdates().catch(() => {});
+    createWindow();
+});
 
 app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
