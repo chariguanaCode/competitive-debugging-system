@@ -5,18 +5,23 @@ import { Layout, Model, TabNode } from 'flexlayout-react';
 import 'flexlayout-react/style/dark.css';
 import useStyles from './Content.css';
 import { Tasks, Watches, TasksManagement, AddTabDialog, TrackedObject, TasksProgressBar } from 'modules';
-import { useAddTrackedObjectDialogActions } from 'reduxState/actions';
+import { useAddTrackedObjectDialogActions, useConfigActions } from 'reduxState/actions';
 import { ContextMenu } from 'components';
 
-import defaultLayout from './defaultLayout';
+import { useLayoutSelection, useLayouts } from 'reduxState/selectors';
 
 const Content: React.FunctionComponent = () => {
     const classes = useStyles();
     const { openAddTrackedObjectDialog } = useAddTrackedObjectDialogActions();
     const [addTabOpen, setAddTabOpen] = useState(false);
 
-    const [model, setModel] = useState(Model.fromJson(defaultLayout));
-    const layout = useRef<Layout>(null);
+    const layoutRef = useRef<Layout>(null);
+
+    const layoutSelection = useLayoutSelection();
+    const layout = useLayouts()[layoutSelection];
+    const { setLayout } = useConfigActions();
+    const model = Model.fromJson(layout);
+    const setModel = (newModel: Model) => setLayout({ key: layoutSelection, value: newModel.toJson() });
 
     const factory = (node: TabNode) => {
         const type = node.getComponent();
@@ -35,8 +40,8 @@ const Content: React.FunctionComponent = () => {
         }
     };
     const addTab = (result: any) => {
-        if (layout.current !== null && result !== null) {
-            layout.current.addTabWithDragAndDrop('Add panel<br>(Drag to location)', result, () => null);
+        if (layoutRef.current !== null && result !== null) {
+            layoutRef.current.addTabWithDragAndDrop('Add panel<br>(Drag to location)', result, () => null);
         }
         setAddTabOpen(false);
     };
@@ -47,7 +52,7 @@ const Content: React.FunctionComponent = () => {
             items={[{ label: 'Add Tracked Object', onClick: () => openAddTrackedObjectDialog(), icon: <AddBox /> }]}
         >
             <div className={classes.layoutWrapper}>
-                <Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
+                <Layout model={model} factory={factory} onModelChange={setModel} ref={layoutRef} />
                 <AddTabDialog open={addTabOpen} onClose={addTab} />
                 <Fab
                     variant="extended"
