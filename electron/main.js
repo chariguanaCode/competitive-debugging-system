@@ -1,6 +1,7 @@
-const { app, BrowserWindow, session } = require('electron');
+const { app, BrowserWindow, session, dialog } = require('electron');
 const path = require('path');
 const url = require('url');
+const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
 
@@ -51,7 +52,40 @@ const createWindow = async () => {
     });
 };
 
-app.on('ready', createWindow);
+autoUpdater.on('update-available', async (info) => {
+    const { response } = await dialog.showMessageBox({
+        type: 'question',
+        message: `An update is available. Would you like to download version ${info.version} from ${info.releaseDate}?`,
+        buttons: ['Yes', 'No'],
+        cancelId: 1,
+    });
+
+    if (response === 0) {
+        autoUpdater.downloadUpdate();
+    }
+});
+
+autoUpdater.on('update-downloaded', async (info) => {
+    const { response } = await dialog.showMessageBox({
+        type: 'question',
+        message: `Update downloaded. It will be installed after you quit the app. Quit now?`,
+        buttons: ['Yes', 'No'],
+        cancelId: 1,
+    });
+
+    if (response === 0) {
+        autoUpdater.quitAndInstall();
+    }
+});
+
+autoUpdater.on('error', (error) => {
+    console.log(error);
+});
+
+app.on('ready', () => {
+    autoUpdater.checkForUpdates().catch(() => {});
+    createWindow();
+});
 
 app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {

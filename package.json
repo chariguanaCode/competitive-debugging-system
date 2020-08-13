@@ -29,6 +29,7 @@
             "provider": "github",
             "releaseType": "draft"
         },
+        "electronUpdaterCompatibility": ">= 2.16",
         "linux": {
             "category": "Programming",
             "target": [
@@ -77,6 +78,7 @@
     },
     "homepage": "https://github.com/chariguanaCode/competitive-debugging-system#readme",
     "dependencies": {
+        "electron-updater": "^4.3.4",
         "md5": "^2.2.1"
     },
     "devDependencies": {
