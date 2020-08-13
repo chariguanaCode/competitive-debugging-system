@@ -14,6 +14,20 @@ export interface TestModel {
     outputPath: string | null;
 }
 
+type LayoutElement = any;
+
+interface BorderElement {
+    type: 'border';
+    location: 'top' | 'bottom' | 'left' | 'right';
+    children: Array<LayoutElement>;
+}
+
+export interface LayoutModel {
+    global: any;
+    layout: LayoutElement;
+    borders: Array<BorderElement>;
+}
+
 export interface ConfigModel {
     projectInfo: ProjectInfoModel;
     settings: {
@@ -30,4 +44,10 @@ export interface ConfigModel {
         };
     };
     tests: Array<TestModel>;
+    layouts: {
+        debugging: LayoutModel;
+        outputs: LayoutModel;
+        tests: LayoutModel;
+    };
+    layoutSelection: 'debugging' | 'outputs' | 'tests';
 }

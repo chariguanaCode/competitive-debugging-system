@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, IconButton, Typography } from '@material-ui/core';
-import { Apps, Settings, PlayArrow, Refresh } from '@material-ui/icons';
-import { styled } from '@material-ui/core/styles';
+import { AppBar, Toolbar, IconButton, Typography, Button, Menu, MenuItem, ListItemText, ListItemIcon } from '@material-ui/core';
+import { Apps, Settings, PlayArrow, Refresh, ViewQuilt, BugReport, Assessment, ViewList } from '@material-ui/icons';
 import { ReactComponent as Logo } from 'assets/cds_logo.svg';
 import { useRunTasks } from 'backend/main';
 import { useLoadProject } from 'backend/projectManagement';
-import { useConfig, useProjectFile, useExecutionState } from 'reduxState/selectors';
+import { useConfig, useProjectFile, useExecutionState, useLayoutSelection } from 'reduxState/selectors';
 import { ExecutionState } from 'reduxState/models';
 import useStyles from './HeaderBar.css';
 import { MainMenu } from 'modules/Menu/screens';
-
-export const MarginTypography = styled(Typography)(({ theme }) => ({
-    marginLeft: theme.spacing(2),
-}));
+import { useConfigActions } from 'reduxState/actions';
 
 export const HeaderBar: React.FunctionComponent = () => {
     const classes = useStyles();
@@ -24,6 +20,10 @@ export const HeaderBar: React.FunctionComponent = () => {
     //const reloadProject = useReloadProject()
     const executionState = useExecutionState();
 
+    const [menuAnchor, setMenuAnchor] = useState<(EventTarget & HTMLButtonElement) | null>(null);
+    const { selectLayout } = useConfigActions();
+    const layoutSelection = useLayoutSelection();
+
     return (
         <>
             <AppBar position="relative" className={classes.appBar}>
@@ -31,13 +31,27 @@ export const HeaderBar: React.FunctionComponent = () => {
                     <IconButton onClick={() => setMenuOpen((previousState) => !previousState)} color="inherit">
                         <Apps color="inherit" />
                     </IconButton>
-                    <MarginTypography color="inherit"></MarginTypography>
-                    <Logo className={classes.logo} width={50} height={50} />
-                    <MarginTypography color="inherit">
+                    <Logo className={classes.logo} width={66} height={50} />
+                    <Button
+                        variant="text"
+                        color="secondary"
+                        className={classes.margin}
+                        startIcon={<ViewQuilt color="inherit" />}
+                        onClick={(event) => {
+                            setMenuAnchor(event.currentTarget);
+                            console.log(event.currentTarget);
+                        }}
+                    >
+                        View
+                    </Button>
+                    <Typography className={classes.margin} color="inherit">
                         {projectFile && config.projectInfo.name}
                         {projectFile && !projectFile.isSaved && ' *'}
-                    </MarginTypography>
-                    <MarginTypography color="inherit">{ExecutionState[executionState.state]}</MarginTypography>
+                    </Typography>
+                    <Typography className={classes.margin} color="inherit">
+                        {ExecutionState[executionState.state]}
+                    </Typography>
+
                     <div style={{ flexGrow: 1 }} />
 
                     <IconButton color="inherit" onClick={runTasks}>
@@ -55,6 +69,24 @@ export const HeaderBar: React.FunctionComponent = () => {
                 </Toolbar>
             </AppBar>
             <MainMenu open={menuOpen} isAnyProjectOpen={!!projectFile} handleClose={() => setMenuOpen(false)} />
+            <Menu anchorEl={menuAnchor} open={!!menuAnchor} onClose={() => setMenuAnchor(null)}>
+                {[
+                    { icon: <BugReport color="inherit" />, label: 'Debugging', layout: 'debugging' as 'debugging' },
+                    { icon: <Assessment color="inherit" />, label: 'Outputs', layout: 'outputs' as 'outputs' },
+                    { icon: <ViewList color="inherit" />, label: 'Tests', layout: 'tests' as 'tests' },
+                ].map((element) => (
+                    <MenuItem
+                        selected={element.layout === layoutSelection}
+                        onClick={() => {
+                            setMenuAnchor(null);
+                            selectLayout(element.layout);
+                        }}
+                    >
+                        <ListItemIcon>{element.icon}</ListItemIcon>
+                        <ListItemText primary={element.label} />
+                    </MenuItem>
+                ))}
+            </Menu>
         </>
     );
 };
