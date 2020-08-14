@@ -4,7 +4,6 @@ const url = require('url');
 const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
-
 const createWindow = async () => {
     const startUrl =
         process.env.ELECTRON_START_URL ||
@@ -19,7 +18,7 @@ const createWindow = async () => {
         height: 600,
         webPreferences: {
             nodeIntegration: true,
-            enableRemoteModule: true
+            enableRemoteModule: true,
         },
         show: false,
         frame: false,
@@ -51,7 +50,14 @@ const createWindow = async () => {
 };
 
 app.on('ready', createWindow);
+
 app.allowRendererProcessReuse = false; //https://github.com/electron/electron/issues/22119
+
+global.paths = {
+    cdsData: `${app.getPath('userData')}/CDSData`,
+    configFile: `${app.getPath('userData')}/CDSData/Config.cds`,
+    notSavedProjects: `${app.getPath('userData')}/CDSData/NotSavedProjects`
+};
 
 autoUpdater.on('update-available', async (info) => {
     const { response } = await dialog.showMessageBox({

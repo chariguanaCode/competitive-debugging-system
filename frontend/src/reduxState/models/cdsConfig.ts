@@ -1,6 +1,6 @@
 export interface CdsConfigModel {
     projects: {
-        notSavedProjectDirectory: string;
+        projectsHistory: Array<string>;
         nextNotSavedProjectName: string;
     };
     settings: {};

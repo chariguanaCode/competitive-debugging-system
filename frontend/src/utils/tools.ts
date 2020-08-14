@@ -66,6 +66,11 @@ export const asyncForEach = async (array: Array<any>, callback: Function) => {
 export const stringFromUintArray = (arr: Uint8Array | Uint16Array | Uint32Array) => {
     let str = '';
     //@ts-ignore
-    for (let i = 0; i < arr.length; i+=5000) str += String.fromCharCode.apply(null,arr.slice(i,i+5000));
+    for (let i = 0; i < arr.length; i += 5000) str += String.fromCharCode.apply(null, arr.slice(i, i + 5000));
     return str;
+};
+
+export const getTimeMark = () => {
+    const currentDate = new Date();
+    return `${currentDate.getFullYear()}${currentDate.getMonth()+1}${currentDate.getDate()}${currentDate.getHours()}${currentDate.getMinutes()}${currentDate.getSeconds()}${currentDate.getMilliseconds()}`;
 };

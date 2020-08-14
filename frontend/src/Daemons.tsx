@@ -6,6 +6,7 @@ import {
     useTrackedObjects,
     useWatchHistoryLocation,
     useWatchActionsHistory,
+    useCdsConfig,
 } from 'reduxState/selectors';
 import {
     TaskState,
@@ -17,12 +18,19 @@ import {
 import { useTaskStatesActions, useTrackedObjectsActions } from 'reduxState/actions';
 import { readFileStream } from 'backend/outputFileTracking';
 import { useParseWatchblocks } from 'backend/watchParse';
+import { useSaveCdsConfigToFile } from 'backend/appManangement';
 
 export default function Daemons(): ReactElement {
+    const cdsConfig = useCdsConfig();
+    const saveCdsConfigToFile = useSaveCdsConfigToFile();
+    useEffect(() => {
+        if(Object.keys(cdsConfig).length) saveCdsConfigToFile();
+    }, [cdsConfig]);
+
     const taskStates = useAllTasksState();
     const currentTask = useCurrentTaskState();
     const config = useConfig();
-    const {parseWatchblocks, readWatchblocks, clearWatchblocks} = useParseWatchblocks();
+    const { parseWatchblocks, readWatchblocks, clearWatchblocks } = useParseWatchblocks();
     const currentTaskProgress = taskStates.current[currentTask.id]?.state;
     const {
         setCurrentTaskStdout,

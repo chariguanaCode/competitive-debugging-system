@@ -2,8 +2,8 @@ const fs = window.require('fs');
 const path = window.require('path');
 const util = window.require('util');
 
-export const fileExist = (filePath: string) => {
-    return new Promise((resolve, reject) => {
+export const fileExist = (filePath: string) =>
+    new Promise((resolve, reject) => {
         fs.access(filePath, fs.constants.F_OK, (err: any) => {
             if (err) {
                 return resolve(false);
@@ -11,16 +11,19 @@ export const fileExist = (filePath: string) => {
             resolve(true);
         });
     });
-};
-/*
-TODO: very strange error, empty file is created, sometimes it works
-https://stackoverflow.com/questions/31572484/node-fs-writefile-creates-a-blank-file (when using not sync)
-*/
-export const saveFile = (filePath: string, content: any) => fs.writeFileSync(filePath, content);
+
+export const saveFile = (filePath: string, content: any) =>
+    new Promise((resolve, reject) => {
+        fs.writeFile(filePath, content, (err: any) => {
+            if (err) {
+                return reject(err);
+            }
+            resolve(true);
+        });
+    });
 
 export const readFile = (filePath: string) => {
     return new Promise((resolve, reject) => {
-        console.log('xd')
         fs.readFile(filePath, 'utf8', (err: any, data: string) => {
             if (err) reject(err);
             resolve(data);
@@ -36,6 +39,18 @@ export const isDirectory = async (directory: string) => {
         return false;
     }
 };
+export const createDirectory = (directoryPath: string) =>
+    new Promise((resolve, reject) => {
+        let path = parsePath(directoryPath);
+        fileExist(path).then((result) =>
+            result
+                ? reject('Directory already exists')
+                : fs.mkdir(path, (err: any) => {
+                      if (err) reject(err);
+                      resolve('Success');
+                  })
+        );
+    });
 
 export const parsePath = (directory: string) => {
     if (!path.isAbsolute(directory)) directory = path.resolve(directory);
