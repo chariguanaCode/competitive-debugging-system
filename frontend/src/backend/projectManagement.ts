@@ -1,11 +1,11 @@
 import useCompilationAndExecution from './cppCompilationAndExecution';
 import * as fileChangeTracking from './fileChangeTracking';
-import * as asyncFileActions from './asyncFileActions';
 import * as syncFileActions from './syncFileActions';
 import { ConfigModel, AllTasksModel, Task, TaskState } from 'reduxState/models';
 import { useConfig, useAllTasksState, useCdsConfig, useProjectFile } from 'reduxState/selectors';
-import { useConfigActions, useTaskStatesActions, useProjectFileActions } from 'reduxState/actions';
-import { pathToFileURL } from 'url';
+import { useConfigActions, useTaskStatesActions, useProjectFileActions, useCdsConfigActions } from 'reduxState/actions';
+import { getTimeMark } from 'utils/tools';
+const remote = window.require('electron').remote;
 
 export const useSaveProjectAs = () => {
     const config = useConfig();
@@ -39,7 +39,7 @@ export const useSaveNotSavedProjectFile = () => {
     const config = useConfig();
     const cdsConfig = useCdsConfig();
     return async () => {
-        const path = cdsConfig.projects.notSavedProjectDirectory + cdsConfig.projects.nextNotSavedProjectName + '.nsp.cdsp';
+        const path = `${remote.getGlobal('paths').notSavedProjects}/${getTimeMark()}.nsp.cdsp`;
         syncFileActions.saveFile(path, JSON.stringify(config));
         return path;
     };
@@ -50,7 +50,7 @@ export const useLoadProject = () => {
     const taskStates = useAllTasksState();
     const { reloadTasks } = useTaskStatesActions();
     const { setProjectFile } = useProjectFileActions();
-
+    const { pushProjectToProjectsHistory } = useCdsConfigActions();
     return async (sourceFilePath: string) => {
         let path = syncFileActions.parsePath(sourceFilePath);
         path = path.slice(0, path.length - 1);
@@ -83,6 +83,7 @@ export const useLoadProject = () => {
         const filenameWithExtension = dividedPath[dividedPath.length - 1];
         const filename = filenameWithExtension.slice(0, -5);
         const directory = dividedPath.slice(0, -1).join('/') + '/';
+        if (hasSaveLocation) pushProjectToProjectsHistory(directory + filename + '.cdsp');
         console.log(newConfig, dividedPath);
         /*
         const tests = {} as { [key: string]: { filePath: string } };

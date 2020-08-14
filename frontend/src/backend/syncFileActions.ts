@@ -2,6 +2,7 @@ const fs = window.require('fs');
 const path = window.require('path');
 const util = window.require('util');
 
+
 export const fileExist = (filePath: string) => fs.existsSync(filePath);
 /*
 TODO: very strange error, empty file is created, sometimes it works

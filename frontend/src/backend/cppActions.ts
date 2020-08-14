@@ -4,14 +4,6 @@ const execFile = util.promisify(window.require('child_process').execFile);
 const spawn = window.require('child_process').spawn;
 const fs = window.require('fs');
 
-/*export const parseCppFile = async (path: string) => {
-    const fileContent: string = await syncFileActions.readFile(path);
-    let modifiedFileContent = fileContent;
-    for (let index = fileContent.indexOf('watch'); index != -1; index = fileContent.indexOf('watch', index + 1)) {
-        
-    }
-};
-parseCppFile('F:/cds/test.cpp');*/
 export const compileCpp = async (filename: string) => {
     try {
         //await execFile('g++', ['-std=c++17', '-O3', '-static', '-o./cpp/test.bin', `${filename}`]);
