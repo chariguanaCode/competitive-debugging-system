@@ -19,9 +19,7 @@ const createWindow = async () => {
         height: 600,
         webPreferences: {
             nodeIntegration: true,
-            nodeIntegrationInWorker: true,
-            nativeWindowOpen: true,
-            enableRemoteModule: true,
+            enableRemoteModule: true
         },
         show: false,
         frame: false,
@@ -51,6 +49,9 @@ const createWindow = async () => {
         mainWindow = null;
     });
 };
+
+app.on('ready', createWindow);
+app.allowRendererProcessReuse = false; //https://github.com/electron/electron/issues/22119
 
 autoUpdater.on('update-available', async (info) => {
     const { response } = await dialog.showMessageBox({

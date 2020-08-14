@@ -1,4 +1,4 @@
-import React, { useState, ReactElement } from 'react';
+import React, { useState, ReactElement,useEffect } from 'react';
 import { CssBaseline } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { Header, Content, Footer } from './layout';
@@ -11,12 +11,17 @@ import { useFileManager } from 'reduxState/selectors';
 import { useFileManagerActions } from 'reduxState/actions';
 
 import 'typeface-roboto';
-import 'typeface-roboto-mono';
+//import 'typeface-roboto-mono';
+import { useLoadProject } from 'backend/projectManagement';
 
 export default function App(): ReactElement {
     const [theme, setTheme] = useState(darkTheme);
     //const [theme, setTheme] = useState(lightTheme);
-
+    const loadProject = useLoadProject();
+    // TODO: autoload previous project on start
+    /*useEffect(() => {
+        loadProject('F:/project.cdsp');
+    }, []);*/
     return (
         <ThemeProvider theme={theme}>
             <>
@@ -26,6 +31,7 @@ export default function App(): ReactElement {
                         height: '100vh',
                     }}
                 >
+                    
                     <CssBaseline />
                     <GlobalStyles />
                     <Daemons />

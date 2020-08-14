@@ -63,3 +63,9 @@ export const asyncForEach = async (array: Array<any>, callback: Function) => {
     }
 };
 
+export const stringFromUintArray = (arr: Uint8Array | Uint16Array | Uint32Array) => {
+    let str = '';
+    //@ts-ignore
+    for (let i = 0; i < arr.length; i+=5000) str += String.fromCharCode.apply(null,arr.slice(i,i+5000));
+    return str;
+};

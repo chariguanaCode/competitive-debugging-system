@@ -6,11 +6,13 @@ import { WatchActionsHistoryModel } from '../models';
 
 export enum WatchActionsHistoryActions {
     SET_WATCH_ACTIONS_HISTORY = 'SET_WATCH_ACTIONS_HISTORY',
+    ADD_TO_WATCH_ACTIONS_HISTORY = 'ADD_TO_WATCH_ACTIONS_HISTORY',
     SET_WATCH_HISTORY_LOCATION = 'SET_WATCH_HISTORY_LOCATION',
 }
 
 const actions = {
-    setWatchActionsHistory: createAction<WatchActionsHistoryModel>(WatchActionsHistoryActions.SET_WATCH_ACTIONS_HISTORY),
+    setWatchActionsHistory: createAction<WatchActionsHistoryModel['history']>(WatchActionsHistoryActions.SET_WATCH_ACTIONS_HISTORY),
+    addToWatchActionsHistory: createAction<WatchActionsHistoryModel['history']>(WatchActionsHistoryActions.ADD_TO_WATCH_ACTIONS_HISTORY),
     setWatchHistoryLocation: createAction<string>(WatchActionsHistoryActions.SET_WATCH_HISTORY_LOCATION),
 };
 

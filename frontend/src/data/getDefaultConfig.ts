@@ -28,6 +28,7 @@ const getDefaultConfig = () => {
             },
         },
         tests: [],
+        watchesIdsActions: {},
         layouts: getDefaultLayouts(),
         layoutSelection: 'debugging',
     } as ConfigModel;

@@ -1,30 +1,32 @@
-import { Watchblock, Watch } from 'reduxState/models';
+import { useRef, useEffect } from 'react';
+import { Watchblock, Watch, WatchActionsHistoryModel } from 'reduxState/models';
+import { useConfig } from 'reduxState/selectors';
+import { useWatchActionsHistoryActions } from 'reduxState/actions';
+import { stringFromUintArray } from 'utils/tools';
 
-const cupl_start = 240;
-//const cupl_end = 246
-const divisor = 244;
-const variable_end = 245;
+const string_start = 's';
+const bitset_start = 'b';
+const number_start = 'n';
+const pointer_start = '*';
 
-const string_start = 's'.charCodeAt(0);
-const bitset_start = 'b'.charCodeAt(0);
-const number_start = 'n'.charCodeAt(0);
-const pointer_start = '*'.charCodeAt(0);
+const array_start = 'a';
+const array_end = 'A';
 
-const array_start = 'a'.charCodeAt(0);
-const array_end = 'A'.charCodeAt(0);
+const pair_start = 'p';
 
-const pair_start = 'p'.charCodeAt(0);
+const struct_start = 'o';
+const struct_end = 'O';
 
-const struct_start = 'o'.charCodeAt(0);
-const struct_end = 'O'.charCodeAt(0);
-
-const watchblock_open_start = 241;
-
-const watch_start = 242;
-
-const watchblock_close_start = 243;
-
-//const watchblock_open_start  = Buffer.from([ cupl_start, 241 ])
+const watchblock_start = String.fromCharCode(242);
+const watchblock_end = String.fromCharCode(243);
+const divisor = String.fromCharCode(244);
+const cupl_start = String.fromCharCode(245);
+const cupl_end = String.fromCharCode(246);
+const watch_start = String.fromCharCode(247);
+const watch_end = String.fromCharCode(248);
+const variable_start = String.fromCharCode(249);
+//const variable_end = String.fromCharCode(250);
+const cds_id_start = String.fromCharCode(251);
 
 export type ConvertResult = (
     | {
@@ -43,33 +45,38 @@ export type ConvertResult = (
           closingType: 'array' | 'struct' | 'pair' | 'watchblock';
       }
 ) & {
-    id: string;
+    call_id: string;
     name?: string;
     pointer?: true;
 };
 
-const convertContents = (contents: Uint8Array, start: number, id: string): { result: ConvertResult; end: number } => {
+const convertContents = (
+    contents: string[],
+    start: number,
+    call_id: string
+): { result: ConvertResult; end: number; valueString: string } => {
     let val_end = start,
+        valueString = '',
         result,
         idCounter = 0;
 
     switch (contents[start]) {
         case array_start:
             result = {
-                id,
+                call_id,
                 type: 'array' as 'array',
                 children: [] as Array<ConvertResult>,
                 state: { expanded: true },
             };
-
             while (contents[val_end + 1] !== array_end) {
-                let val = convertContents(contents, val_end + 1, id + `.${idCounter}`);
+                let val = convertContents(contents, val_end + 1, call_id + `.${idCounter}`);
                 val.result.name = `${idCounter++}`;
                 result.children.push(val.result);
                 val_end = val.end;
+                valueString += `${val.valueString},`;
             }
             result.children.push({
-                id: `${id}.end`,
+                call_id: `${call_id}.end`,
                 type: 'closing',
                 closingType: 'array',
             });
@@ -77,31 +84,32 @@ const convertContents = (contents: Uint8Array, start: number, id: string): { res
             return {
                 result,
                 end: val_end + 1,
+                valueString: `[${valueString.slice(0, -1)}]`,
             };
 
         case struct_start:
             result = {
-                id,
+                call_id,
                 type: 'struct' as 'struct',
                 children: [] as Array<ConvertResult>,
                 state: { expanded: true },
             };
 
             while (contents[val_end + 1] !== struct_end) {
-                const name = convertContents(contents, val_end + 1, id + `.${idCounter}`) as {
+                const name = convertContents(contents, val_end + 1, call_id + `.${idCounter}`) as {
                     result: { type: 'string'; value: string };
                     end: number;
                 };
                 val_end = name.end;
 
-                const val = convertContents(contents, val_end + 1, id + `.${idCounter++}`);
+                const val = convertContents(contents, val_end + 1, call_id + `.${idCounter++}`);
                 val.result.name = name.result.value as string;
 
                 result.children.push(val.result);
                 val_end = val.end;
             }
             result.children.push({
-                id: `${id}.end`,
+                call_id: `${call_id}.end`,
                 type: 'closing',
                 closingType: 'struct',
             });
@@ -109,26 +117,27 @@ const convertContents = (contents: Uint8Array, start: number, id: string): { res
             return {
                 result,
                 end: val_end + 1,
+                valueString: '"0"', // TODO: support for structs
             };
 
         case pair_start:
-            let first = convertContents(contents, val_end + 1, id + '.first');
+            let first = convertContents(contents, start + 1, call_id + '.first');
             first.result.name = 'first';
             val_end = first.end;
-
-            let second = convertContents(contents, val_end + 1, id + '.second');
+            valueString += `"first": ${first.valueString},`;
+            let second = convertContents(contents, val_end + 1, call_id + '.second');
             second.result.name = 'second';
             val_end = second.end;
-
+            valueString += `"second": ${first.valueString}`;
             return {
                 result: {
-                    id,
+                    call_id,
                     type: 'pair' as 'pair',
                     children: [
                         first.result,
                         second.result,
                         {
-                            id: `${id}.end`,
+                            call_id: `${call_id}.end`,
                             type: 'closing',
                             closingType: 'pair',
                         },
@@ -136,20 +145,21 @@ const convertContents = (contents: Uint8Array, start: number, id: string): { res
                     state: { expanded: true },
                 },
                 end: val_end,
+                valueString: `{${valueString}}`,
             };
 
         case pointer_start:
-            const val = convertContents(contents, start + 1, id);
+            const val = convertContents(contents, start + 1, call_id);
             return {
                 result: {
                     ...val.result,
                     pointer: true,
                 },
                 end: val.end,
+                valueString: val.valueString,
             };
 
         default:
-            val_end = contents.indexOf(variable_end, start);
             let type = 'invalid' as 'invalid' | 'number' | 'string' | 'bitset';
             switch (contents[start]) {
                 case number_start:
@@ -165,118 +175,132 @@ const convertContents = (contents: Uint8Array, start: number, id: string): { res
 
             return {
                 result: {
-                    id,
+                    call_id,
                     type,
-                    value: new TextDecoder('utf-8').decode(contents.slice(start + 1, val_end)),
+                    value: contents[start + 1],
                 },
-                end: val_end,
+                end: start + 1,
+                valueString: `"${contents[start + 1]}"`,
             };
     }
 };
 
-let watchblockStack: Array<Watchblock> = [];
+export const useParseWatchblocks = () => {
+    const watchblockStack = useRef<Array<Watchblock>>([]);
+    const tempWatchActionsHistory = useRef<WatchActionsHistoryModel['history']>({});
+    const watchActionsHistoryPreviousKey = useRef<string>('-1');
+    const projectConfig = useConfig();
+    const { addToWatchActionsHistory, setWatchActionsHistory } = useWatchActionsHistoryActions();
+    const readWatchblocks = () => {
+        return watchblockStack.current[0];
+    };
 
-export const clearWatchblocks = () => {
-    watchblockStack = [
-        {
-            id: '-1',
-            children: [],
-            type: 'watchblock',
-            line: -1,
-            name: '',
-            state: { expanded: true },
-        },
-    ];
-};
-
-export const readWatchblocks = () => {
-    return watchblockStack[0];
-};
-
-export const parseWatchblocks = (newData: Uint8Array) => {
-    let loc = newData.indexOf(cupl_start);
-    if (loc === -1) return;
-
-    const curr = newData;
-    let begin, end;
-    let id, name, line, data_type, config, result, contents;
-    let topOfStack: Watchblock;
-    switch (curr[loc + 1]) {
-        case watch_start:
-            begin = loc + 2;
-            end = curr.indexOf(divisor, begin);
-            id = new TextDecoder('utf-8').decode(curr.slice(begin, end));
-
-            begin = end + 1;
-            end = curr.indexOf(divisor, begin);
-            name = new TextDecoder('utf-8').decode(curr.slice(begin, end));
-
-            begin = end + 1;
-            end = curr.indexOf(divisor, begin);
-            line = parseInt(new TextDecoder('utf-8').decode(curr.slice(begin, end)));
-
-            begin = end + 1;
-            end = curr.indexOf(divisor, begin);
-            data_type = new TextDecoder('utf-8').decode(curr.slice(begin, end));
-
-            begin = end + 1;
-            end = curr.indexOf(divisor, begin);
-            config = new TextDecoder('utf-8').decode(curr.slice(begin, end));
-
-            begin = end + 1;
-            end = curr.indexOf(divisor, begin);
-            contents = curr.slice(begin, end);
-
-            result = convertContents(contents, 0, id).result;
-
-            watchblockStack[watchblockStack.length - 1].children.push({
-                name,
-                line,
-                data_type,
-                config,
-                ...result,
-            });
-            break;
-
-        case watchblock_open_start:
-            begin = loc + 2;
-            end = curr.indexOf(divisor, begin);
-            id = new TextDecoder('utf-8').decode(curr.slice(begin, end));
-
-            begin = end + 1;
-            end = curr.indexOf(divisor, begin);
-            name = new TextDecoder('utf-8').decode(curr.slice(begin, end));
-
-            begin = end + 1;
-            end = curr.indexOf(divisor, begin);
-            line = parseInt(new TextDecoder('utf-8').decode(curr.slice(begin, end)));
-
-            topOfStack = watchblockStack[watchblockStack.length - 1];
-            topOfStack.children.push({
-                id,
-                name,
-                line,
+    const clearWatchblocks = () => {
+        watchblockStack.current = [
+            {
+                call_id: '-1',
+                children: [],
                 type: 'watchblock',
-                children: [] as Array<Watchblock | Watch>,
-                state: { expanded: true },
-            });
-
-            watchblockStack.push(topOfStack.children[topOfStack.children.length - 1] as Watchblock);
-
-            break;
-        case watchblock_close_start:
-            topOfStack = watchblockStack[watchblockStack.length - 1];
-            topOfStack.children.push({
-                id: topOfStack.id + '.end',
-                name: '',
                 line: -1,
-                type: 'closing',
-                config: '',
-                data_type: '',
-                closingType: 'watchblock',
-            });
-            watchblockStack.pop();
+                name: '',
+                state: { expanded: true },
+            },
+        ];
+    };
 
-            break;
-    }
+    const parseWatchblocks = (newData: Uint8Array) => {
+        const dataString = stringFromUintArray(newData);
+        const cupl_start_index = dataString.indexOf(cupl_start);
+        if (cupl_start_index === -1) return;
+        const cupl_end_index = dataString.indexOf(cupl_end, cupl_start_index);
+        const data = dataString.slice(cupl_start_index, cupl_end_index + 1).split(divisor);
+        let loc = 1;
+        let begin, end;
+        let name: string, line: string, config: any, call_id, cds_id;
+        let watchAction;
+        let topOfStack: Watchblock;
+        switch (data[loc]) {
+            case watch_start:
+                [call_id, line, config] = data.slice(loc + 1, loc + 4);
+                loc += 4;
+                let variables = [];
+                let variablesValuesStrings: Array<string> = [];
+                while (data[loc] !== watch_end) {
+                    switch (data[loc]) {
+                        case variable_start:
+                            const { result, end, valueString } = convertContents(data, loc + 3, call_id);
+                            variables.push({
+                                name: data[loc + 1],
+                                data_type: data[loc + 2],
+                                ...result,
+                            });
+                            variablesValuesStrings.push(valueString);
+                            loc = end + 1;
+                            break;
+                        case cds_id_start:
+                            cds_id = data[loc + 1];
+                            loc += 2;
+                            break;
+                    }
+                }
+                if (cds_id) {
+                    const actions = projectConfig.watchesIdsActions[cds_id];
+                    if (actions) {
+                        const historyEntryActions = actions.map((action) => ({
+                            action: action.action,
+                            targetObject: action.target,
+                            payload: variablesValuesStrings.map((valueString) => JSON.parse(valueString)),
+                        }));
+                        tempWatchActionsHistory.current[call_id] = {
+                            previousKey: watchActionsHistoryPreviousKey.current,
+                            nextKey: '-1',
+                            actions: historyEntryActions,
+                        };
+                        if (watchActionsHistoryPreviousKey.current !== '-1')
+                            tempWatchActionsHistory.current[watchActionsHistoryPreviousKey.current].nextKey = call_id;
+                        watchActionsHistoryPreviousKey.current = call_id;
+                        setWatchActionsHistory(tempWatchActionsHistory.current);
+                    }
+                }
+                variables.forEach((variable) => {
+                    watchblockStack.current[watchblockStack.current.length - 1].children.push({
+                        line: parseInt(line),
+                        config,
+                        ...variable,
+                    });
+                });
+                break;
+            case watchblock_start:
+                [call_id, name, line] = data.slice(loc + 1, loc + 4);
+                topOfStack = watchblockStack.current[watchblockStack.current.length - 1];
+                topOfStack.children.push({
+                    call_id,
+                    name,
+                    line: parseInt(line),
+                    type: 'watchblock',
+                    children: [] as Array<Watchblock | Watch>,
+                    state: { expanded: true },
+                });
+
+                watchblockStack.current.push(topOfStack.children[topOfStack.children.length - 1] as Watchblock);
+
+                break;
+            case watchblock_end:
+                topOfStack = watchblockStack.current[watchblockStack.current.length - 1];
+                topOfStack.children.push({
+                    call_id: topOfStack.call_id + '.end',
+                    name: '',
+                    line: -1,
+                    type: 'closing',
+                    config: '',
+                    data_type: '',
+                    closingType: 'watchblock',
+                });
+                watchblockStack.current.pop();
+
+                break;
+        }
+    };
+
+    return { parseWatchblocks, readWatchblocks, clearWatchblocks };
 };

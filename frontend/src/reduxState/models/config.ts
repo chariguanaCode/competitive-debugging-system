@@ -14,6 +14,13 @@ export interface TestModel {
     outputPath: string | null;
 }
 
+export interface watchIdActionsModel {
+    [key: string]: [{
+        target: string,
+        action: string,
+    }]
+}
+
 type LayoutElement = any;
 
 interface BorderElement {
@@ -43,7 +50,8 @@ export interface ConfigModel {
             };
         };
     };
-    tests: Array<TestModel>;
+    tests: Array<TestModel>; 
+    watchesIdsActions: watchIdActionsModel;
     layouts: {
         debugging: LayoutModel;
         outputs: LayoutModel;
