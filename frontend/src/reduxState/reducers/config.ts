@@ -5,7 +5,7 @@ import getDefaultConfig from 'data/getDefaultConfig';
 
 export const configReducer = handleActions<ConfigModel, ConfigActionPayload>(
     {
-        [ConfigActions.SET_CONFIG]: (state, action) => (action.payload as unknown) as ConfigModel,
+        [ConfigActions.SET_CONFIG]: (state, action) => Object.assign({}, state, action.payload) as ConfigModel,
         [ConfigActions.SET_PROJECT_INFO]: (state, action) => ({ ...state, ...action.payload } as ConfigModel),
         [ConfigActions.ADD_TESTS]: (state, action) => ({
             ...state,

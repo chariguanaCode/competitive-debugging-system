@@ -5,10 +5,20 @@ import { WatchActionsHistoryModel, OneDimensionArrayActionType, TwoDimensionArra
 export const watchActionsHistoryReducer = handleActions<WatchActionsHistoryModel, WatchActionsHistoryActionPayload>(
     {
         [WatchActionsHistoryActions.SET_WATCH_ACTIONS_HISTORY]: (state, action) => {
-            const payload = (action.payload as unknown) as WatchActionsHistoryModel['history'];
+            const payload = action.payload as WatchActionsHistoryModel['history'];
             return {
                 ...state,
                 history: payload,
+            };
+        },
+        [WatchActionsHistoryActions.ADD_TO_WATCH_ACTIONS_HISTORY]: (state, action) => {
+            const payload = action.payload as WatchActionsHistoryModel['history'];
+            return {
+                ...state,
+                history: {
+                    ...state.history,
+                    ...payload,
+                },
             };
         },
         [WatchActionsHistoryActions.SET_WATCH_HISTORY_LOCATION]: (state, action) => {

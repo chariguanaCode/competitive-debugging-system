@@ -48,7 +48,9 @@
     },
     "homepage": "https://github.com/chariguanaCode/competitive-debugging-system#readme",
     "dependencies": {
-        "md5": "^2.2.1"
+        "electron-rebuild": "^1.11.0",
+        "md5": "^2.2.1",
+        "typeface-roboto-mono": "0.0.75"
     },
     "devDependencies": {
         "concurrently": "^5.2.0",

@@ -27,6 +27,7 @@ const getDefaultConfig = () => {
             },
         },
         tests: [],
+        watchesIdsActions: {}
     } as ConfigModel;
 };
 

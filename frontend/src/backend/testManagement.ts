@@ -27,8 +27,6 @@ export const useFinishTest = () => {
 
     return (id: number) => () => {
         const execTime = window.process.hrtime(taskStates.current[id].startTime);
-        console.log(taskStates.current[id]);
-
         taskStates.current[id] = {
             state: TaskState.Successful,
             childProcess: null,

@@ -20,14 +20,11 @@ export const saveFile = (filePath: string, content: any) => fs.writeFileSync(fil
 
 export const readFile = (filePath: string) => {
     return new Promise((resolve, reject) => {
-        let data = fs.readFileSync(
-            filePath,
-            'utf8'
-        ); /*, (err: any, data: string) => {
+        console.log('xd')
+        fs.readFile(filePath, 'utf8', (err: any, data: string) => {
             if (err) reject(err);
             resolve(data);
-        });*/
-        resolve(data);
+        });
     });
 };
 

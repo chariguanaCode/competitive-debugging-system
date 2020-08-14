@@ -74,7 +74,7 @@ export const useLoadProject = () => {
         const hasSaveLocation = !path.match(/.*\.nsp.cdsp/);
         let newConfig: ConfigModel = {} as ConfigModel;
 
-        await asyncFileActions.readFile(path).then((data: any) => {
+        await syncFileActions.readFile(path).then((data: any) => {
             newConfig = JSON.parse(data);
             console.log('Read config');
             console.log('Loaded config');

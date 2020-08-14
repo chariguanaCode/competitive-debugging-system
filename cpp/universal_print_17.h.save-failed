@@ -11,9 +11,9 @@
  *  Description:    A library for Competitive Debugging System
  *
  *  Created:        22.12.2019
- *  Last updated:   14.08.2020
+ *  Last updated:   08.08.2020
  *
- *  Version: 2.1
+ *  Version: 2.0
  *
  *  universal-print-in-cpp-for-cds
  *  Universal print in C++ for Competitive Debugging System
@@ -169,7 +169,9 @@ namespace cupl {
     const char watch_end   = 248;
     const char variable_start = 249;
     const char cds_id_start = 251;
+//std::string variable_start   = "variable_start";
     const char variable_end   = 250;
+   // std::string variable_end   = "variable_end";
 
     const char string_start  = 's';
     const char bitset_start  = 'b';
@@ -228,7 +230,7 @@ namespace cupl {
     void print_cds() {};
     template <typename T, typename... Types>
     void print_cds(T var1, Types... var2) {
-        cerr << var1 << divisor;
+        cerr << var1 << (var1 != '\n' ? divisor : '');
         print_cds(var2...);
     }
 
@@ -254,14 +256,12 @@ namespace cupl {
     main_wrapper wrapper;
 
     int watchblock_open(string name, int line) {
-        print_cds(cupl_start,watchblock_start, cupl_element_id++, name, line,cupl_end);
-        cerr<<endl;
+        print_cds(cupl_start,watchblock_start, cupl_element_id++, name, line,cupl_end, '\n');
         return 1;
     }
 
     int watchblock_close(string name){
-        print_cds(cupl_start, watchblock_end, cupl_end);
-        cerr<<endl;
+        print_cds(cupl_start, watchblock_end, cupl_end, '\n');
     }
 
     void print_watch_opening_informations(int line){
@@ -269,8 +269,7 @@ namespace cupl {
     }
 
     void print_watch_closing_informations(){
-        print_cds(watch_end, cupl_end);
-        cerr<<endl;
+        print_cds(watch_end, cupl_end, '\n');
     }
 
     void print_main(id_type x, string name){

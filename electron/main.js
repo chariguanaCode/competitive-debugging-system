@@ -18,8 +18,8 @@ const createWindow = async () => {
         height: 600,
         webPreferences: {
             nodeIntegration: true,
-            nodeIntegrationInWorker: true,
-            nativeWindowOpen: true,
+            //nodeIntegrationInWorker: true,
+            //nativeWindowOpen: true,
             enableRemoteModule: true
         },
         show: false,
@@ -51,7 +51,7 @@ const createWindow = async () => {
 };
 
 app.on('ready', createWindow);
-
+app.allowRendererProcessReuse = false;
 app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
         app.quit();

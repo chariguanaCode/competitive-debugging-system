@@ -1,14 +1,14 @@
 import { ConvertResult } from 'backend/watchParse';
 
 export type Watch = {
-    id: string;
+    call_id: string;
     line: number;
     data_type: string;
     config: any;
 } & ConvertResult;
 
 export interface Watchblock {
-    id: string;
+    call_id: string;
     children: Array<Watchblock | Watch>;
     type: 'watchblock';
     line: number;

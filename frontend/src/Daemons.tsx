@@ -16,15 +16,14 @@ import {
 } from 'reduxState/models';
 import { useTaskStatesActions, useTrackedObjectsActions } from 'reduxState/actions';
 import { readFileStream } from 'backend/outputFileTracking';
-import { clearWatchblocks, readWatchblocks, parseWatchblocks } from 'backend/watchParse';
+import { useParseWatchblocks } from 'backend/watchParse';
 
 export default function Daemons(): ReactElement {
     const taskStates = useAllTasksState();
     const currentTask = useCurrentTaskState();
     const config = useConfig();
-
+    const {parseWatchblocks, readWatchblocks, clearWatchblocks} = useParseWatchblocks();
     const currentTaskProgress = taskStates.current[currentTask.id]?.state;
-
     const {
         setCurrentTaskStdout,
         setCurrentTaskStdoutSize,
@@ -34,7 +33,6 @@ export default function Daemons(): ReactElement {
 
     useEffect(() => {
         if (![TaskState.Pending, TaskState.Running, undefined].includes(currentTaskProgress)) {
-            console.log(currentTask.id, currentTaskProgress);
             readFileStream(
                 config.tests[currentTask.id].inputPath + '.out',
                 false,
@@ -43,7 +41,6 @@ export default function Daemons(): ReactElement {
                 () => {},
                 () => {}
             );
-
             readFileStream(
                 config.tests[currentTask.id].inputPath + '.err',
                 true,

@@ -29,7 +29,6 @@ export default () => {
             setExecutionState({ state: ExecutionState.Running, details: `Took ${hrend[0]}s ${hrend[1] / 1000000}ms` });
 
             console.log('Running tests...');
-
             console.log('Found tests:', tests);
             const testPromises = new PromiseQueue(4);
             await Promise.all(
@@ -43,6 +42,8 @@ export default () => {
                 )
             );
             setExecutionState({ state: ExecutionState.Finished, details: '' });
-        } catch (err) {}
+        } catch (err) {
+            console.log(err);
+        }
     };
 };

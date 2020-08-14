@@ -11,7 +11,7 @@ export const saveFile = (filePath: string, content: any) => fs.writeFileSync(fil
 
 export const readFile = (filePath: string) => {
     return new Promise((resolve, reject) => {
-        let data = fs.readFileSync(
+        let data: string = fs.readFileSync(
             filePath,
             'utf8'
         ); /*, (err: any, data: string) => {

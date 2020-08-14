@@ -4,7 +4,12 @@ import { TwoDimensionArrayAction } from './twoDimensionalArrayActions';
 export * from './oneDimensionalArrayActions';
 export * from './twoDimensionalArrayActions';
 
-export type WatchActionModel = (OneDimensionArrayAction | TwoDimensionArrayAction) & { targetObject: string };
+export type WatchActionModel = {
+    targetObject: string,
+    action: string,
+    payload: any // TODO: add payload type    
+}
+//(OneDimensionArrayAction | TwoDimensionArrayAction) & { targetObject: string };
 
 export type WatchActionsHistoryModel = {
     history: {
