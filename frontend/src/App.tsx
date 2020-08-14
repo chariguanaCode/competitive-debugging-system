@@ -11,7 +11,7 @@ import { useFileManager } from 'reduxState/selectors';
 import { useFileManagerActions } from 'reduxState/actions';
 
 import 'typeface-roboto';
-import 'typeface-roboto-mono';
+//import 'typeface-roboto-mono';
 import { useLoadProject } from 'backend/projectManagement';
 
 export default function App(): ReactElement {

@@ -7,23 +7,53 @@
         "run": "concurrently \"npm run frontend\" \"wait-on http://localhost:3000 && npm run electron\" ",
         "frontend": "cross-env BROWSER=\"none\" REACT_APP_VERSION=\"$npm_package_version\" REACT_APP_NAME=\"$npm_package_name\" npm start --prefix ./frontend",
         "electron": "cross-env ELECTRON_START_URL=http://localhost:3000 electron .",
-        "build": "npm run build --prefix frontend && electron-builder"
+        "build": "npm install --no-bin-links --prefix frontend && cross-env CI=\"false\" BROWSER=\"none\" REACT_APP_VERSION=\"$npm_package_version\" REACT_APP_NAME=\"$npm_package_name\" npm run build --prefix frontend ",
+        "fullBuild": "npm run build && electron-builder",
+        "postinstall": "electron-builder install-app-deps"
     },
     "main": "electron/main.js",
     "build": {
         "productName": "Competitive Debugging System",
+        "artifactName": "${name}-${version}-${os}.${ext}",
         "files": [
             "frontend/build/**/*",
             "electron/**/*"
         ],
+        "extraFiles": [
+            "cpp/**/*"
+        ],
+        "directories": {
+            "buildResources": "electron/buildResources"
+        },
+        "publish": {
+            "provider": "github",
+            "releaseType": "draft"
+        },
+        "electronUpdaterCompatibility": ">= 2.16",
         "linux": {
             "category": "Programming",
             "target": [
                 {
-                    "target": "tar.xz",
+                    "target": "AppImage",
                     "arch": "x64"
                 }
             ]
+        },
+        "win": {
+            "artifactName": "${name}-${version}-${os}-portable.${ext}",
+            "target": [
+                {
+                    "target": "nsis",
+                    "arch": "x64"
+                },
+                {
+                    "target": "portable",
+                    "arch": "x64"
+                }
+            ]
+        },
+        "nsis": {
+            "artifactName": "${name}-${version}-${os}-installer.${ext}"
         }
     },
     "repository": {
@@ -48,9 +78,8 @@
     },
     "homepage": "https://github.com/chariguanaCode/competitive-debugging-system#readme",
     "dependencies": {
-        "electron-rebuild": "^1.11.0",
-        "md5": "^2.2.1",
-        "typeface-roboto-mono": "0.0.75"
+        "electron-updater": "^4.3.4",
+        "md5": "^2.2.1"
     },
     "devDependencies": {
         "concurrently": "^5.2.0",

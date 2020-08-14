@@ -39,23 +39,19 @@
     },
     "homepage": "./",
     "scripts": {
-        "start": "react-scripts start",
-        "build": "react-scripts build",
-        "test": "react-scripts test"
+        "start": "node ./node_modules/react-scripts/bin/react-scripts.js start",
+        "build": "node ./node_modules/react-scripts/bin/react-scripts.js build",
+        "test": "node ./node_modules/react-scripts/bin/react-scripts.js test"
     },
     "eslintConfig": {
         "extends": "react-app"
     },
     "browserslist": {
         "production": [
-            ">0.2%",
-            "not dead",
-            "not op_mini all"
+            "last 1 chrome version"
         ],
         "development": [
-            "last 1 chrome version",
-            "last 1 firefox version",
-            "last 1 safari version"
+            "last 1 chrome version"
         ]
     }
 }

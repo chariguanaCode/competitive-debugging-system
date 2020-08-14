@@ -1,4 +1,5 @@
 import { ConfigModel } from 'reduxState/models';
+import getDefaultLayouts from './getDefaultLayouts';
 
 const getDefaultConfig = () => {
     let today = new Date();
@@ -27,7 +28,9 @@ const getDefaultConfig = () => {
             },
         },
         tests: [],
-        watchesIdsActions: {}
+        watchesIdsActions: {},
+        layouts: getDefaultLayouts(),
+        layoutSelection: 'debugging',
     } as ConfigModel;
 };
 
