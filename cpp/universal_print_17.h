@@ -135,12 +135,12 @@ namespace cupl {
 #define _CUPL_watch_16(var, ...) cupl::print_main(var, #var); _CUPL_watch_15(__VA_ARGS__)
 
 #define watch(...) \
-    { cupl::print_watch_opening_informations(__LINE__); \
+    { cupl::print_watch_opening_information(__LINE__); \
     _CUPL_GET_NUMBER_OF_WATCH_ARGS_(ignore, ##__VA_ARGS__, \
     _CUPL_watch_16, _CUPL_watch_15, _CUPL_watch_14, _CUPL_watch_13, _CUPL_watch_12, _CUPL_watch_11, \
     _CUPL_watch_10, _CUPL_watch_9 , _CUPL_watch_8 , _CUPL_watch_7 , _CUPL_watch_6 , _CUPL_watch_5,  \
     _CUPL_watch_4 , _CUPL_watch_3 , _CUPL_watch_2 , _CUPL_watch_1 , _CUPL_watch_0)(__VA_ARGS__); \
-    cupl::print_watch_closing_informations(); }
+    cupl::print_watch_closing_information(); }
 #define watchblock(x) for(int psPDNaVCRHn5ABqHHaXL2vCxw5sgraKSH4GeAcD9D7e5UgTw8Z=cupl::watchblock_open(x, __LINE__); psPDNaVCRHn5ABqHHaXL2vCxw5sgraKSH4GeAcD9D7e5UgTw8Z; psPDNaVCRHn5ABqHHaXL2vCxw5sgraKSH4GeAcD9D7e5UgTw8Z=cupl::watchblock_close(x))
 #define debug if (1)
 
@@ -264,11 +264,11 @@ namespace cupl {
         cerr<<endl;
     }
 
-    void print_watch_opening_informations(int line){
+    void print_watch_opening_information(int line){
         print_cds(cupl_start, watch_start, cupl_element_id++, line, "config");
     }
 
-    void print_watch_closing_informations(){
+    void print_watch_closing_information(){
         print_cds(watch_end, cupl_end);
         cerr<<endl;
     }
