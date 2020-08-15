@@ -14,6 +14,8 @@ export const Information: React.FunctionComponent<ContentProps> = memo(({ setFil
                 <div>Project name: {config.projectInfo.name}</div>
                 <div>Project description: {config.projectInfo.description}</div>
                 <div>Project author: {config.projectInfo.author}</div>
+                <div>Creation date: {config.projectInfo.createDate}</div>
+                <div>Total time spent: {config.projectInfo.totalTimeSpent}</div>
             </div>
         </>
     );
