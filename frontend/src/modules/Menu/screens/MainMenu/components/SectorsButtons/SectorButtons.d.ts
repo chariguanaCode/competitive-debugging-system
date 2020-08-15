@@ -1,10 +1,10 @@
 import { Sector } from './SectorsButtons';
 
-export interface SectorButton {
+export interface MainMenuSectorButton {
     name: string;
     icon: JSX.Element;
     doesNeedOpenProject: boolean;
     doesNeedSaveLocation?: boolean;
-    sectorId: Sector;
+    key: Sector;
     disabled?: boolean;
 }

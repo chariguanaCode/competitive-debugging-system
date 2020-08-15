@@ -41,6 +41,14 @@ declare module '@material-ui/core/styles/createPalette' {
         selectedButtonBackgroundColor: string;
     }
 
+    interface MenuOptions {
+        backgroundColor: string;
+        iconColorEnabled: string;
+        iconColorDisabled: string;
+        fontColor: string;
+        selectedButtonBackgroundColor: string;
+    }
+
     interface ContentLayoutOptions {
         panelHeader: string;
         panelBackground: string;
@@ -61,6 +69,7 @@ declare module '@material-ui/core/styles/createPalette' {
         watchblocks: WatchBlockOptions;
         header: HeaderOptions;
         mainMenu: MainMenuOptions;
+        Menu: MenuOptions;
         fileManager: FileManagerOptions;
         contentLayout: ContentLayoutOptions;
         taskState: TaskStateOptions;
@@ -71,6 +80,7 @@ declare module '@material-ui/core/styles/createPalette' {
         watchblocks: WatchBlockOptions;
         header: HeaderOptions;
         mainMenu: MainMenuOptions;
+        Menu: MenuOptions;
         fileManager: FileManagerOptions;
         contentLayout: ContentLayoutOptions;
         taskState: TaskStateOptions;

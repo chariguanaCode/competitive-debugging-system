@@ -53,6 +53,13 @@ export const lightTheme = createMuiTheme({
             fontColor: 'black',
             selectedButtonBackgroundColor: '#b0bec5',
         },
+        Menu: {
+            backgroundColor: 'white',
+            iconColorEnabled: grey[900],
+            iconColorDisabled: '',
+            fontColor: 'black',
+            selectedButtonBackgroundColor: '#b0bec5',
+        },
         fileManager: {
             fontColor: 'black',
             backgroundColor: 'white',
@@ -110,6 +117,13 @@ export const darkTheme = createMuiTheme({
             closeButton: amber[500],
         },
         mainMenu: {
+            backgroundColor: grey[800],
+            iconColorEnabled: amber[500],
+            iconColorDisabled: '',
+            fontColor: 'white',
+            selectedButtonBackgroundColor: '#8ea3ad',
+        },
+        Menu: {
             backgroundColor: grey[800],
             iconColorEnabled: amber[500],
             iconColorDisabled: '',
