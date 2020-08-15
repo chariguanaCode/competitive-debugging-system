@@ -4,10 +4,12 @@ import { useTheme } from '@material-ui/core/styles';
 import { MenuList, MenuItem } from '@material-ui/core';
 import SectorsButtons, { Sector } from '../SectorsButtons';
 import { SidebarProps } from './Types';
+import {useProjectFile} from 'reduxState/selectors'
 
 export const Sidebar: React.FunctionComponent<SidebarProps> = ({ isAnyProjectOpen, selectSector, selectedSector }) => {
     const classes = useStyles();
     const theme = useTheme();
+    const projectFile = useProjectFile();
     return (
         <>
             <div className={classes.Sidebar}>
@@ -16,7 +18,7 @@ export const Sidebar: React.FunctionComponent<SidebarProps> = ({ isAnyProjectOpe
                         return (
                             <MenuItem
                                 key={`MainMenuOption-${index}`}
-                                disabled={obj.disabled || (obj.doesNeedOpenProject && !isAnyProjectOpen)}
+                                disabled={obj.disabled || (obj.doesNeedOpenProject && !projectFile) || (obj.doesNeedSaveLocation && !projectFile?.hasSaveLocation)}
                                 onClick={() => {
                                     selectSector(obj.sectorId);
                                 }}

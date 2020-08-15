@@ -1,5 +1,5 @@
 import React from 'react';
-import { SectorButton } from './Types';
+import { SectorButton } from './SectorButtons.d';
 import {
     AllInbox as AllInboxIcon,
     FolderOpen as FolderOpenIcon,
@@ -52,6 +52,7 @@ const SectorsButtons: Array<SectorButton> = [
         icon: <SaveIcon style={{ color: 'blue' }} />,
         doesNeedOpenProject: true,
         sectorId: Sector.Save,
+        doesNeedSaveLocation: true,
     },
     {
         name: 'Information',
@@ -64,14 +65,14 @@ const SectorsButtons: Array<SectorButton> = [
         icon: <ImportExportIcon style={{ color: 'blue' }} />,
         doesNeedOpenProject: true,
         sectorId: Sector.Export,
-        disabled: true
+        disabled: true,
     },
     {
         name: 'Print',
         icon: <PrintIcon style={{ color: 'blue' }} />,
         doesNeedOpenProject: true,
         sectorId: Sector.Print,
-        disabled: true
+        disabled: true,
     },
 ];
 

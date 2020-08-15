@@ -13,6 +13,8 @@ export const SaveAs: React.FunctionComponent<ContentProps> = memo(({ setFileMana
     const saveProjectAs = useSaveProjectAs();
     const loadProject = useLoadProject();
     const isUpdatedConfigSaved = useRef<boolean>(true);
+    const wasConfigUpdated = useRef<boolean>(false);
+    const wasProjectFilenameEdited = useRef<boolean>(false);
     const [isLoading, setLoadingStatus] = useState<boolean>(false);
     const config = useConfig();
     const { setConfig } = useConfigActions();
@@ -24,14 +26,12 @@ export const SaveAs: React.FunctionComponent<ContentProps> = memo(({ setFileMana
         projectFilename: '',
     });
     // TODO: ? set default values from current config (has prons and cons)
-    // TODO: focus on name
     // TODO: better location handling
-    // TODO: auto filename
     useEffect(() => {
-        /** when config is set, save .cdsp file **/
         /** TODO: it should be called only after setNewConfig call, not after mount */
         let saveAndLoadConfig = async () => {
             isUpdatedConfigSaved.current = true;
+            wasConfigUpdated.current = false;
             const projectPath = await saveProjectAs(formValues.projectLocation, formValues.projectFilename).catch((err) => {
                 console.log(err);
             });
@@ -42,7 +42,7 @@ export const SaveAs: React.FunctionComponent<ContentProps> = memo(({ setFileMana
             closeMainMenu();
         };
 
-        if (!isUpdatedConfigSaved.current) saveAndLoadConfig();
+        if (!isUpdatedConfigSaved.current && wasConfigUpdated.current) saveAndLoadConfig();
     }, [config]);
 
     const setNewConfig = () => {
@@ -52,6 +52,7 @@ export const SaveAs: React.FunctionComponent<ContentProps> = memo(({ setFileMana
         newConfig.projectInfo.description = formValues.projectDescription;
         newConfig.projectInfo.author = formValues.projectAuthor;
         isUpdatedConfigSaved.current = false;
+        wasConfigUpdated.current = true;
         setConfig(newConfig);
     };
 
@@ -69,15 +70,14 @@ export const SaveAs: React.FunctionComponent<ContentProps> = memo(({ setFileMana
     let setFormValue = (e: any) => {
         if (e.persist) e.persist();
         let additionalChangedFormValues = {};
-        if (e.target.name === 'projectName' && formValues.projectFilename === '') {
+        if (e.target.name === 'projectName' && (!wasProjectFilenameEdited.current || !!!formValues.projectFilename)) {
+            wasProjectFilenameEdited.current = false;
             additionalChangedFormValues = {
-                projectFilename: e.target.value,
+                projectFilename: e.target.value.split(' ').join('_'), // NDS
             };
         }
-        if (e.target.name === 'projectFilename' && formValues.projectName === '') {
-            additionalChangedFormValues = {
-                projectName: e.target.value,
-            };
+        if (e.target.name === 'projectFilename') {
+            wasProjectFilenameEdited.current = true;
         }
 
         setFormValues((pvFormValues) => ({
@@ -90,7 +90,13 @@ export const SaveAs: React.FunctionComponent<ContentProps> = memo(({ setFileMana
         <>
             <form style={{ display: 'flex', flexDirection: 'column' }}>
                 <div style={{ paddingBottom: '6px', fontSize: '24px' }}>Save as</div>
-                <TextField label="Project name" name="projectName" value={formValues.projectName} onChange={setFormValue} />
+                <TextField
+                    autoFocus
+                    label="Project name"
+                    name="projectName"
+                    value={formValues.projectName}
+                    onChange={setFormValue}
+                />
                 <TextField
                     label="Project file name"
                     name="projectFilename"

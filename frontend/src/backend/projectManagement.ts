@@ -6,6 +6,7 @@ import { ConfigModel, AllTasksModel, Task, TaskState, ProjectFileModel } from 'r
 import { useConfig, useAllTasksState, useCdsConfig, useProjectFile } from 'reduxState/selectors';
 import { useConfigActions, useTaskStatesActions, useProjectFileActions, useCdsConfigActions } from 'reduxState/actions';
 import { getTimeMark } from 'utils/tools';
+import { getDefaultConfig } from 'data';
 const remote = window.require('electron').remote;
 const md5 = window.require('md5');
 
@@ -92,10 +93,10 @@ export const useLoadProject = () => {
         }
 
         const hasSaveLocation = !path.match(/.*\.nsp.cdsp/);
-        let newConfig: ConfigModel = {} as ConfigModel;
+        let newConfig: ConfigModel = getDefaultConfig() as ConfigModel;
         let newConfigMD5: number = 0;
         await syncFileActions.readFile(path).then((data: any) => {
-            newConfig = JSON.parse(data);
+            newConfig = Object.assign(newConfig, JSON.parse(data));
             newConfigMD5 = md5(data);
             console.log('Read config');
             console.log('Loaded config');
