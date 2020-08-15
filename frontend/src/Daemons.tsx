@@ -19,6 +19,7 @@ import { useTaskStatesActions, useTrackedObjectsActions } from 'reduxState/actio
 import { readFileStream } from 'backend/outputFileTracking';
 import { useParseWatchblocks } from 'backend/watchParse';
 import { useSaveCdsConfigToFile } from 'backend/appManangement';
+import { useSaveTemporaryProjectFile } from 'backend/projectManagement';
 
 export default function Daemons(): ReactElement {
     const cdsConfig = useCdsConfig();
@@ -26,10 +27,14 @@ export default function Daemons(): ReactElement {
     useEffect(() => {
         if(Object.keys(cdsConfig).length) saveCdsConfigToFile();
     }, [cdsConfig]);
+    const config = useConfig();
+    const saveTemporaryProjectFile = useSaveTemporaryProjectFile()
+    useEffect(() => {
+        if(Object.keys(config).length) saveTemporaryProjectFile();
+    }, [config]);
 
     const taskStates = useAllTasksState();
     const currentTask = useCurrentTaskState();
-    const config = useConfig();
     const { parseWatchblocks, readWatchblocks, clearWatchblocks } = useParseWatchblocks();
     const currentTaskProgress = taskStates.current[currentTask.id]?.state;
     const {

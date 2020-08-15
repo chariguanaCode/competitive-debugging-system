@@ -264,11 +264,11 @@ namespace cupl {
         cerr<<endl;
     }
 
-    void print_watch_opening_informations(int line){
+    void print_watch_opening_information(int line){
         print_cds(cupl_start, watch_start, cupl_element_id++, line, "config");
     }
 
-    void print_watch_closing_informations(){
+    void print_watch_closing_information(){
         print_cds(watch_end, cupl_end);
         cerr<<endl;
     }
