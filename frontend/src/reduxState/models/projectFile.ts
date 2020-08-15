@@ -4,4 +4,5 @@ export type ProjectFileModel = {
     directory: string;
     filename: string;
     hasSaveLocation: boolean;
+    savedFileHash: number;
 } | null

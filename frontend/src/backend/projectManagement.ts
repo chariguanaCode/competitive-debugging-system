@@ -1,11 +1,27 @@
 import useCompilationAndExecution from './cppCompilationAndExecution';
 import * as fileChangeTracking from './fileChangeTracking';
 import * as syncFileActions from './syncFileActions';
-import { ConfigModel, AllTasksModel, Task, TaskState } from 'reduxState/models';
+import * as asyncFileActions from './asyncFileActions';
+import { ConfigModel, AllTasksModel, Task, TaskState, ProjectFileModel } from 'reduxState/models';
 import { useConfig, useAllTasksState, useCdsConfig, useProjectFile } from 'reduxState/selectors';
 import { useConfigActions, useTaskStatesActions, useProjectFileActions, useCdsConfigActions } from 'reduxState/actions';
 import { getTimeMark } from 'utils/tools';
 const remote = window.require('electron').remote;
+const md5 = window.require('md5');
+
+export const useSaveTemporaryProjectFile = () => {
+    const projectFile = useProjectFile();
+    const config = useConfig();
+    const { setProjectFileSaveState } = useProjectFileActions();
+
+    return async () => {
+        if (!projectFile) return;
+        // TODO: handling errors
+        await asyncFileActions.saveFile(projectFile.path, JSON.stringify(config)).catch();
+        setProjectFileSaveState(md5(JSON.stringify(config)) === projectFile.savedFileHash);
+        return projectFile.path;
+    };
+};
 
 export const useSaveProjectAs = () => {
     const config = useConfig();
@@ -23,14 +39,18 @@ export const useSaveProjectAs = () => {
 export const useSaveProject = () => {
     const projectFile = useProjectFile();
     const config = useConfig();
-    const { setProjectFileSaveState } = useProjectFileActions();
+    const { updateProjectFile } = useProjectFileActions();
 
     return async () => {
         if (!projectFile) return;
         // TODO: handling errors
         const path = projectFile.directory + projectFile.filename + '.cdsp';
-        syncFileActions.saveFile(projectFile.directory + projectFile.filename + '.cdsp', JSON.stringify(config));
-        setProjectFileSaveState(true);
+        const stringifiedConfig = JSON.stringify(config);
+        await asyncFileActions.saveFile(projectFile.directory + projectFile.filename + '.cdsp', stringifiedConfig).catch();
+        updateProjectFile({
+            isSaved: true,
+            savedFileHash: md5(stringifiedConfig),
+        } as ProjectFileModel);
         return path;
     };
 };
@@ -73,9 +93,10 @@ export const useLoadProject = () => {
 
         const hasSaveLocation = !path.match(/.*\.nsp.cdsp/);
         let newConfig: ConfigModel = {} as ConfigModel;
-
+        let newConfigMD5: number = 0;
         await syncFileActions.readFile(path).then((data: any) => {
             newConfig = JSON.parse(data);
+            newConfigMD5 = md5(data);
             console.log('Read config');
             console.log('Loaded config');
         });
@@ -103,6 +124,7 @@ export const useLoadProject = () => {
             filename: filename,
             isSaved: hasSaveLocation,
             hasSaveLocation: hasSaveLocation,
+            savedFileHash: newConfigMD5,
         });
 
         // TODO: rozdzielic do innej funkcji
