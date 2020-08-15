@@ -6,7 +6,7 @@ import { useFileManagerActions } from 'reduxState/actions';
 import { Button } from '@material-ui/core';
 import { useConfigActions } from 'reduxState/actions';
 
-export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = ({}) => {
+export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = ({ closeDialog }) => {
     const classes = useStyles();
     const { addTests } = useConfigActions();
     const { setFileManager } = useFileManagerActions();
@@ -56,15 +56,16 @@ export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = (
                 </div>
                 <div className={classes.submitButton}>
                     <Button
-                        onClick={() =>
+                        onClick={() => {
                             addTests(
                                 state.mergedFiles.map((file) => ({
                                     name: file.inputPath.path,
                                     inputPath: file.inputPath.path,
                                     outputPath: file.outputPath ? file.outputPath.path : null,
                                 }))
-                            )
-                        }
+                            );
+                            closeDialog();
+                        }}
                         fullWidth
                         disabled={!state.mergedFiles.length}
                     >{`Add ${state.mergedFiles.length} tasks`}</Button>

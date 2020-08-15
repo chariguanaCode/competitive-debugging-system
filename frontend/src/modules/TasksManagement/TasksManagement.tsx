@@ -19,7 +19,11 @@ export const TasksManagement: React.FunctionComponent<TasksManagementPropsModel>
                         setState({ tasksAdditionDialogVisibility: false });
                     }}
                 >
-                    <TasksAddition />
+                    <TasksAddition
+                        closeDialog={() => {
+                            setState({ tasksAdditionDialogVisibility: false });
+                        }}
+                    />
                 </Dialog>
                 <Button onClick={() => setState({ tasksAdditionDialogVisibility: true })}> Add tasks </Button>
             </div>
