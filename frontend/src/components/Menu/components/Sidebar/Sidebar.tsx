@@ -1,37 +1,34 @@
-import React from 'react';
+import React, { memo } from 'react';
 import useStyles from './Sidebar.css';
-import { useTheme } from '@material-ui/core/styles';
 import { MenuList, MenuItem } from '@material-ui/core';
-import SectorsButtons, { Sector } from '../SectorsButtons';
-import { SidebarProps } from './Types';
-import {useProjectFile} from 'reduxState/selectors'
+import { useTheme } from '@material-ui/core/styles';
+import { SidebarPropsModel } from './Sidebar.d';
 
-export const Sidebar: React.FunctionComponent<SidebarProps> = ({ isAnyProjectOpen, selectSector, selectedSector }) => {
+export const Sidebar: React.FunctionComponent<SidebarPropsModel> = memo(({ buttons, selectSector, selectedSector }) => {
     const classes = useStyles();
     const theme = useTheme();
-    const projectFile = useProjectFile();
     return (
         <>
             <div className={classes.Sidebar}>
                 <MenuList className={classes.SectorsButtonsList}>
-                    {SectorsButtons.map((obj, index) => {
+                    {buttons.map((obj, index) => {
                         return (
                             <MenuItem
-                                key={`MainMenuOption-${index}`}
-                                disabled={obj.disabled || (obj.doesNeedOpenProject && !projectFile) || (obj.doesNeedSaveLocation && !projectFile?.hasSaveLocation)}
+                                key={`MenuOption-${index}`}
+                                disabled={obj.disabled}
                                 onClick={() => {
-                                    selectSector(obj.sectorId);
+                                    selectSector(obj.key);
                                 }}
                                 className={classes.OptionItem}
                                 style={{
                                     backgroundColor:
-                                        obj.sectorId === selectedSector
-                                            ? theme.palette.mainMenu.selectedButtonBackgroundColor
+                                        obj.key === selectedSector
+                                            ? theme.palette.Menu.selectedButtonBackgroundColor
                                             : 'transparent',
                                 }}
                             >
                                 {React.cloneElement(obj.icon, {
-                                    style: { color: theme.palette.mainMenu.iconColorEnabled },
+                                    style: { color: theme.palette.Menu.iconColorEnabled },
                                 })}
                                 <span style={{ paddingLeft: '10px' }}>{obj.name}</span>
                             </MenuItem>
@@ -41,6 +38,6 @@ export const Sidebar: React.FunctionComponent<SidebarProps> = ({ isAnyProjectOpe
             </div>
         </>
     );
-};
+});
 
 export default Sidebar;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SectorButton } from './SectorButtons.d';
+import { MainMenuSectorButton } from './SectorButtons.d';
 import {
     AllInbox as AllInboxIcon,
     FolderOpen as FolderOpenIcon,
@@ -12,66 +12,66 @@ import {
 } from '@material-ui/icons';
 
 export enum Sector {
-    CreateProject,
-    OpenProject,
-    RecentProjects,
-    SaveAs,
-    Save,
-    Information,
-    Export,
-    Print,
+    CreateProject = "CreateProject",
+    OpenProject = "OpenProject",
+    RecentProjects = "RecentProjects",
+    SaveAs = "SaveAs",
+    Save = "Save",
+    Information = "Information",
+    Export = "Export",
+    Print = "Print",
 }
 
-const SectorsButtons: Array<SectorButton> = [
+const SectorsButtons: Array<MainMenuSectorButton> = [
     {
         name: 'Create Project',
         icon: <NoteIcon style={{ color: '#64b5f6' }} />,
         doesNeedOpenProject: false,
-        sectorId: Sector.CreateProject,
+        key: Sector.CreateProject,
     },
     {
         name: 'Open Project',
         icon: <FolderOpenIcon style={{ color: '#ffeb3b' }} />,
         doesNeedOpenProject: false,
-        sectorId: Sector.OpenProject,
+        key: Sector.OpenProject,
     },
     {
         name: 'Recent Projects',
         icon: <AllInboxIcon style={{ color: 'blue' }} />,
         doesNeedOpenProject: false,
-        sectorId: Sector.RecentProjects,
+        key: Sector[Sector.RecentProjects],
     },
     {
         name: 'Save As',
         icon: <SaveAltIcon style={{ color: 'blue' }} />,
         doesNeedOpenProject: true,
-        sectorId: Sector.SaveAs,
+        key: Sector.SaveAs,
     },
     {
         name: 'Save',
         icon: <SaveIcon style={{ color: 'blue' }} />,
         doesNeedOpenProject: true,
-        sectorId: Sector.Save,
+        key: Sector.Save,
         doesNeedSaveLocation: true,
     },
     {
         name: 'Information',
         icon: <InfoIcon style={{ color: 'blue' }} />,
         doesNeedOpenProject: true,
-        sectorId: Sector.Information,
+        key: Sector.Information,
     },
     {
         name: 'Export',
         icon: <ImportExportIcon style={{ color: 'blue' }} />,
         doesNeedOpenProject: true,
-        sectorId: Sector.Export,
+        key: Sector.Export,
         disabled: true,
     },
     {
         name: 'Print',
         icon: <PrintIcon style={{ color: 'blue' }} />,
         doesNeedOpenProject: true,
-        sectorId: Sector.Print,
+        key: Sector.Print,
         disabled: true,
     },
 ];
