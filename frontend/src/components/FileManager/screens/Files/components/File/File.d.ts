@@ -7,4 +7,5 @@ export interface FilePropsModel {
     onFileClick: (file: FileModel, e: any, fileIsAlreadyClicked = false, id: number) => any;
     fileIndex: number;
     onKeyDownOnFile: (file: FileModel, e: any, fileIsAlreadyClicked = false, id: number) => any;
+    zoomFactor: number;
 }

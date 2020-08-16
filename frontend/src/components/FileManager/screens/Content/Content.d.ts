@@ -9,6 +9,7 @@ export interface ContentPropsModel {
     maxNumberOfSelectedFiles: FileManagerPropsModel['maxNumberOfSelectedFiles'];
     currentPath: FileManagerStateModel['currentPath'];
     searchText: string;
+    zoomFactor: FileManagerStateModel['zoomFactor'];
 }
 
 export interface ContentStateModel {}

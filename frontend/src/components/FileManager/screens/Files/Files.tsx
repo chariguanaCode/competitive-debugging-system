@@ -15,6 +15,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
     files,
     acceptableFilesExtensions,
     searchText,
+    zoomFactor,
 }) => {
     const classes = useStyles();
     const [hiddenSearchResultIndex, setHiddenSearchResultIndex] = useState<number>(0);
@@ -40,7 +41,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
     };
 
     const handleSelectedFiles = (selectedFilesToSet: typeof selectedFiles, idsToRerender: Array<number>, e?: any) => {
-        if (selectedFilesToSet.size > maxNumberOfSelectedFiles) {
+        if (selectedFilesToSet.size > (maxNumberOfSelectedFiles || 0)) {
             //setErrorSnackbarMessage(`Maximum number of selected files is ${maxNumberOfSelectedFiles}`);
             return;
         }
@@ -106,6 +107,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
             <div onKeyDown={onKeyDownOnFiles} key={key} style={style}>
                 <File
                     // shouldBeFocused={shouldBeFocused}
+                    zoomFactor={zoomFactor}
                     isSelected={isSelected}
                     isAcceptable={isAcceptable}
                     file={file}
@@ -127,8 +129,9 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
                             width={width}
                             height={height}
                             rowCount={filesFilteredBySearch.length}
-                            rowHeight={50}
+                            rowHeight={40 * zoomFactor} //TODO: set default height to lower? (was 50)
                             scrollToIndex={hiddenSearchResultIndex}
+                            overscanRowCount={0}
                         ></List>
                     )}
                 </AutoSizer>

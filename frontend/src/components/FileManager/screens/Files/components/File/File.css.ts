@@ -12,11 +12,9 @@ const useStyles = makeStyles((theme) => ({
         margin: '2px',
         height: '100%',
         width: '100%',
-        fontSize: '13px', //(props: any) => props.fileTextSize, //13px
         maxWidth: (props: any) => props.fileButtonWidth, //"120px",
         border: 'none',
         outline: 'none',
-        padding: '10px 10px',
         textDecoration: 'none',
         display: 'inline-block',
         cursor: 'pointer',
@@ -35,19 +33,21 @@ const useStyles = makeStyles((theme) => ({
         alignContent: 'center',
         alignItems: 'center',
     },
-    fileIconContainer: {
+    fileIconContainer: (props: any) => ({
         display: 'flex',
         alignContent: 'center',
         justifyContent: 'center',
         marginRight: '4px',
-    },
-    filenameContainer: {
-        //fontSize: displaySettingsStyle.fileTextSize, TODO: dynamic font size
+        width: props.fileIconWidth, 
+        height: props.fileIconHeight,
+    }),
+    filenameContainer: (props: any) => ({
+        fontSize: props.fontSize, //(props) => `calc(13px * ${props.zoomFactor ? props.zoomFactor : 1})`, //displaySettingsStyle.fileTextSize, TODO: dynamic font size
         wordBreak: 'break-all',
         display: 'flex',
         alignContent: 'center',
         justifyContent: 'center',
-    },
+    }),
     fileButtonContainer: {
         display: 'inline',
         position: 'relative',
