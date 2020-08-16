@@ -30,6 +30,7 @@ export interface FileManagerStateModel {
     sortMethodNumber: number;
     areSettingsOpen: boolean;
     searchText: string;
+    zoomFactor: number;
     //filesDisplaySize: number;
 }
 

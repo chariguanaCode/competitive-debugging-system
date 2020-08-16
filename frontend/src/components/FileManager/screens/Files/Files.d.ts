@@ -8,6 +8,7 @@ export interface FilesPropsModel {
     setSelectedFiles: (arg1: FileManagerStateModel['selectedFiles']) => any;
     maxNumberOfSelectedFiles: FileManagerPropsModel['maxNumberOfSelectedFiles'];
     searchText: FileManagerStateModel['searchText'];
+    zoomFactor: FileManagerStateModel['zoomFactor'];
 }
 
 export interface HiddenSearchRefModel {

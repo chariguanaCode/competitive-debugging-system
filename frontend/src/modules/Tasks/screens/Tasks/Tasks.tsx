@@ -149,7 +149,7 @@ const Tasks = ({ node }: Props) => {
             </TableHead>
             <TableBody>
                 {taskStates.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map(({ state, executionTime }, id) => (
-                    <TableRow>
+                    <TableRow key={`Tasks-TableRow-${id}`}>
                         <TableCell
                             style={{
                                 backgroundColor: theme.palette.taskState[state],

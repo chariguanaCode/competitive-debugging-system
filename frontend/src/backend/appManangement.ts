@@ -11,12 +11,17 @@ export const getAppConfig = async (): Promise<CdsConfigModel> => {
     const appDataDirectory = paths.cdsData;
     const notSavedProjectsDirectory = paths.notSavedProjects;
     const configFilePath = paths.configFile;
-    await asyncFileActions.createDirectory(appDataDirectory).catch(err => {});
-    await asyncFileActions.createDirectory(notSavedProjectsDirectory).catch(err => {});
+    await asyncFileActions.createDirectory(appDataDirectory).catch((err) => {});
+    await asyncFileActions.createDirectory(notSavedProjectsDirectory).catch((err) => {});
     if (!(await asyncFileActions.fileExist(configFilePath).catch())) {
         await asyncFileActions.saveFile(configFilePath, JSON.stringify(getDefaultCdsConfig()));
     }
-    return JSON.parse((await asyncFileActions.readFile(configFilePath).catch()) as string) as CdsConfigModel;
+    let readConfig: string = '';
+    while (readConfig === '')
+        readConfig = (await asyncFileActions.readFile(configFilePath).catch((err) => console.log(err))) as string;
+    //TEMPORARY BYPASS
+    console.log(readConfig); // TODO: CRITICAL ERROR, SOMETIMES "" DONT NOW WHY
+    return JSON.parse(readConfig) as CdsConfigModel;
 }; //TODO: add update of CDS file
 
 export const useAppSetup = () => {
@@ -26,7 +31,7 @@ export const useAppSetup = () => {
         const cdsConfig = await getAppConfig();
         setCdsConfig(cdsConfig);
         const projectsHistory = cdsConfig.projects.projectsHistory;
-        if (projectsHistory.length) loadProject(projectsHistory[0]);
+        if (projectsHistory.length) loadProject(projectsHistory[projectsHistory.length - 1]);
     };
 };
 
@@ -34,5 +39,5 @@ export const useSaveCdsConfigToFile = () => {
     const cdsConfig = useCdsConfig();
     return async () => {
         await asyncFileActions.saveFile(remote.getGlobal('paths').configFile, JSON.stringify(cdsConfig));
-    }
+    };
 };

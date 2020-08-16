@@ -13,8 +13,14 @@ export const File: React.FunctionComponent<FilePropsModel> = ({
     onFileClick,
     fileIndex,
     onKeyDownOnFile,
+    zoomFactor,
 }) => {
-    const classes = useStyles(/*displaySettingsStyle*/);
+    const displaySettings = {
+        fontSize: `${13*zoomFactor}px`,
+        fileIconWidth: `${24*zoomFactor}px`,
+        fileIconHeight: `${24*zoomFactor}px`,
+    };
+    const classes = useStyles(displaySettings /*displaySettingsStyle*/);
     const [isMouseOverFile, setMouseIsOverFile] = useState<boolean>(false);
     // TODO: maybe create state in parent
     // TODO: close button

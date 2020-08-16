@@ -15,6 +15,7 @@ export const fileExist = (filePath: string) =>
 export const saveFile = (filePath: string, content: any) =>
     new Promise((resolve, reject) => {
         fs.writeFile(filePath, content, (err: any) => {
+            console.log('W', filePath, content, err);
             if (err) {
                 return reject(err);
             }
@@ -24,7 +25,14 @@ export const saveFile = (filePath: string, content: any) =>
 
 export const readFile = (filePath: string) => {
     return new Promise((resolve, reject) => {
-        fs.readFile(filePath, 'utf8', (err: any, data: string) => {
+        fs.readFile(filePath, 'utf-8', (err: any, data: string) => {
+            console.log({
+                R: filePath,
+                data: data,
+                err: err,
+                dataStr: data.toString(),
+            });
+
             if (err) reject(err);
             resolve(data);
         });

@@ -87,6 +87,11 @@ const getDefaultLayouts = () => {
             },
             borders: [],
         },
+        empty: {
+            global,
+            layout: {},
+            borders: [],
+        },
     };
 };
 

@@ -5,7 +5,7 @@ import { FileManagerPropsModel, FileManagerStateModel, FileModel, Path } from '.
 import { Header, Footer, Content } from './screens';
 import { loadFilesOnDirectory } from 'backend/filesHandlingFunctions';
 import { comparatorForFilesSort } from './utils/tools';
-import { Button, Dialog, DialogContent } from '@material-ui/core';
+import { Button, Dialog, DialogContent, Slider } from '@material-ui/core';
 import { parsePath } from 'utils/tools';
 
 export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
@@ -17,7 +17,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     selectFiles = () => {},
     directoryOnStart = '/',
     closeFileManager = () => {},
-    withFilesStats = false
+    withFilesStats = false,
     //config,
 }) => {
     // TODO: add loading circular to file manager
@@ -33,6 +33,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
         sortMethodNumber: 0,
         areSettingsOpen: false,
         searchText: '',
+        zoomFactor: 1, //min: 0.5 max 3 step 0.1
     });
     // TODO: zoom
 
@@ -110,6 +111,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                             maxNumberOfSelectedFiles={maxNumberOfSelectedFiles}
                             loadDirectory={loadDirectory}
                             currentPath={state.currentPath}
+                            zoomFactor={state.zoomFactor}
                         />
                     </div>
                     <div className={classes.FooterContainer}>
@@ -126,5 +128,4 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
         </>
     );
 };
-// <Layout model={model} factory={factory} onModelChange={setModel} ref={layout} />
 export default FileManager;

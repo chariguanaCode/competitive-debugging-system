@@ -15,10 +15,12 @@ export interface TestModel {
 }
 
 export interface watchIdActionsModel {
-    [key: string]: [{
-        target: string,
-        action: string,
-    }]
+    [key: string]: [
+        {
+            target: string;
+            action: string;
+        }
+    ];
 }
 
 type LayoutElement = any;
@@ -50,12 +52,13 @@ export interface ConfigModel {
             };
         };
     };
-    tests: Array<TestModel>; 
+    tests: Array<TestModel>;
     watchesIdsActions: watchIdActionsModel;
     layouts: {
         debugging: LayoutModel;
         outputs: LayoutModel;
         tests: LayoutModel;
+        empty: LayoutModel;
     };
-    layoutSelection: 'debugging' | 'outputs' | 'tests';
+    layoutSelection: 'debugging' | 'outputs' | 'tests' | 'empty'; // TODO: just string in future
 }

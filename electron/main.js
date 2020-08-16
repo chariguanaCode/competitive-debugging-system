@@ -4,7 +4,14 @@ const url = require('url');
 const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
+
 const createWindow = async () => {
+    await session.defaultSession
+        .loadExtension(
+            'C:\\Users\\LegwanXDL\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\4.8.2_0'
+        )
+        .then((res) => console.log(res))
+        .catch((err) => console.log(err));
     const startUrl =
         process.env.ELECTRON_START_URL ||
         url.format({
@@ -30,11 +37,8 @@ const createWindow = async () => {
     //mainWindow.webContents.openDevTools()
 
     //mainWindow.setMenu(null)
-    /*
-    await session.defaultSession.loadExtension(
-        '/home/charodziej/snap/chromium/common/chromium/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.8.2_0/'
-    );
 
+    /*
     await session.defaultSession.loadExtension(
         '/home/charodziej/snap/chromium/common/chromium/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0/'
     );
@@ -56,7 +60,7 @@ app.allowRendererProcessReuse = false; //https://github.com/electron/electron/is
 global.paths = {
     cdsData: `${app.getPath('userData')}/CDSData`,
     configFile: `${app.getPath('userData')}/CDSData/Config.cds`,
-    notSavedProjects: `${app.getPath('userData')}/CDSData/NotSavedProjects`
+    notSavedProjects: `${app.getPath('userData')}/CDSData/NotSavedProjects`,
 };
 
 autoUpdater.on('update-available', async (info) => {

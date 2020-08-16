@@ -76,6 +76,7 @@ export const HeaderBar: React.FunctionComponent = () => {
                     { icon: <ViewList color="inherit" />, label: 'Tests', layout: 'tests' as 'tests' },
                 ].map((element) => (
                     <MenuItem
+                        key={`SelectView-MenuItem-${element.label}`}
                         selected={element.layout === layoutSelection}
                         onClick={() => {
                             setMenuAnchor(null);
