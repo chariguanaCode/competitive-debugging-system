@@ -2,9 +2,15 @@ import useCompilationAndExecution from './cppCompilationAndExecution';
 import * as fileChangeTracking from './fileChangeTracking';
 import * as syncFileActions from './syncFileActions';
 import * as asyncFileActions from './asyncFileActions';
-import { ConfigModel, AllTasksModel, Task, TaskState, ProjectFileModel } from 'reduxState/models';
+import { ConfigModel, AllTasksModel, Task, TaskState, ProjectFileModel, TrackedObjectsModel } from 'reduxState/models';
 import { useConfig, useAllTasksState, useCdsConfig, useProjectFile } from 'reduxState/selectors';
-import { useConfigActions, useTaskStatesActions, useProjectFileActions, useCdsConfigActions } from 'reduxState/actions';
+import {
+    useConfigActions,
+    useTaskStatesActions,
+    useProjectFileActions,
+    useCdsConfigActions,
+    useTrackedObjectsActions,
+} from 'reduxState/actions';
 import { getTimeMark } from 'utils/tools';
 import { getDefaultConfig } from 'data';
 const remote = window.require('electron').remote;
@@ -72,6 +78,8 @@ export const useLoadProject = () => {
     const { reloadTasks } = useTaskStatesActions();
     const { setProjectFile } = useProjectFileActions();
     const { pushProjectToProjectsHistory } = useCdsConfigActions();
+    const { setAllTrackedObjects } = useTrackedObjectsActions();
+
     return async (sourceFilePath: string) => {
         let path = syncFileActions.parsePath(sourceFilePath);
         path = path.slice(0, path.length - 1);
@@ -107,17 +115,7 @@ export const useLoadProject = () => {
         const directory = dividedPath.slice(0, -1).join('/') + '/';
         if (hasSaveLocation) pushProjectToProjectsHistory(directory + filename + '.cdsp');
         console.log(newConfig, dividedPath);
-        /*
-        const tests = {} as { [key: string]: { filePath: string } };
-        for (let i = 0; i < 100; i++) {
-            for (const key in newConfig.tests) {
-                if (newConfig.tests.hasOwnProperty(key)) {
-                    tests[`${key} ${i}`] = newConfig.tests[key];
-                }
-            }
-        }
-        newConfig.tests = tests;
-        */
+
         setConfig(newConfig);
         setProjectFile({
             path: directory + filename + '.temp.cdsp',
@@ -128,7 +126,21 @@ export const useLoadProject = () => {
             savedFileHash: newConfigMD5,
         });
 
+        const newTrackedObjects = {} as TrackedObjectsModel;
+        for (const { name, type } of newConfig.trackedObjects) {
+            switch (type) {
+                case 'array_1d':
+                    newTrackedObjects[name] = { type, value: [] as string[], color: [] as string[] };
+                    break;
+                case 'array_2d':
+                    newTrackedObjects[name] = { type, value: [[]] as string[][], color: [[]] as string[][] };
+                    break;
+            }
+        }
+        setAllTrackedObjects(newTrackedObjects);
+
         // TODO: rozdzielic do innej funkcji
+        taskStates.current = [];
         for (const key in newConfig.tests) {
             if (newConfig.tests.hasOwnProperty(key)) {
                 taskStates.current[key] = {

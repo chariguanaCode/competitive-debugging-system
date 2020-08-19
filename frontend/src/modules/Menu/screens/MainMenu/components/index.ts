@@ -1,2 +1,2 @@
-export { default as Content } from './Content';
-export { default as Sidebar } from './Sidebar';
+export * from './Contents';
+export { default as Sidebar } from './SectorsButtons';

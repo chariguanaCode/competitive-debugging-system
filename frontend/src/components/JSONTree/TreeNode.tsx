@@ -54,10 +54,10 @@ export default React.memo(function TreeNode({ node, style, onChange }: Props): R
         return false;
     };
 
-    const selected = useWatchHistoryLocation() === data.id;
+    const selected = useWatchHistoryLocation() === data.call_id;
     const selectable = data.line !== undefined;
     const selectTracking = () => {
-        setWatchHistoryLocation(data.id);
+        setWatchHistoryLocation(data.call_id);
     };
 
     const { line, name } = data;

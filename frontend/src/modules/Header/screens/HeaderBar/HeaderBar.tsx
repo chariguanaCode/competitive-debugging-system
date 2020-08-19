@@ -39,7 +39,6 @@ export const HeaderBar: React.FunctionComponent = () => {
                         startIcon={<ViewQuilt color="inherit" />}
                         onClick={(event) => {
                             setMenuAnchor(event.currentTarget);
-                            console.log(event.currentTarget);
                         }}
                     >
                         View

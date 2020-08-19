@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useTheme } from '@material-ui/core/styles';
 import useStyles from './MainMenu.css';
 import { MainMenuProps } from './Types';
-import { Sidebar, Content } from './components';
+//import { Sidebar, Content } from './components';
 import { Sector } from './components/SectorsButtons';
 import { useFileManagerActions } from 'reduxState/actions';
 import { Menu } from 'components';

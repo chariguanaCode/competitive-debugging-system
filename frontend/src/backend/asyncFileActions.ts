@@ -15,7 +15,7 @@ export const fileExist = (filePath: string) =>
 export const saveFile = (filePath: string, content: any) =>
     new Promise((resolve, reject) => {
         fs.writeFile(filePath, content, (err: any) => {
-            console.log('W', filePath, content, err);
+            //console.log('W', filePath, content, err);
             if (err) {
                 return reject(err);
             }

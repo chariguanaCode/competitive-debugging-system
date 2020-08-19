@@ -13,7 +13,7 @@ import {
     MenuItem,
 } from '@material-ui/core';
 import { useAddTrackedObjectDialog } from 'reduxState/selectors';
-import { useAddTrackedObjectDialogActions, useTrackedObjectsActions } from 'reduxState/actions';
+import { useAddTrackedObjectDialogActions, useTrackedObjectsActions, useConfigActions } from 'reduxState/actions';
 import { TrackedObject } from 'reduxState/models';
 
 export const AddTrackedObjectDialog = () => {
@@ -25,6 +25,8 @@ export const AddTrackedObjectDialog = () => {
     const [name, setName] = useState('');
 
     const { setSingleTrackedObject } = useTrackedObjectsActions();
+
+    const { addTrackedObject } = useConfigActions();
 
     return (
         <Dialog open={open} onClose={closeAddTrackedObjectDialog} fullWidth>
@@ -59,6 +61,7 @@ export const AddTrackedObjectDialog = () => {
                                 setSingleTrackedObject(name, { type, value: [[]] as string[][], color: [[]] as string[][] });
                                 break;
                         }
+                        addTrackedObject({ name, type });
                     }}
                     color="primary"
                     disabled={!type.length || !name.length}

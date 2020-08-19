@@ -2,7 +2,7 @@ import { useDispatch } from 'react-redux';
 import { useMemo } from 'react';
 import { bindActionCreators } from 'redux';
 import { createAction, Action } from 'redux-actions';
-import { ConfigModel, ProjectInfoModel, TestModel, LayoutModel } from '../models';
+import { ConfigModel, ProjectInfoModel, TestModel, LayoutModel, TrackedObject } from '../models';
 
 export enum ConfigActions {
     SET_CONFIG = 'SET_CONFIG',
@@ -10,6 +10,7 @@ export enum ConfigActions {
     ADD_TESTS = 'ADD_TESTS',
     SET_LAYOUT = 'SET_LAYOUT',
     SELECT_LAYOUT = 'SELECT_LAYOUT',
+    ADD_TRACKED_OBJECT = 'ADD_TRACKED_OBJECT',
 }
 
 const actions = {
@@ -18,6 +19,7 @@ const actions = {
     addTests: createAction<Array<TestModel>>(ConfigActions.ADD_TESTS),
     setLayout: createAction<{ key: keyof ConfigModel['layouts']; value: LayoutModel }>(ConfigActions.SET_LAYOUT),
     selectLayout: createAction<keyof ConfigModel['layouts']>(ConfigActions.SELECT_LAYOUT),
+    addTrackedObject: createAction<{ name: string; type: TrackedObject['type'] }>(ConfigActions.ADD_TRACKED_OBJECT),
 };
 
 export type ConfigActionPayload = typeof actions[keyof typeof actions] extends (...args: any[]) => Action<infer R> ? R : never;
