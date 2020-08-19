@@ -7,9 +7,7 @@ const fs = window.require('fs');
 export const compileCpp = async (filename: string) => {
     try {
         //await execFile('g++', ['-std=c++17', '-O3', '-static', '-o./cpp/test.bin', `${filename}`]);
-        await execFile('g++', ['-std=c++17', '-static', '-o./cpp/test.bin',`${filename}`]).catch((err: any) =>
-            console.log(err)
-        );
+        await execFile('g++', ['-std=c++17', '-static', '-o./cpp/test.bin', `${filename}`]);
         return './cpp/test.bin';
     } catch (err) {
         throw err.stderr;

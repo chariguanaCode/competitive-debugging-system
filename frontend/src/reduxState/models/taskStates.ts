@@ -8,6 +8,7 @@ export type Watch = {
 } & ConvertResult;
 
 export interface Watchblock {
+    id: string; //to be removed
     call_id: string;
     children: Array<Watchblock | Watch>;
     type: 'watchblock';

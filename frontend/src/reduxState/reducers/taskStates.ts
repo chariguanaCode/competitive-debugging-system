@@ -69,12 +69,14 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
             stdoutFileSize: 0,
             //watchblocks: { children: [] as Array<Watchblock | Watch> } as Watchblock,
             watchblocks: {
+                id: '0',
                 call_id: '0',
                 type: 'watchblock',
                 line: 0,
                 name: 'root',
                 children: [
                     {
+                        id: '0',
                         call_id: '0',
                         type: 'number',
                         name: 'none',
@@ -84,18 +86,20 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
                         config: '',
                     },
                     {
+                        id: '1',
                         call_id: '1',
                         type: 'array',
                         name: 'myArray',
                         line: 10,
                         data_type: '',
                         children: [
-                            { call_id: '1.0', name: '0', type: 'number', value: 10 },
-                            { call_id: '1.1', name: '1', type: 'number', value: 10 },
-                            { call_id: '1.2', name: '2', type: 'number', value: 10 },
-                            { call_id: '1.3', name: '3', type: 'number', value: 10 },
-                            { call_id: '1.4', name: '4', type: 'number', value: 10 },
+                            { id: '1.0', call_id: '1.0', name: '0', type: 'number', value: 10 },
+                            { id: '1.1', call_id: '1.1', name: '1', type: 'number', value: 10 },
+                            { id: '1.2', call_id: '1.2', name: '2', type: 'number', value: 10 },
+                            { id: '1.3', call_id: '1.3', name: '3', type: 'number', value: 10 },
+                            { id: '1.4', call_id: '1.4', name: '4', type: 'number', value: 10 },
                             {
+                                id: '1.closing',
                                 call_id: '1.closing',
                                 closingType: 'array',
                                 type: 'closing',
@@ -105,6 +109,7 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
                         config: '',
                     },
                     {
+                        id: '2',
                         call_id: '2',
                         type: 'number',
                         name: 'a',
@@ -114,6 +119,7 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
                         config: '',
                     },
                     {
+                        id: '2',
                         call_id: '2',
                         type: 'number',
                         name: 'b',
@@ -123,6 +129,7 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
                         config: '',
                     },
                     {
+                        id: '3',
                         call_id: '3',
                         type: 'number',
                         name: '2d array',
@@ -132,6 +139,7 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
                         config: '',
                     },
                     {
+                        id: '4',
                         call_id: '4',
                         type: 'number',
                         name: 'changeValue 4',
@@ -141,6 +149,7 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
                         config: '',
                     },
                     {
+                        id: '5',
                         call_id: '5',
                         type: 'number',
                         name: 'setColor',
@@ -150,6 +159,7 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
                         config: '',
                     },
                     {
+                        id: '6',
                         call_id: '6',
                         type: 'number',
                         name: 'setColorRow',
@@ -159,6 +169,7 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
                         config: '',
                     },
                     {
+                        id: '7',
                         call_id: '7',
                         type: 'number',
                         name: 'setCell',
@@ -170,6 +181,7 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
                     ...Array(2000)
                         .fill(false)
                         .map((val, index) => ({
+                            id: (index + 10).toString(),
                             call_id: (index + 10).toString(),
                             type: 'number' as 'number',
                             name: `test ${index}`,

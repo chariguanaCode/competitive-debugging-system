@@ -1,3 +1,5 @@
+import { TrackedObject } from './trackedObjects';
+
 export interface ProjectInfoModel {
     files: Array<string>;
     name: string;
@@ -61,4 +63,8 @@ export interface ConfigModel {
         empty: LayoutModel;
     };
     layoutSelection: 'debugging' | 'outputs' | 'tests' | 'empty'; // TODO: just string in future
+    trackedObjects: Array<{
+        name: string;
+        type: TrackedObject['type'];
+    }>;
 }

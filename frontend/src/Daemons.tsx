@@ -25,12 +25,12 @@ export default function Daemons(): ReactElement {
     const cdsConfig = useCdsConfig();
     const saveCdsConfigToFile = useSaveCdsConfigToFile();
     useEffect(() => {
-        if(Object.keys(cdsConfig).length) saveCdsConfigToFile();
+        if (Object.keys(cdsConfig).length) saveCdsConfigToFile();
     }, [cdsConfig]);
     const config = useConfig();
-    const saveTemporaryProjectFile = useSaveTemporaryProjectFile()
+    const saveTemporaryProjectFile = useSaveTemporaryProjectFile();
     useEffect(() => {
-        if(Object.keys(config).length) saveTemporaryProjectFile();
+        if (Object.keys(config).length) saveTemporaryProjectFile();
     }, [config]);
 
     const taskStates = useAllTasksState();
@@ -87,8 +87,9 @@ export default function Daemons(): ReactElement {
         let startLocationNumber = parseInt(previousHistoryLocation.current);
         let endLocationNumber = parseInt(watchHistoryLocation);
         if (startLocationNumber < endLocationNumber) {
-            while (startLocationNumber < endLocationNumber && !actionsHistory[startLocationNumber.toString()])
-                startLocationNumber++;
+            if (startLocationNumber !== -1)
+                while (startLocationNumber < endLocationNumber && !actionsHistory[startLocationNumber.toString()])
+                    startLocationNumber++;
             while (startLocationNumber < endLocationNumber && !actionsHistory[endLocationNumber.toString()])
                 endLocationNumber--;
         } else {
@@ -133,7 +134,7 @@ export default function Daemons(): ReactElement {
             for (let i = 0; i < actionsHistory[loc].actions.length && notFinished > 0; i++) {
                 const currAction = actionsHistory[loc].actions[i];
                 let shouldSkip = false as boolean;
-                switch (currAction.type) {
+                switch (currAction.action) {
                     case OneDimensionArrayActionType.set_cell:
                     case TwoDimensionArrayActionType.set_row:
                     case TwoDimensionArrayActionType.set_cell:
@@ -148,7 +149,7 @@ export default function Daemons(): ReactElement {
                 if (shouldSkip) continue;
 
                 seekingState[currAction.targetObject].actionStack.push(currAction);
-                switch (currAction.type) {
+                switch (currAction.action) {
                     case OneDimensionArrayActionType.set_whole:
                     case TwoDimensionArrayActionType.set_whole:
                         seekingState[currAction.targetObject].finished.value = true;
@@ -203,56 +204,64 @@ export default function Daemons(): ReactElement {
                 switch (newTrackedObjects[key].type) {
                     case 'array_1d':
                         while (seekingState[key].actionStack.length > 0) {
-                            const currAction = seekingState[key].actionStack.pop() ?? { type: 'none' };
-                            switch (currAction.type) {
+                            const currAction = seekingState[key].actionStack.pop() ?? {
+                                action: 'none',
+                                payload: '',
+                                targetObject: '',
+                            };
+                            switch (currAction.action) {
                                 case OneDimensionArrayActionType.set_whole:
-                                    newTrackedObjects[key].value = [...currAction.value];
+                                    newTrackedObjects[key].value = [...currAction.payload[0]];
                                     break;
                                 case OneDimensionArrayActionType.set_whole_color:
-                                    newTrackedObjects[key].color = [...currAction.value];
+                                    newTrackedObjects[key].color = [...currAction.payload[0]];
                                     break;
                                 case OneDimensionArrayActionType.set_cell:
-                                    newTrackedObjects[key].value[currAction.index] = currAction.value;
+                                    newTrackedObjects[key].value[currAction.payload[0]] = currAction.payload[1];
                                     break;
                                 case OneDimensionArrayActionType.set_cell_color:
-                                    newTrackedObjects[key].color[currAction.index] = currAction.value;
+                                    newTrackedObjects[key].color[currAction.payload[0]] = currAction.payload[1];
                                     break;
                             }
                         }
                         break;
                     case 'array_2d':
                         while (seekingState[key].actionStack.length > 0) {
-                            const currAction = seekingState[key].actionStack.pop() ?? { type: 'none' };
-                            switch (currAction.type) {
+                            const currAction = seekingState[key].actionStack.pop() ?? {
+                                action: 'none',
+                                payload: '',
+                                targetObject: '',
+                            };
+                            switch (currAction.action) {
                                 case TwoDimensionArrayActionType.set_whole:
-                                    for (const i in currAction.value)
-                                        newTrackedObjects[key].value[i] = [...currAction.value[i]];
+                                    for (const i in currAction.payload[0] as Array<string>)
+                                        newTrackedObjects[key].value[i] = [...currAction.payload[0][i]];
                                     break;
                                 case TwoDimensionArrayActionType.set_whole_color:
-                                    for (const i in currAction.value)
-                                        newTrackedObjects[key].color[i] = [...currAction.value[i]];
+                                    for (const i in currAction.payload[0] as Array<string>)
+                                        newTrackedObjects[key].color[i] = [...currAction.payload[0][i]];
                                     break;
                                 case TwoDimensionArrayActionType.set_row:
-                                    newTrackedObjects[key].value[currAction.index] = [...currAction.value];
+                                    newTrackedObjects[key].value[currAction.payload[0]] = [...currAction.payload[1]];
                                     break;
                                 case TwoDimensionArrayActionType.set_row_color:
-                                    newTrackedObjects[key].color[currAction.index] = [...currAction.value];
+                                    newTrackedObjects[key].color[currAction.payload[0]] = [...currAction.payload[1]];
                                     break;
                                 case TwoDimensionArrayActionType.set_cell:
-                                    newTrackedObjects[key].value[currAction.firstIndex] =
-                                        newTrackedObjects[key].value[currAction.firstIndex] || [];
+                                    newTrackedObjects[key].value[currAction.payload[0]] =
+                                        newTrackedObjects[key].value[currAction.payload[0]] || [];
 
-                                    (newTrackedObjects[key].value[currAction.firstIndex] as Array<string>)[
-                                        currAction.secondIndex
-                                    ] = currAction.value;
+                                    (newTrackedObjects[key].value[currAction.payload[0]] as Array<string>)[
+                                        currAction.payload[1]
+                                    ] = currAction.payload[2];
                                     break;
                                 case TwoDimensionArrayActionType.set_cell_color:
-                                    newTrackedObjects[key].color[currAction.firstIndex] =
-                                        newTrackedObjects[key].color[currAction.firstIndex] || [];
+                                    newTrackedObjects[key].color[currAction.payload[0]] =
+                                        newTrackedObjects[key].color[currAction.payload[0]] || [];
 
-                                    (newTrackedObjects[key].color[currAction.firstIndex] as Array<string>)[
-                                        currAction.secondIndex
-                                    ] = currAction.value;
+                                    (newTrackedObjects[key].color[currAction.payload[0]] as Array<string>)[
+                                        currAction.payload[1]
+                                    ] = currAction.payload[2];
                                     break;
                             }
                         }

@@ -31,6 +31,7 @@ const getDefaultConfig = () => {
         watchesIdsActions: {},
         layouts: getDefaultLayouts(),
         layoutSelection: 'empty',
+        trackedObjects: [],
     } as ConfigModel;
 };
 

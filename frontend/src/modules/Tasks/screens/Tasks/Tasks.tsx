@@ -19,7 +19,7 @@ import { useKillTest } from 'backend/testManagement';
 import { Close, FilterList, BugReport, Assessment } from '@material-ui/icons';
 import { useAllTasksState, useConfig } from 'reduxState/selectors';
 import { TaskState } from 'reduxState/models';
-import { useTaskStatesActions } from 'reduxState/actions';
+import { useTaskStatesActions, useConfigActions } from 'reduxState/actions';
 import { TabNode } from 'flexlayout-react';
 
 interface Props {
@@ -30,6 +30,7 @@ const Tasks = ({ node }: Props) => {
     const theme = useTheme();
 
     const killTest = useKillTest();
+    const { selectLayout } = useConfigActions();
 
     const taskData = useAllTasksState().current;
     const { setCurrentTaskId } = useTaskStatesActions();
@@ -52,6 +53,12 @@ const Tasks = ({ node }: Props) => {
 
     const debugTask = (id: number) => {
         setCurrentTaskId(id);
+        selectLayout('debugging');
+    };
+
+    const viewTaskOutput = (id: number) => {
+        setCurrentTaskId(id);
+        selectLayout('outputs');
     };
 
     const handleFilterChange = (
@@ -170,6 +177,11 @@ const Tasks = ({ node }: Props) => {
                             )}
                             {state !== TaskState.Pending && state !== TaskState.Running && (
                                 <>
+                                    <Tooltip title="View output" placement="bottom" arrow>
+                                        <IconButton style={{ padding: 6 }} onClick={() => viewTaskOutput(id)}>
+                                            <Assessment fontSize="small" />
+                                        </IconButton>
+                                    </Tooltip>
                                     <Tooltip title="Debug" placement="bottom" arrow>
                                         <IconButton style={{ padding: 6 }} onClick={() => debugTask(id)}>
                                             <BugReport fontSize="small" />

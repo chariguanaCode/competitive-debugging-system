@@ -14,7 +14,7 @@ export const TrackedObject = ({ config }: Props) => {
 
     const trackedObject = useTrackedObject(config.object);
 
-    switch (trackedObject.type) {
+    switch (trackedObject?.type) {
         case 'array_1d':
             return <OneDimensionArray value={trackedObject} />;
         case 'array_2d':

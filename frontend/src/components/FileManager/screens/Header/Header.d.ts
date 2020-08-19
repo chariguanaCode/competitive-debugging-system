@@ -6,7 +6,7 @@ export interface HeaderPropsModel {
     setRootDirectory: (newRootDirectory: FileManagerStateModel['currentRootPath']) => any;
     sortMethodNumber: FileManagerStateModel['sortMethodNumber'];
     setSortMethodNumber: (number: FileManagerStateModel['sortMethodNumber']) => any;
-    dialogClose: FileManagerPropsModel['closeFileManager'];
+    dialogClose: NonNullable<FileManagerPropsModel['closeFileManager']>;
     setSearchText: (arg1: FileManagerStateModel['searchText']) => any;
 }
 

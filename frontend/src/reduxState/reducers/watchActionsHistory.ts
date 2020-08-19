@@ -43,8 +43,8 @@ export const watchActionsHistoryReducer = handleActions<WatchActionsHistoryModel
                 actions: [
                     {
                         targetObject: 'aaa',
-                        type: OneDimensionArrayActionType.set_whole,
-                        value: ['10', '10', '10', '10', '10'],
+                        action: OneDimensionArrayActionType.set_whole,
+                        payload: [['10', '10', '10', '10', '10']],
                     },
                 ],
             },
@@ -54,9 +54,8 @@ export const watchActionsHistoryReducer = handleActions<WatchActionsHistoryModel
                 actions: [
                     {
                         targetObject: 'aaa',
-                        type: OneDimensionArrayActionType.set_cell,
-                        index: 0,
-                        value: '5',
+                        action: OneDimensionArrayActionType.set_cell,
+                        payload: [0, '5'],
                     },
                 ],
             },
@@ -66,11 +65,13 @@ export const watchActionsHistoryReducer = handleActions<WatchActionsHistoryModel
                 actions: [
                     {
                         targetObject: 'bbb',
-                        type: TwoDimensionArrayActionType.set_whole,
-                        value: [
-                            ['1', '2', '3', '4', '5'],
-                            ['0', '0', '0', '0', '0', '0', '0'],
-                            ['1234', '2'],
+                        action: TwoDimensionArrayActionType.set_whole,
+                        payload: [
+                            [
+                                ['1', '2', '3', '4', '5'],
+                                ['0', '0', '0', '0', '0', '0', '0'],
+                                ['1234', '2'],
+                            ],
                         ],
                     },
                 ],
@@ -81,9 +82,8 @@ export const watchActionsHistoryReducer = handleActions<WatchActionsHistoryModel
                 actions: [
                     {
                         targetObject: 'aaa',
-                        type: OneDimensionArrayActionType.set_cell,
-                        index: 40,
-                        value: '5',
+                        action: OneDimensionArrayActionType.set_cell,
+                        payload: [40, '5'],
                     },
                 ],
             },
@@ -93,9 +93,8 @@ export const watchActionsHistoryReducer = handleActions<WatchActionsHistoryModel
                 actions: [
                     {
                         targetObject: 'aaa',
-                        type: OneDimensionArrayActionType.set_cell_color,
-                        index: 4,
-                        value: 'green',
+                        action: OneDimensionArrayActionType.set_cell_color,
+                        payload: [4, 'green'],
                     },
                 ],
             },
@@ -105,9 +104,8 @@ export const watchActionsHistoryReducer = handleActions<WatchActionsHistoryModel
                 actions: [
                     {
                         targetObject: 'bbb',
-                        type: TwoDimensionArrayActionType.set_row_color,
-                        index: 1,
-                        value: ['purple', 'blue', 'darkcyan', 'green', 'yellow', 'orange', 'red'],
+                        action: TwoDimensionArrayActionType.set_row_color,
+                        payload: [1, ['purple', 'blue', 'darkcyan', 'green', 'yellow', 'orange', 'red']],
                     },
                 ],
             },
@@ -117,17 +115,13 @@ export const watchActionsHistoryReducer = handleActions<WatchActionsHistoryModel
                 actions: [
                     {
                         targetObject: 'bbb',
-                        type: TwoDimensionArrayActionType.set_cell,
-                        firstIndex: 3,
-                        secondIndex: 0,
-                        value: 'witaaaaam',
+                        action: TwoDimensionArrayActionType.set_cell,
+                        payload: [3, 0, 'witaaaaam'],
                     },
                     {
                         targetObject: 'bbb',
-                        type: TwoDimensionArrayActionType.set_cell,
-                        firstIndex: 7,
-                        secondIndex: 10,
-                        value: 'witam',
+                        action: TwoDimensionArrayActionType.set_cell,
+                        payload: [7, 10, 'witaaaaam'],
                     },
                 ],
             },
@@ -147,10 +141,12 @@ export const watchActionsHistoryReducer = handleActions<WatchActionsHistoryModel
                             actions: [
                                 {
                                     targetObject: 'bbb',
-                                    type: TwoDimensionArrayActionType.set_cell,
-                                    firstIndex: Math.floor(Math.random() * 10),
-                                    secondIndex: Math.floor(Math.random() * 10),
-                                    value: Math.floor(Math.random() * 1000).toString(),
+                                    action: TwoDimensionArrayActionType.set_cell,
+                                    payload: [
+                                        Math.floor(Math.random() * 10),
+                                        Math.floor(Math.random() * 10),
+                                        Math.floor(Math.random() * 1000).toString(),
+                                    ],
                                 },
                             ],
                         },

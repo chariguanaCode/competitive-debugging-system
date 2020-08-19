@@ -1,6 +1,6 @@
 import { handleActions } from 'redux-actions';
 import { ConfigActions, ConfigActionPayload } from '../actions';
-import { ConfigModel, TestModel, ProjectInfoModel, LayoutModel } from '../models';
+import { ConfigModel, TestModel, ProjectInfoModel, LayoutModel, TrackedObject } from '../models';
 import getDefaultConfig from 'data/getDefaultConfig';
 
 export const configReducer = handleActions<ConfigModel, ConfigActionPayload>(
@@ -24,6 +24,13 @@ export const configReducer = handleActions<ConfigModel, ConfigActionPayload>(
         [ConfigActions.SELECT_LAYOUT]: (state, action) => ({
             ...state,
             layoutSelection: (action.payload as unknown) as keyof ConfigModel['layouts'],
+        }),
+        [ConfigActions.ADD_TRACKED_OBJECT]: (state, action) => ({
+            ...state,
+            trackedObjects: [
+                ...state.trackedObjects,
+                (action.payload as unknown) as { name: string; type: TrackedObject['type'] },
+            ],
         }),
     },
     getDefaultConfig()

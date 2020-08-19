@@ -19,18 +19,7 @@ export const trackedObjectsReducer = handleActions<TrackedObjectsModel, TrackedO
             };
         },
     },
-    {
-        aaa: {
-            type: 'array_1d',
-            value: [],
-            color: [],
-        },
-        bbb: {
-            type: 'array_2d',
-            value: [[]],
-            color: [[]],
-        },
-    }
+    {}
 );
 
 export default trackedObjectsReducer;
