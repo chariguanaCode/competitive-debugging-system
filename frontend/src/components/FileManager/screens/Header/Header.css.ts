@@ -10,8 +10,8 @@ const useStyles = makeStyles((theme) => ({
     leftContainer: {
         flexGrow: 1,
     },
-    SearchContainer: { flexGrow: 1, textAlign: 'right', minWidth: '300px' },
-    NavigationContainer: {},
+    SearchContainer: { flexGrow: 1, textAlign: 'right', minWidth: '200px'},
+    NavigationContainer: {minWidth: '210px'},
     OperationalButtonsContainer: { position: 'absolute', top: '10px', right: '10px' },
 }));
 

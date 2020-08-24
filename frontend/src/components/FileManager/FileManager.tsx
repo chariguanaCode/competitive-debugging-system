@@ -86,7 +86,13 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
 
     return (
         <>
-            <Dialog open={!!open} maxWidth={'xl'}>
+            <Dialog
+                classes={{
+                    paper: classes.MuiDialogPaper,
+                }}
+                open={!!open}
+                maxWidth={'xl'}
+            >
                 <div className={classes.FileManager}>
                     <div className={classes.HeaderContainer}>
                         <Header

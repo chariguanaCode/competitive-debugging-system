@@ -43,10 +43,11 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
     const handleSelectedFiles = (selectedFilesToSet: typeof selectedFiles, idsToRerender: Array<number>, e?: any) => {
         if (selectedFilesToSet.size > (maxNumberOfSelectedFiles || 0)) {
             //setErrorSnackbarMessage(`Maximum number of selected files is ${maxNumberOfSelectedFiles}`);
-            return;
+            return false;
         }
         //if(e) e.target.style.backgroundColor = "red"
         setSelectedFiles(selectedFilesToSet);
+        return true;
     };
     const onKeyDownOnFile = (file: FileModel, e: any, fileIsAlreadyClicked: boolean = false, id: number) => {
         if (e.keyCode === 13) {
@@ -69,7 +70,8 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
                 loadDirectory({ path: file.path });
             } else if (!isRightMB && !fileIsAlreadyClicked) {
                 selectedFilesMap.set(file.path, file);
-                handleSelectedFiles(selectedFilesMap, [id], e);
+                if (!handleSelectedFiles(selectedFilesMap, [id], e) && file.type === 'DIRECTORY')
+                    loadDirectory({ path: file.path });
             } else {
                 handleSelectedFiles(selectedFilesMap, [id], e);
             }

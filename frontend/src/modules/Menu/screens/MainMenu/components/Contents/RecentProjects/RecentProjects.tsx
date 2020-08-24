@@ -19,6 +19,7 @@ export const RecentProjects: React.FunctionComponent<ContentProps> = memo(({ clo
                             loadProject(projectPath);
                             closeMainMenu();
                         }}
+                        className ={classes.RecentProjectButton}
                     >
                         {projectPath}
                     </Button>
