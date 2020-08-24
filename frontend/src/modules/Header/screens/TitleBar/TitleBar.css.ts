@@ -2,7 +2,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 export const useStyles = makeStyles((theme) => ({
     titleBar: {
-        zIndex: theme.zIndex.drawer + 3,
+        zIndex: theme.zIndex.drawer + 1000,
         position: 'relative',
         padding: '0px 12px',
         backgroundColor: theme.palette.header.background,

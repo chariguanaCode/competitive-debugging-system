@@ -2,7 +2,6 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
     Sort: {
-        padding: '15px',
         display: 'flex',
         flexDirection: 'row',
         alignContent: 'center',

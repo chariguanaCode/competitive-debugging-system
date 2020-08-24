@@ -4,7 +4,7 @@ const useStyles = makeStyles((theme) => ({
     MainMenu: {
         position: 'absolute',
         left: '0px',
-        top: (props: any) => (props.open ? '80px' : '-400px'),
+        top: (props: any) => (props.open ? '74px' : '-400px'),
         transition: 'top 0.43s',
         zIndex: 1201,
         display: 'flex',

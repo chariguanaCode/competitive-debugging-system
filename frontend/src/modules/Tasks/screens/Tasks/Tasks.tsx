@@ -165,7 +165,7 @@ const Tasks = ({ node }: Props) => {
                         >
                             {TaskState[state]}
                         </TableCell>
-                        <TableCell>{testConfig[id].name}</TableCell>
+                        <TableCell>{testConfig[id] && testConfig[id].name}</TableCell>
                         <TableCell>{executionTime}</TableCell>
                         <TableCell style={{ paddingTop: 8, paddingBottom: 8 }}>
                             {state === TaskState.Running && (

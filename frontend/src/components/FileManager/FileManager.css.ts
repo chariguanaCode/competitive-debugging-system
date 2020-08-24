@@ -1,14 +1,17 @@
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
+    MuiDialogPaper: {
+        overflow: 'hidden'
+    },
     FileManager: {
         WebkitUserSelect: 'none',
-        height: '900px',
-        width: '1400px',
+        height: '90vh',
+        width: 'min(90vw, 1400px)',
         display: 'flex',
         flexDirection: 'column',
         padding: '30px 10px 10px 10px',
-        overflow: 'auto',
+        overflow: 'hidden',
         '&::-webkit-scrollbar-thumb': {
             backgroundColor: 'red',
         },
@@ -17,7 +20,6 @@ const useStyles = makeStyles((theme) => ({
             height: '0 !important',
         },
     },
-
     HeaderContainer: { minHeight: '50px', marginBottom: '10px' },
     ContentContainer: { minHeight: '10px', height: '100%', marginBottom: '10px' },
     FooterContainer: { minHeight: '50px' },
