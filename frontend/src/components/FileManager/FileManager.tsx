@@ -34,6 +34,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
         areSettingsOpen: false,
         searchText: '',
         zoomFactor: 1, //min: 0.5 max 3 step 0.1
+        currentRootPath: '',
     });
     // TODO: zoom
 
@@ -78,11 +79,12 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     const comparatorForFilesSortProvider = (obj1: FileModel, obj2: FileModel) =>
         comparatorForFilesSort(state.sortMethodNumber, obj1, obj2);
 
-    let setStateValue = (key: string, newValue: any) =>
-        setState((prevState) => ({
+    let setStateValue = (key: keyof FileManagerStateModel, newValue: any | ((arg1: any) => any)) => {
+        setState((prevState: FileManagerStateModel) => ({
             ...prevState,
-            [key]: newValue,
+            [key]: typeof newValue === 'function' ? newValue(prevState[key]) : newValue,
         }));
+    };
 
     return (
         <>
@@ -118,6 +120,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                             loadDirectory={loadDirectory}
                             currentPath={state.currentPath}
                             zoomFactor={state.zoomFactor}
+                            setZoomFactor={(value) => setStateValue('zoomFactor', value)}
                         />
                     </div>
                     <div className={classes.FooterContainer}>

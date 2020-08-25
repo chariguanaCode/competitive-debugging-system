@@ -5,7 +5,7 @@ import { FilesPropsModel, HiddenSearchRefModel } from './Files.d';
 import { FileModel } from '../../FileManager.d';
 import { checkIfActiveElementIsInput, isNumeric, isRightButton, sortStringCompare } from 'utils/tools';
 import useStyles from './Files.css';
-import { Button } from '@material-ui/core';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 const Files: React.FunctionComponent<FilesPropsModel> = ({
     maxNumberOfSelectedFiles,
@@ -16,6 +16,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
     acceptableFilesExtensions,
     searchText,
     zoomFactor,
+    setZoomFactor,
 }) => {
     const classes = useStyles();
     const [hiddenSearchResultIndex, setHiddenSearchResultIndex] = useState<number>(0);
@@ -33,6 +34,17 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         } catch {}
         setFilesFilteredBySearch(files.filter((file: FileModel) => file.name.match(searchRegex)));
     }, [files, searchText]);
+    const selectAllFiles = () => {
+        handleSelectedFiles(
+            new Map(
+                // TODO: optimize that
+                [...selectedFiles.entries()].concat(
+                    files.reduce((pvVal: Array<any>, file: FileModel) => pvVal.concat([[file.path, file]]), [])
+                )
+            )
+        );
+    };
+    useHotkeys('ctrl+a', selectAllFiles, {}, [filesFilteredBySearch]);
 
     const onKeyDownOnFiles = (e: any) => {
         if (e.keyCode >= 49 && e.keyCode <= 125 && /*isHiddenSearchOn.current && */ !checkIfActiveElementIsInput()) {
@@ -40,7 +52,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         }
     };
 
-    const handleSelectedFiles = (selectedFilesToSet: typeof selectedFiles, idsToRerender: Array<number>, e?: any) => {
+    const handleSelectedFiles = (selectedFilesToSet: typeof selectedFiles, idsToRerender?: Array<number>, e?: any) => {
         if (selectedFilesToSet.size > (maxNumberOfSelectedFiles || 0)) {
             //setErrorSnackbarMessage(`Maximum number of selected files is ${maxNumberOfSelectedFiles}`);
             return false;
@@ -119,11 +131,17 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
                 />
             </div>
         );
-    };
+    }; //min: 0.5 max 3 step 0.1
 
+    const handleZoom = (e: any) => {
+        if (!e.ctrlKey) return;
+        e.persist();
+        const delta = Math.sign(e.deltaY) * -0.1; //Number(Math.fround(e.deltaY * -0.001).toFixed(1))
+        setZoomFactor((currentZoomFactor: number): number => Math.min(Math.max(0.5, currentZoomFactor + delta), 3));
+    };
     return (
         <>
-            <div className={classes.Files}>
+            <div className={classes.Files} onWheel={handleZoom}>
                 <AutoSizer>
                     {({ width, height }) => (
                         <List
@@ -133,7 +151,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
                             rowCount={filesFilteredBySearch.length}
                             rowHeight={40 * zoomFactor} //TODO: set default height to lower? (was 50)
                             scrollToIndex={hiddenSearchResultIndex}
-                            overscanRowCount={0}
+                            overscanRowCount={30}
                         ></List>
                     )}
                 </AutoSizer>

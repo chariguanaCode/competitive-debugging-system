@@ -34,16 +34,3 @@ export const isDirectory = async (path: string) => {
         return stats.isDirectory();
     }
 };
-
-export const parsePath = (directory: string) => {
-    if (directory[directory.length - 1] != '/' && directory[directory.length - 1] != '\\') directory += '/';
-
-    if (!path.isAbsolute(directory)) directory = path.resolve(directory);
-    /* if((homePath[homePath.length-1]!=="/" || homePath[homePath.length-1]!=="\") && (directory[0]!=='/' || directory[0]!=='\\'))directory = '/' + directory;
-            directory = homePath + directory;
-            TODO: default home path (in settings), now it's backend directory
-        */
-
-    directory = directory.split('\\').join('/');
-    return directory;
-};

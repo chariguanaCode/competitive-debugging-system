@@ -24,6 +24,7 @@ export interface FileManagerStateModel {
     files: Array<FileModel>;
     selectedFiles: Map<string, FileModel>;
     currentPath: string;
+    currentRootPath: string;
     managerError: any;
     visibleFilesExtensions: Array<string>;
     acceptableFilesExtensions: Set<string> | undefined;

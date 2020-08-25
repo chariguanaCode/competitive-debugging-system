@@ -10,6 +10,11 @@ export interface ContentPropsModel {
     currentPath: FileManagerStateModel['currentPath'];
     searchText: string;
     zoomFactor: FileManagerStateModel['zoomFactor'];
+    setZoomFactor: (
+        newZoomFactor:
+            | FileManagerStateModel['zoomFactor']
+            | ((arg1: FileManagerStateModel['zoomFactor']) => FileManagerStateModel['zoomFactor'])
+    ) => any;
 }
 
 export interface ContentStateModel {}

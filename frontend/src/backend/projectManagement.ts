@@ -81,8 +81,8 @@ export const useLoadProject = () => {
     const { setAllTrackedObjects } = useTrackedObjectsActions();
 
     return async (sourceFilePath: string) => {
-        let path = syncFileActions.parsePath(sourceFilePath);
-        path = path.slice(0, path.length - 1);
+        let path = asyncFileActions.parsePath(sourceFilePath, false);
+        //path = path.slice(0, path.length - 1);
         console.log('Loading config...', path);
 
         // TODO: errors handling

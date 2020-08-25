@@ -1,6 +1,9 @@
+import { parse } from "path";
+
 const fs = window.require('fs');
 const path = window.require('path');
 const util = window.require('util');
+const os = window.require('os');
 
 export const fileExist = (filePath: string) =>
     new Promise((resolve, reject) => {
@@ -60,11 +63,21 @@ export const createDirectory = (directoryPath: string) =>
         );
     });
 
-export const parsePath = (directory: string) => {
-    if (!path.isAbsolute(directory)) directory = path.resolve(directory);
+export const getSystemRootPath = () => {
+    if (os.platform() == 'win32') {
+        const road = path.relative('C:/', '/');
+        if (!road.length) return 'C:/';
+        return road;
+    } else return '/';
+};
 
-    if (directory[directory.length - 1] != '/' && directory[directory.length - 1] != '\\') directory += '/';
-
-    directory = directory.split('\\').join('/');
-    return directory;
+export const parsePath = (directory: string, followingSeparator?: boolean) => {
+    let parsedPath = path.normalize(directory + '/');
+    if (!path.isAbsolute(parsedPath)) parsedPath = path.resolve(parsedPath);
+    parsedPath = parsedPath.split('\\').join('/');
+    if (parsedPath[0] === '/' && os.platform() == 'win32') parsedPath = getSystemRootPath() + parsedPath.slice(1);
+    parsedPath = parsedPath.split('\\').join('/');
+    if (followingSeparator && parsedPath[parsedPath.length - 1] !== '/') parsedPath += '/';
+    else if(!followingSeparator && parsedPath[parsedPath.length - 1] === '/') parsedPath = parsedPath.slice(0,-1)
+    return parsedPath
 };
