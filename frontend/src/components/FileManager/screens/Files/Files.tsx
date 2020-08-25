@@ -6,6 +6,7 @@ import { FileModel } from '../../FileManager.d';
 import { checkIfActiveElementIsInput, isNumeric, isRightButton, sortStringCompare } from 'utils/tools';
 import useStyles from './Files.css';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { SwapCalls } from '@material-ui/icons';
 
 const Files: React.FunctionComponent<FilesPropsModel> = ({
     maxNumberOfSelectedFiles,
@@ -24,6 +25,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         currentHiddenSearchText: '',
         lastHiddenSearchTime: 0,
     });
+    const pvSelectedFileIndex = useRef<number>(0);
     const [filesFilteredBySearch, setFilesFilteredBySearch] = useState<typeof files>([]);
 
     useEffect(() => {
@@ -34,15 +36,13 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         } catch {}
         setFilesFilteredBySearch(files.filter((file: FileModel) => file.name.match(searchRegex)));
     }, [files, searchText]);
+
     const selectAllFiles = () => {
-        handleSelectedFiles(
-            new Map(
-                // TODO: optimize that
-                [...selectedFiles.entries()].concat(
-                    files.reduce((pvVal: Array<any>, file: FileModel) => pvVal.concat([[file.path, file]]), [])
-                )
-            )
-        );
+        let selectedFilesMap = new Map(selectedFiles);
+        files.forEach((file) => {
+            if (!!!acceptableFilesExtensions || acceptableFilesExtensions.has(file.type)) selectedFilesMap.set(file.path, file);
+        });
+        handleSelectedFiles(selectedFilesMap);
     };
     useHotkeys('ctrl+a', selectAllFiles, {}, [filesFilteredBySearch]);
 
@@ -50,6 +50,17 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         if (e.keyCode >= 49 && e.keyCode <= 125 && /*isHiddenSearchOn.current && */ !checkIfActiveElementIsInput()) {
             //hiddenSearch(e);
         }
+    };
+
+    const selectFilesOnRange = (begin: number, end: number, remove: boolean = false) => {
+        if (begin > end) [begin, end] = [end, begin];
+        let selectedFilesMap = new Map(selectedFiles);
+        files.slice(begin, end + 1).forEach((file) => {
+            if (!remove && (!!!acceptableFilesExtensions || acceptableFilesExtensions.has(file.type)))
+                selectedFilesMap.set(file.path, file);
+            if (remove) selectedFilesMap.delete(file.path);
+        });
+        handleSelectedFiles(selectedFilesMap);
     };
 
     const handleSelectedFiles = (selectedFilesToSet: typeof selectedFiles, idsToRerender?: Array<number>, e?: any) => {
@@ -61,6 +72,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         setSelectedFiles(selectedFilesToSet);
         return true;
     };
+
     const onKeyDownOnFile = (file: FileModel, e: any, fileIsAlreadyClicked: boolean = false, id: number) => {
         if (e.keyCode === 13) {
             if (file.type === 'DIRECTORY') {
@@ -68,9 +80,14 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
             }
         }
     };
+
     const onFileClick = (file: FileModel, e: any, fileIsAlreadyClicked = false, id: number) => {
         if (e.persist) e.persist();
         let isRightMB = isRightButton(e);
+
+        /* select or remove files with shift*/
+        if (e.shiftKey) return selectFilesOnRange(pvSelectedFileIndex.current, id, isRightMB);
+
         if (!acceptableFilesExtensions || acceptableFilesExtensions.has(file.type)) {
             let selectedFilesMap = new Map(selectedFiles);
             if ((fileIsAlreadyClicked && isRightMB) || (fileIsAlreadyClicked && file.type !== 'DIRECTORY')) {
@@ -82,8 +99,9 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
                 loadDirectory({ path: file.path });
             } else if (!isRightMB && !fileIsAlreadyClicked) {
                 selectedFilesMap.set(file.path, file);
-                if (!handleSelectedFiles(selectedFilesMap, [id], e) && file.type === 'DIRECTORY')
-                    loadDirectory({ path: file.path });
+                const result = handleSelectedFiles(selectedFilesMap, [id], e);
+                if (!result && file.type === 'DIRECTORY') return loadDirectory({ path: file.path });
+                if (result) pvSelectedFileIndex.current = id;
             } else {
                 handleSelectedFiles(selectedFilesMap, [id], e);
             }
