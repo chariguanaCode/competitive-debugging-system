@@ -2,7 +2,7 @@ import { ConvertResult } from 'backend/watchParse';
 
 export type Watch = {
     call_id: string;
-    line: number;
+    line: string;
     data_type: string;
     config: any;
 } & ConvertResult;
@@ -12,7 +12,7 @@ export interface Watchblock {
     call_id: string;
     children: Array<Watchblock | Watch>;
     type: 'watchblock';
-    line: number;
+    line: string;
     name: string;
     state: {
         expanded: boolean;
@@ -38,7 +38,7 @@ export interface Task {
     error?: {
         code: number;
         signal: string;
-        stderr: Uint8Array | string;
+        stderr: string;
     };
 }
 

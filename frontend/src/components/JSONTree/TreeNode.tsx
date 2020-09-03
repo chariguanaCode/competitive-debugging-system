@@ -4,6 +4,7 @@ import { WatchBlockOptions } from '@material-ui/core/styles/createPalette';
 import { Watchblock, Watch } from 'reduxState/models';
 import { useWatchHistoryLocation } from 'reduxState/selectors';
 import { useWatchActionsHistoryActions } from 'reduxState/actions';
+import useStyles from './JSONTree.css';
 
 interface Props {
     node: any;
@@ -31,6 +32,7 @@ function Colored({ type, children }: ColoredProps): ReactElement {
 
 export default React.memo(function TreeNode({ node, style, onChange }: Props): ReactElement {
     const { setWatchHistoryLocation } = useWatchActionsHistoryActions();
+    const classes = useStyles();
     const theme = useTheme();
 
     const data = node as Watchblock | Watch;
@@ -54,7 +56,7 @@ export default React.memo(function TreeNode({ node, style, onChange }: Props): R
         return false;
     };
 
-    const selected = useWatchHistoryLocation() === data.call_id;
+    const selected = useWatchHistoryLocation() === (data.call_id + '.').substr(0, (data.call_id + '.').indexOf('.'));
     const selectable = data.line !== undefined;
     const selectTracking = () => {
         setWatchHistoryLocation(data.call_id);
@@ -75,11 +77,22 @@ export default React.memo(function TreeNode({ node, style, onChange }: Props): R
         }
 
         if (line !== undefined) {
-            result.push(
-                <span style={{ cursor: 'pointer' }}>
-                    {colored({ line })}: {colored({ name })} ={' '}
-                </span>
-            );
+            if (line[0] !== ' ') {
+                result.push(
+                    <span style={{ cursor: 'pointer' }}>
+                        {colored({ line })}: {colored({ name })}
+                        {' = '}
+                    </span>
+                );
+            } else {
+                result.push(
+                    <span style={{ cursor: 'pointer' }}>
+                        {line + '  '}
+                        {colored({ name })}
+                        {' = '}
+                    </span>
+                );
+            }
         } else {
             result.push(<>{colored({ array: name })} : </>);
         }
@@ -128,13 +141,12 @@ export default React.memo(function TreeNode({ node, style, onChange }: Props): R
                 height: style.height,
                 left: style.left,
                 top: style.top,
-                marginLeft: style.marginLeft,
+                paddingLeft: (8.555 * 4 * ((style.marginLeft as number) + (data.type !== 'closing' && !line ? 30 : 0))) / 30,
 
-                wordSpacing: 4,
-                transform: `translate(${data.type === 'closing' ? -30 : 0}px)`,
                 minWidth: '100%',
                 backgroundColor: selected ? theme.palette.watchblocks.selected : 'transparent',
             }}
+            className={classes.treeNode}
             onClick={selectable ? selectTracking : () => {}}
         >
             {contents}

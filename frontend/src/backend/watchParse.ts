@@ -2,7 +2,6 @@ import { useRef, useEffect } from 'react';
 import { Watchblock, Watch, WatchActionsHistoryModel } from 'reduxState/models';
 import { useConfig } from 'reduxState/selectors';
 import { useWatchActionsHistoryActions } from 'reduxState/actions';
-import { stringFromUintArray } from 'utils/tools';
 
 const string_start = 's';
 const bitset_start = 'b';
@@ -19,13 +18,18 @@ const struct_end = 'O';
 
 const watchblock_start = String.fromCharCode(242);
 const watchblock_end = String.fromCharCode(243);
+
 const divisor = String.fromCharCode(244);
+
 const cupl_start = String.fromCharCode(245);
 const cupl_end = String.fromCharCode(246);
+
 const watch_start = String.fromCharCode(247);
 const watch_end = String.fromCharCode(248);
+
 const variable_start = String.fromCharCode(249);
 //const variable_end = String.fromCharCode(250);
+
 const cds_id_start = String.fromCharCode(251);
 
 export type ConvertResult = (
@@ -210,28 +214,28 @@ export const useParseWatchblocks = () => {
                 call_id: '-1',
                 children: [],
                 type: 'watchblock',
-                line: -1,
+                line: '-1',
                 name: '',
                 state: { expanded: true },
             },
         ];
     };
 
-    const parseWatchblocks = (newData: Uint8Array) => {
-        const dataString = stringFromUintArray(newData);
+    const parseWatchblocks = (dataString: string) => {
         const cupl_start_index = dataString.indexOf(cupl_start);
         if (cupl_start_index === -1) return;
         const cupl_end_index = dataString.indexOf(cupl_end, cupl_start_index);
         const data = dataString.slice(cupl_start_index, cupl_end_index + 1).split(divisor);
+
         let loc = 1;
-        let begin, end;
         let name: string, line: string, config: any, call_id, cds_id;
-        let watchAction;
         let topOfStack: Watchblock;
+
         switch (data[loc]) {
             case watch_start:
                 [call_id, line, config] = data.slice(loc + 1, loc + 4);
                 loc += 4;
+
                 let variables = [];
                 let variablesValuesStrings: Array<string> = [];
                 while (data[loc] !== watch_end) {
@@ -261,6 +265,7 @@ export const useParseWatchblocks = () => {
                             targetObject: action.target,
                             payload: variablesValuesStrings.map((valueString) => JSON.parse(valueString)),
                         }));
+
                         tempWatchActionsHistory.current[call_id] = {
                             previousKey: watchActionsHistoryPreviousKey.current,
                             nextKey: '-1',
@@ -269,15 +274,18 @@ export const useParseWatchblocks = () => {
                         if (watchActionsHistoryPreviousKey.current !== '-1')
                             tempWatchActionsHistory.current[watchActionsHistoryPreviousKey.current].nextKey = call_id;
                         watchActionsHistoryPreviousKey.current = call_id;
-                        setWatchActionsHistory(tempWatchActionsHistory.current);
+
+                        setWatchActionsHistory(tempWatchActionsHistory.current); //potentially terrible efficiency
                     }
                 }
+
                 variables.forEach((variable) => {
                     watchblockStack.current[watchblockStack.current.length - 1].children.push({
-                        line: parseInt(line),
+                        line,
                         config,
                         ...variable,
                     });
+                    line = ' '.repeat(line.length);
                 });
                 break;
             case watchblock_start:
@@ -287,7 +295,7 @@ export const useParseWatchblocks = () => {
                     id: call_id,
                     call_id,
                     name,
-                    line: parseInt(line),
+                    line,
                     type: 'watchblock',
                     children: [] as Array<Watchblock | Watch>,
                     state: { expanded: true },
@@ -302,7 +310,7 @@ export const useParseWatchblocks = () => {
                     id: topOfStack.call_id + '.end',
                     call_id: topOfStack.call_id + '.end',
                     name: '',
-                    line: -1,
+                    line: '-1',
                     type: 'closing',
                     config: '',
                     data_type: '',

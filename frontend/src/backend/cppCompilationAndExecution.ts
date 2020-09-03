@@ -13,18 +13,22 @@ export default () => {
     const testError = useTestError();
 
     return async () => {
-        const filename = config.projectInfo.files[0];
+        const sourcePath = config.projectInfo.files[0];
+        const modifiedSourcePath = sourcePath.replace(/\.cpp$/, '.tmp.cpp');
+        const binaryPath = sourcePath.replace(/\.cpp$/, '.bin');
         const tests = config.tests;
         try {
             setExecutionState({ state: ExecutionState.Compiling, details: '' });
             let hrstart = window.process.hrtime();
-            const binaryName = await cppActions.compileCpp(filename).then(
-                (result: string) => result,
-                (stderr: any) => {
-                    setExecutionState({ state: ExecutionState.CompilationError, details: stderr });
-                    throw new Error();
-                }
-            );
+
+            await cppActions.modifyCppSource(sourcePath, modifiedSourcePath);
+
+            await cppActions.compileCpp(modifiedSourcePath, binaryPath).catch((stderr: any) => {
+                setExecutionState({ state: ExecutionState.CompilationError, details: stderr });
+                console.log(stderr);
+                throw new Error();
+            });
+
             let hrend = window.process.hrtime(hrstart);
             setExecutionState({ state: ExecutionState.Running, details: `Took ${hrend[0]}s ${hrend[1] / 1000000}ms` });
 
@@ -35,7 +39,7 @@ export default () => {
                 tests.map(({ inputPath }, id) =>
                     testPromises
                         .enqueue(
-                            () => cppActions.executeTest(binaryName, inputPath, inputPath + '.out', inputPath + '.err'),
+                            () => cppActions.executeTest(binaryPath, inputPath, inputPath + '.out', inputPath + '.err'),
                             beginTest(id)
                         )
                         .then(finishTest(id), testError(id))
