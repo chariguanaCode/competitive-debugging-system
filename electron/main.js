@@ -79,6 +79,11 @@ autoUpdater.on('update-available', async (info) => {
 });
 
 autoUpdater.on('update-downloaded', async (info) => {
+    // workaround for https://github.com/electron-userland/electron-builder/issues/4046
+    if (process.env.DESKTOPINTEGRATION === 'AppImageLauncher') {
+        process.env.APPIMAGE = process.env.ARGV0;
+    }
+
     const { response } = await dialog.showMessageBox({
         type: 'question',
         message: `Update downloaded. It will be installed after you quit the app. Quit now?`,
