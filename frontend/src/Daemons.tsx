@@ -49,7 +49,7 @@ export default function Daemons(): ReactElement {
             readFileStream(
                 config.tests[currentTask.id].inputPath + '.out',
                 false,
-                (data: Uint8Array) => setCurrentTaskStdout(new TextDecoder('utf-8').decode(data)),
+                (data: string) => setCurrentTaskStdout(data),
                 setCurrentTaskStdoutSize,
                 () => {},
                 () => {}
@@ -57,7 +57,7 @@ export default function Daemons(): ReactElement {
             readFileStream(
                 config.tests[currentTask.id].inputPath + '.err',
                 true,
-                (data: Uint8Array) => parseWatchblocks(data),
+                (data: string) => parseWatchblocks(data),
                 setCurrentTaskWatchblocksSize,
                 () => clearWatchblocks(),
                 () => {

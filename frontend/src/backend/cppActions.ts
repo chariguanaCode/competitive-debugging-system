@@ -1,14 +1,23 @@
-import * as syncFileActions from './syncFileActions';
+import { readFile, saveFile } from 'backend/asyncFileActions';
 const util = window.require('util');
 const execFile = util.promisify(window.require('child_process').execFile);
 const spawn = window.require('child_process').spawn;
 const fs = window.require('fs');
+const remote = window.require('electron').remote;
 
-export const compileCpp = async (filename: string) => {
+export const modifyCppSource = async (originalSourcePath: string, newSourcePath: string) => {
+    const cppFolder = remote.getGlobal('paths').cppFiles;
+    let source = await readFile(originalSourcePath);
+
+    source = `#include "${cppFolder}/universal_print_17.h"\n` + `#define CDS_DEBUG 1\n` + `\n` + source;
+
+    await saveFile(newSourcePath, source);
+};
+
+export const compileCpp = async (sourcePath: string, binaryPath: string) => {
     try {
         //await execFile('g++', ['-std=c++17', '-O3', '-static', '-o./cpp/test.bin', `${filename}`]);
-        await execFile('g++', ['-std=c++17', '-static', '-o./cpp/test.bin', `${filename}`]);
-        return './cpp/test.bin';
+        await execFile('g++', ['-std=c++17', '-static', `-o${binaryPath}`, `${sourcePath}`]);
     } catch (err) {
         throw err.stderr;
     }

@@ -38,6 +38,9 @@ const useStyles = makeStyles((theme) => ({
         '.flexlayout__tabset_header_outer': {
             backgroundColor: theme.palette.contentLayout.panelHeader,
         },
+        '.flexlayout__tabset_header_inner_top': {
+            borderTop: 'none',
+        },
         '.flexlayout__tab': {
             backgroundColor: theme.palette.contentLayout.panelBackground,
             color: theme.palette.getContrastText(theme.palette.contentLayout.panelBackground),

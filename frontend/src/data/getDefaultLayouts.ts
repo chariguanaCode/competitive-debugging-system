@@ -36,7 +36,7 @@ const getDefaultLayouts = () => {
                             {
                                 type: 'tab',
                                 name: 'Watches',
-                                component: 'watch',
+                                component: 'watches',
                             },
                         ],
                     },
@@ -49,7 +49,20 @@ const getDefaultLayouts = () => {
             layout: {
                 type: 'row',
                 weight: 100,
-                children: [],
+                children: [
+                    {
+                        type: 'tabset',
+                        weight: 50,
+                        selected: 0,
+                        children: [
+                            {
+                                type: 'tab',
+                                name: 'Outputs',
+                                component: 'outputs',
+                            },
+                        ],
+                    },
+                ],
             },
             borders: [],
         },

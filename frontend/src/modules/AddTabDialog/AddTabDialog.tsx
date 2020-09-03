@@ -42,8 +42,9 @@ export const AddTabDialog = ({ open, onClose }: Props) => {
                     <FormControl className={classes.input}>
                         <InputLabel>Type</InputLabel>
                         <Select value={type} onChange={(event) => setType(event.target.value as string)}>
-                            <MenuItem value="watch">Watches</MenuItem>
+                            <MenuItem value="watches">Watches</MenuItem>
                             <MenuItem value="tasks">Tasks</MenuItem>
+                            <MenuItem value="outputs">Outputs</MenuItem>
                             <MenuItem value="trackedObject">Tracked Object</MenuItem>
                             <MenuItem value="tasks management">Tasks management</MenuItem>
                         </Select>
