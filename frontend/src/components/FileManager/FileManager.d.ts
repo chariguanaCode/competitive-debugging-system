@@ -40,11 +40,12 @@ export interface FileManagerPropsModel {
     maxNumberOfSelectedFiles?: number;
     selectFiles?: ((arg1: Array<string>) => any) | ((arg1: Array<FileModel>) => any);
     directoryOnStart?: string;
-    closeFileManager?: () => any;
+    closeFileManager?: (lastDirectory: string) => any;
     visibleFilesExtensions?: Array<string>;
     acceptableFilesExtensions?: Array<string>;
     open?: boolean;
     withFilesStats?: boolean;
+    lastDirectory?: string;
     //config?: FileManagerConfigTypes;
 }
 

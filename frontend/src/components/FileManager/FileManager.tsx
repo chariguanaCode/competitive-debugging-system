@@ -15,9 +15,10 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     visibleFilesExtensions,
     acceptableFilesExtensions,
     selectFiles = () => {},
-    directoryOnStart = '/',
+    directoryOnStart = null,
     closeFileManager = () => {},
     withFilesStats = false,
+    lastDirectory = '/'
     //config,
 }) => {
     // TODO: add loading circular to file manager
@@ -39,8 +40,14 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     // TODO: zoom
 
     useEffect(() => {
-        loadDirectory({ path: directoryOnStart });
+        if(directoryOnStart)
+            loadDirectory({ path: directoryOnStart });
     }, [directoryOnStart]);
+
+    useEffect(() => {
+        if(!directoryOnStart)
+            loadDirectory({ path: lastDirectory });
+    }, [lastDirectory]);
 
     useEffect(() => {
         setState((pvState) => ({
@@ -48,6 +55,10 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
             files: Array.from(pvState.files).sort(comparatorForFilesSortProvider),
         }));
     }, [state.sortMethodNumber]);
+
+    const __closeFileManager = () => {
+        closeFileManager(state.currentPath);
+    }
 
     const loadDirectory = async ({ path, regex }: { path: string; regex?: string }) => {
         //setLoadingState(true);
@@ -73,6 +84,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                       number: '404',
                   },
             files: files,
+            searchText: '',
         }));
     };
 
@@ -98,7 +110,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                 <div className={classes.FileManager}>
                     <div className={classes.HeaderContainer}>
                         <Header
-                            dialogClose={closeFileManager}
+                            dialogClose={__closeFileManager}
                             currentPath={state.currentPath}
                             loadDirectory={loadDirectory}
                             setSearchText={(newValue: string) => setStateValue('searchText', newValue)}
@@ -126,7 +138,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                     <div className={classes.FooterContainer}>
                         <Footer
                             selectFiles={selectFiles}
-                            dialogClose={closeFileManager}
+                            dialogClose={__closeFileManager}
                             selectedFiles={state.selectedFiles}
                             withFilesStats={withFilesStats}
                             minNumberOfSelectedFiles={minNumberOfSelectedFiles}

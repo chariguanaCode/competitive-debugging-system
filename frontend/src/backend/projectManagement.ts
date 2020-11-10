@@ -37,7 +37,8 @@ export const useSaveProjectAs = () => {
         if (!(await syncFileActions.isDirectory(directory))) {
             return;
         }
-        const path = directory + name + '.cdsp';
+        
+        const path = asyncFileActions.parsePath(directory, true) + name + '.cdsp';
         syncFileActions.saveFile(path, JSON.stringify(config));
         return path;
     };

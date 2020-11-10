@@ -11,8 +11,8 @@ export const FileManagerContainer: React.FunctionComponent<{ useFileManager: any
             {fileManager.open && (
                 <FileManager
                     {...fileManager}
-                    closeFileManager={() => {
-                        setFileManager({ open: false });
+                    closeFileManager={(lastDirectory: string) => {
+                        setFileManager({ open: false, lastDirectory: lastDirectory });
                     }}
                 />
             )}
