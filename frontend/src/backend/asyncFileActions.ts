@@ -4,6 +4,19 @@ const fs = window.require('fs');
 const path = window.require('path');
 const util = window.require('util');
 const os = window.require('os');
+const Diff = require('diff');
+
+export const compareFiles = async (filePath1: string, filePath2: string, returnBoolean = false) => {
+    const fileString1 = (await readFile(filePath1)).toString();
+    const fileString2 = (await readFile(filePath2)).toString();
+
+    const diff = await Diff.diffTrimmedLines(fileString1, fileString2);
+
+    if(returnBoolean)
+        return diff.length <= 1;
+
+    return 0;
+}
 
 export const fileExist = (filePath: string) =>
     new Promise((resolve, reject) => {
@@ -14,6 +27,12 @@ export const fileExist = (filePath: string) =>
             resolve(true);
         });
     });
+
+    // TO DO: CHANGE TO PROMISE
+export const getFileBasename = (filePath: string) => {
+    const parsedPath = parsePath(filePath);
+    return path.basename(parsedPath);
+}
 
 export const saveFile = (filePath: string, content: any) =>
     new Promise((resolve, reject) => {
@@ -29,12 +48,12 @@ export const saveFile = (filePath: string, content: any) =>
 export const readFile = (filePath: string) => {
     return new Promise((resolve: (data: string) => void, reject) => {
         fs.readFile(filePath, 'utf-8', (err: any, data: string) => {
-            console.log({
+            /*console.log({
                 R: filePath,
                 data: data,
                 err: err,
                 dataStr: data.toString(),
-            });
+            });*/
 
             if (err) reject(err);
             resolve(data);
@@ -60,6 +79,19 @@ export const createDirectory = (directoryPath: string) =>
                       if (err) reject(err);
                       resolve('Success');
                   })
+        );
+    });
+
+export const removeDirectory = (directoryPath: string) =>
+    new Promise((resolve, reject) => {
+        let path = parsePath(directoryPath);
+        fileExist(path).then((result) =>
+            result
+                ? fs.rmdir(path, { recursive: true }, (err: any) => {
+                    if (err) reject(err);
+                    resolve('Success');
+                })
+                : reject("Directory doesn't exist")
         );
     });
 

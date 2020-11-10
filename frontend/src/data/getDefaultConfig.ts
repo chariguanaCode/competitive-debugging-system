@@ -1,9 +1,11 @@
 import { ConfigModel } from 'reduxState/models';
 import getDefaultLayouts from './getDefaultLayouts';
+import { v4 as uuidv4 } from 'uuid';
 
 const getDefaultConfig = () => {
     let today = new Date();
     let currentDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    let projectUuid = uuidv4();
     return {
         projectInfo: {
             files: [],
@@ -13,6 +15,7 @@ const getDefaultConfig = () => {
             lastEditDate: currentDate,
             totalTimeSpent: '0h0m0s',
             description: '',
+            uuid: projectUuid,
         },
         settings: {
             main: {

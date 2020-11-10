@@ -2,6 +2,7 @@ import { TrackedObject } from './trackedObjects';
 
 export interface ProjectInfoModel {
     files: Array<string>;
+    uuid: string;
     name: string;
     author: string;
     createDate: string;

@@ -63,6 +63,8 @@ global.paths = {
     cppFiles: process.env.ELECTRON_START_URL
         ? path.join(__dirname, '..', 'cpp')
         : path.join(__dirname, '..', '..', '..', 'cpp'),
+    testsOutputs: `${app.getPath('userData')}/CDSData/TestsOutputs`
+    
 };
 
 autoUpdater.on('update-available', async (info) => {
