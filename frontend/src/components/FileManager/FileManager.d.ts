@@ -24,6 +24,7 @@ export interface FileManagerStateModel {
     files: Array<FileModel>;
     selectedFiles: Map<string, FileModel>;
     currentPath: string;
+    currentRootPath: string;
     managerError: any;
     visibleFilesExtensions: Array<string>;
     acceptableFilesExtensions: Set<string> | undefined;
@@ -39,11 +40,12 @@ export interface FileManagerPropsModel {
     maxNumberOfSelectedFiles?: number;
     selectFiles?: ((arg1: Array<string>) => any) | ((arg1: Array<FileModel>) => any);
     directoryOnStart?: string;
-    closeFileManager?: () => any;
+    closeFileManager?: (lastDirectory: string) => any;
     visibleFilesExtensions?: Array<string>;
     acceptableFilesExtensions?: Array<string>;
     open?: boolean;
     withFilesStats?: boolean;
+    lastDirectory?: string;
     //config?: FileManagerConfigTypes;
 }
 

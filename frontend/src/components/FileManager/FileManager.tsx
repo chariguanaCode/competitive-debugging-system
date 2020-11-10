@@ -15,9 +15,10 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     visibleFilesExtensions,
     acceptableFilesExtensions,
     selectFiles = () => {},
-    directoryOnStart = '/',
+    directoryOnStart = null,
     closeFileManager = () => {},
     withFilesStats = false,
+    lastDirectory = '/'
     //config,
 }) => {
     // TODO: add loading circular to file manager
@@ -34,12 +35,19 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
         areSettingsOpen: false,
         searchText: '',
         zoomFactor: 1, //min: 0.5 max 3 step 0.1
+        currentRootPath: '',
     });
     // TODO: zoom
 
     useEffect(() => {
-        loadDirectory({ path: directoryOnStart });
+        if(directoryOnStart)
+            loadDirectory({ path: directoryOnStart });
     }, [directoryOnStart]);
+
+    useEffect(() => {
+        if(!directoryOnStart)
+            loadDirectory({ path: lastDirectory });
+    }, [lastDirectory]);
 
     useEffect(() => {
         setState((pvState) => ({
@@ -47,6 +55,10 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
             files: Array.from(pvState.files).sort(comparatorForFilesSortProvider),
         }));
     }, [state.sortMethodNumber]);
+
+    const __closeFileManager = () => {
+        closeFileManager(state.currentPath);
+    }
 
     const loadDirectory = async ({ path, regex }: { path: string; regex?: string }) => {
         //setLoadingState(true);
@@ -72,17 +84,19 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                       number: '404',
                   },
             files: files,
+            searchText: '',
         }));
     };
 
     const comparatorForFilesSortProvider = (obj1: FileModel, obj2: FileModel) =>
         comparatorForFilesSort(state.sortMethodNumber, obj1, obj2);
 
-    let setStateValue = (key: string, newValue: any) =>
-        setState((prevState) => ({
+    let setStateValue = (key: keyof FileManagerStateModel, newValue: any | ((arg1: any) => any)) => {
+        setState((prevState: FileManagerStateModel) => ({
             ...prevState,
-            [key]: newValue,
+            [key]: typeof newValue === 'function' ? newValue(prevState[key]) : newValue,
         }));
+    };
 
     return (
         <>
@@ -96,7 +110,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                 <div className={classes.FileManager}>
                     <div className={classes.HeaderContainer}>
                         <Header
-                            dialogClose={closeFileManager}
+                            dialogClose={__closeFileManager}
                             currentPath={state.currentPath}
                             loadDirectory={loadDirectory}
                             setSearchText={(newValue: string) => setStateValue('searchText', newValue)}
@@ -118,12 +132,13 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                             loadDirectory={loadDirectory}
                             currentPath={state.currentPath}
                             zoomFactor={state.zoomFactor}
+                            setZoomFactor={(value) => setStateValue('zoomFactor', value)}
                         />
                     </div>
                     <div className={classes.FooterContainer}>
                         <Footer
                             selectFiles={selectFiles}
-                            dialogClose={closeFileManager}
+                            dialogClose={__closeFileManager}
                             selectedFiles={state.selectedFiles}
                             withFilesStats={withFilesStats}
                             minNumberOfSelectedFiles={minNumberOfSelectedFiles}

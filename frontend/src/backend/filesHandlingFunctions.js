@@ -1,5 +1,4 @@
 import * as asyncFileActions from './asyncFileActions';
-import * as syncFileActions from './syncFileActions';
 import { asyncForEach } from 'utils/tools';
 import { FiberPin } from '@material-ui/icons';
 const fs = window.require('fs');
@@ -21,22 +20,6 @@ export const getPartitionsNames = async () => {
     });*/
 };
 //
-const loadAllFilesOnDirectory = async (directory = 'C:/') => {
-    let filesToSend = [];
-    directory = syncFileActions.parsePath(directory);
-    fs.readdir(directory, (err, files) => {
-        if (err) {
-            //break;
-        } else {
-            if (files) {
-                files.forEach((file) => {
-                    if (!path.extname(directory + file)) filesToSend.push(file);
-                });
-            }
-            return filesToSend;
-        }
-    });
-};
 
 const selectFileType = (fileType) => {
     if (fileType === 'DIRECTORY') return 'DIRECTORY';
@@ -48,6 +31,8 @@ const selectFileType = (fileType) => {
 };
 
 export const loadFilesOnDirectory = async ({ filesExtensions, directory, regex }) => {
+    directory = asyncFileActions.parsePath(directory, true);
+
     let regexExp;
     if (regex) {
         try {
@@ -58,9 +43,8 @@ export const loadFilesOnDirectory = async ({ filesExtensions, directory, regex }
     }
 
     let loadedFiles = [];
-    directory = syncFileActions.parsePath(directory);
 
-    if (!(await syncFileActions.fileExist(directory))) {
+    if (!(await asyncFileActions.fileExist(directory))) {
         //webserver.sendError("The file you provided doesn't exist", '')
         return [[], directory, { message: "Directory doesn't exist" }];
     }
@@ -127,6 +111,8 @@ const recursivelyGoThruDirectoryTree = async (
 
 // TODO: write it better
 export const loadFilesOnDirectoryAncestors = async ({ filesExtensions = [], directory, regex = undefined, lim = Infinity }) => {
+    directory = asyncFileActions.parsePath(directory, true);
+
     let regexExp;
     if (regex) {
         try {
@@ -136,9 +122,7 @@ export const loadFilesOnDirectoryAncestors = async ({ filesExtensions = [], dire
         }
     }
 
-    directory = syncFileActions.parsePath(directory);
-
-    if (!(await syncFileActions.fileExist(directory))) {
+    if (!(await asyncFileActions.fileExist(directory))) {
         //webserver.sendError("The file you provided doesn't exist", '')
         return [[], directory, { message: "Directory doesn't exist", directory: directory }];
     }

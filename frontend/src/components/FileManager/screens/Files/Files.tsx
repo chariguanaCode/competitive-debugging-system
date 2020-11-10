@@ -5,7 +5,8 @@ import { FilesPropsModel, HiddenSearchRefModel } from './Files.d';
 import { FileModel } from '../../FileManager.d';
 import { checkIfActiveElementIsInput, isNumeric, isRightButton, sortStringCompare } from 'utils/tools';
 import useStyles from './Files.css';
-import { Button } from '@material-ui/core';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { SwapCalls } from '@material-ui/icons';
 
 const Files: React.FunctionComponent<FilesPropsModel> = ({
     maxNumberOfSelectedFiles,
@@ -16,6 +17,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
     acceptableFilesExtensions,
     searchText,
     zoomFactor,
+    setZoomFactor,
 }) => {
     const classes = useStyles();
     const [hiddenSearchResultIndex, setHiddenSearchResultIndex] = useState<number>(0);
@@ -23,6 +25,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         currentHiddenSearchText: '',
         lastHiddenSearchTime: 0,
     });
+    const pvSelectedFileIndex = useRef<number>(0);
     const [filesFilteredBySearch, setFilesFilteredBySearch] = useState<typeof files>([]);
 
     useEffect(() => {
@@ -34,13 +37,33 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         setFilesFilteredBySearch(files.filter((file: FileModel) => file.name.match(searchRegex)));
     }, [files, searchText]);
 
+    const selectAllFiles = () => {
+        let selectedFilesMap = new Map(selectedFiles);
+        files.forEach((file) => {
+            if (!!!acceptableFilesExtensions || acceptableFilesExtensions.has(file.type)) selectedFilesMap.set(file.path, file);
+        });
+        handleSelectedFiles(selectedFilesMap);
+    };
+    useHotkeys('ctrl+a', selectAllFiles, {}, [filesFilteredBySearch]);
+
     const onKeyDownOnFiles = (e: any) => {
         if (e.keyCode >= 49 && e.keyCode <= 125 && /*isHiddenSearchOn.current && */ !checkIfActiveElementIsInput()) {
             //hiddenSearch(e);
         }
     };
 
-    const handleSelectedFiles = (selectedFilesToSet: typeof selectedFiles, idsToRerender: Array<number>, e?: any) => {
+    const selectFilesOnRange = (begin: number, end: number, remove: boolean = false) => {
+        if (begin > end) [begin, end] = [end, begin];
+        let selectedFilesMap = new Map(selectedFiles);
+        files.slice(begin, end + 1).forEach((file) => {
+            if (!remove && (!!!acceptableFilesExtensions || acceptableFilesExtensions.has(file.type)))
+                selectedFilesMap.set(file.path, file);
+            if (remove) selectedFilesMap.delete(file.path);
+        });
+        handleSelectedFiles(selectedFilesMap);
+    };
+
+    const handleSelectedFiles = (selectedFilesToSet: typeof selectedFiles, idsToRerender?: Array<number>, e?: any) => {
         if (selectedFilesToSet.size > (maxNumberOfSelectedFiles || 0)) {
             //setErrorSnackbarMessage(`Maximum number of selected files is ${maxNumberOfSelectedFiles}`);
             return false;
@@ -49,6 +72,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
         setSelectedFiles(selectedFilesToSet);
         return true;
     };
+
     const onKeyDownOnFile = (file: FileModel, e: any, fileIsAlreadyClicked: boolean = false, id: number) => {
         if (e.keyCode === 13) {
             if (file.type === 'DIRECTORY') {
@@ -56,9 +80,14 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
             }
         }
     };
+
     const onFileClick = (file: FileModel, e: any, fileIsAlreadyClicked = false, id: number) => {
         if (e.persist) e.persist();
         let isRightMB = isRightButton(e);
+
+        /* select or remove files with shift*/
+        if (e.shiftKey) return selectFilesOnRange(pvSelectedFileIndex.current, id, isRightMB);
+
         if (!acceptableFilesExtensions || acceptableFilesExtensions.has(file.type)) {
             let selectedFilesMap = new Map(selectedFiles);
             if ((fileIsAlreadyClicked && isRightMB) || (fileIsAlreadyClicked && file.type !== 'DIRECTORY')) {
@@ -70,8 +99,9 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
                 loadDirectory({ path: file.path });
             } else if (!isRightMB && !fileIsAlreadyClicked) {
                 selectedFilesMap.set(file.path, file);
-                if (!handleSelectedFiles(selectedFilesMap, [id], e) && file.type === 'DIRECTORY')
-                    loadDirectory({ path: file.path });
+                const result = handleSelectedFiles(selectedFilesMap, [id], e);
+                if (!result && file.type === 'DIRECTORY') return loadDirectory({ path: file.path });
+                if (result) pvSelectedFileIndex.current = id;
             } else {
                 handleSelectedFiles(selectedFilesMap, [id], e);
             }
@@ -119,11 +149,17 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
                 />
             </div>
         );
-    };
+    }; //min: 0.5 max 3 step 0.1
 
+    const handleZoom = (e: any) => {
+        if (!e.ctrlKey) return;
+        e.persist();
+        const delta = Math.sign(e.deltaY) * -0.1; //Number(Math.fround(e.deltaY * -0.001).toFixed(1))
+        setZoomFactor((currentZoomFactor: number): number => Math.min(Math.max(0.5, currentZoomFactor + delta), 3));
+    };
     return (
         <>
-            <div className={classes.Files}>
+            <div className={classes.Files} onWheel={handleZoom}>
                 <AutoSizer>
                     {({ width, height }) => (
                         <List
@@ -133,7 +169,7 @@ const Files: React.FunctionComponent<FilesPropsModel> = ({
                             rowCount={filesFilteredBySearch.length}
                             rowHeight={40 * zoomFactor} //TODO: set default height to lower? (was 50)
                             scrollToIndex={hiddenSearchResultIndex}
-                            overscanRowCount={0}
+                            overscanRowCount={30}
                         ></List>
                     )}
                 </AutoSizer>

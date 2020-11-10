@@ -6,7 +6,8 @@ const useStyles = makeStyles((theme) => ({
         height: (props: any) => props.FileIconWidth,
     },
     FileButton: {
-        backgroundColor: 'transparent',
+        backgroundColor: (props: any) =>
+            props.isSelected ? theme.palette.fileManager.selectionColor : 'transparent',
         color: theme.palette.fileManager.fontColor,
         fontWeight: 200,
         margin: '2px',
@@ -23,9 +24,6 @@ const useStyles = makeStyles((theme) => ({
             border: 'none',
         },
     },
-    selectedFileButton: {
-        backgroundColor: theme.palette.fileManager.selectionColor + '!important',
-    },
     fileButtonContent: {
         display: 'flex',
         // flexDirection: (props: any) => props.fileView.flexDirection, //"column",
@@ -38,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
         alignContent: 'center',
         justifyContent: 'center',
         marginRight: '4px',
-        width: props.fileIconWidth, 
+        width: props.fileIconWidth,
         height: props.fileIconHeight,
     }),
     filenameContainer: (props: any) => ({

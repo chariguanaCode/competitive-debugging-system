@@ -16,9 +16,10 @@ export const File: React.FunctionComponent<FilePropsModel> = ({
     zoomFactor,
 }) => {
     const displaySettings = {
-        fontSize: `${13*zoomFactor}px`,
-        fileIconWidth: `${24*zoomFactor}px`,
-        fileIconHeight: `${24*zoomFactor}px`,
+        fontSize: `${13 * zoomFactor}px`,
+        fileIconWidth: `${24 * zoomFactor}px`,
+        fileIconHeight: `${24 * zoomFactor}px`,
+        isSelected: isSelected,
     };
     const classes = useStyles(displaySettings /*displaySettingsStyle*/);
     const [isMouseOverFile, setMouseIsOverFile] = useState<boolean>(false);
@@ -44,7 +45,6 @@ export const File: React.FunctionComponent<FilePropsModel> = ({
         >
             <button
                 className={clsx(classes.FileButton, {
-                    [`${classes.selectedFileButton} file-selected`]: isSelected,
                     'file-acceptable': isAcceptable,
                 })}
                 onMouseDown={(e) => {

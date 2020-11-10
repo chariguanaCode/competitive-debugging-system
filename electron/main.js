@@ -30,8 +30,7 @@ const createWindow = async () => {
         });
 
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        show: false,
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true,
@@ -44,6 +43,7 @@ const createWindow = async () => {
     mainWindow.loadURL(startUrl);
 
     mainWindow.once('ready-to-show', () => {
+        mainWindow.maximize()
         mainWindow.show();
     });
 
