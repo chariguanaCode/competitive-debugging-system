@@ -5,8 +5,6 @@ const useStyles = makeStyles((theme) => ({
         zIndex: theme.zIndex.drawer + 2,
         color: theme.palette.type === 'dark' ? 'white' : theme.palette.primary.contrastText,
         backgroundColor: theme.palette.type === 'dark' ? theme.palette.background.paper : '',
-        //transform: 'translate(0px, -42px)',
-        //animation: '$appbar-grow 0.5s ease-in-out forwards 3s',
     },
     logo: {
         marginLeft: theme.spacing(2),

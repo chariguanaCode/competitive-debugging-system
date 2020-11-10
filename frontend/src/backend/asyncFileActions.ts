@@ -27,7 +27,7 @@ export const saveFile = (filePath: string, content: any) =>
     });
 
 export const readFile = (filePath: string) => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve: (data: string) => void, reject) => {
         fs.readFile(filePath, 'utf-8', (err: any, data: string) => {
             console.log({
                 R: filePath,

@@ -6,12 +6,21 @@ const { autoUpdater } = require('electron-updater');
 let mainWindow;
 
 const createWindow = async () => {
-    await session.defaultSession
-        .loadExtension(
-            'C:\\Users\\LegwanXDL\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\4.8.2_0'
-        )
-        .then((res) => console.log(res))
-        .catch((err) => console.log(err));
+    if (process.env.ELECTRON_START_URL) {
+        const extensions = [
+            'C:\\Users\\LegwanXDL\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\4.8.2_0',
+            '/home/charodziej/snap/chromium/common/chromium/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0/',
+            '/home/charodziej/snap/chromium/common/chromium/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.8.2_0/',
+        ];
+        for (const extension of extensions) {
+            try {
+                console.log(await session.defaultSession.loadExtension(extension));
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    }
+
     const startUrl =
         process.env.ELECTRON_START_URL ||
         url.format({
@@ -32,22 +41,13 @@ const createWindow = async () => {
     });
 
     mainWindow.loadURL(startUrl);
-    //mainWindow.webContents.openDevTools()
-
-    //mainWindow.setMenu(null)
-
-    /*
-    await session.defaultSession.loadExtension(
-        '/home/charodziej/snap/chromium/common/chromium/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0/'
-    );
-    */
 
     mainWindow.once('ready-to-show', () => {
         mainWindow.maximize()
         mainWindow.show();
     });
 
-    mainWindow.on('closed', function () {
+    mainWindow.on('closed', () => {
         mainWindow = null;
     });
 };
@@ -60,6 +60,9 @@ global.paths = {
     cdsData: `${app.getPath('userData')}/CDSData`,
     configFile: `${app.getPath('userData')}/CDSData/Config.cds`,
     notSavedProjects: `${app.getPath('userData')}/CDSData/NotSavedProjects`,
+    cppFiles: process.env.ELECTRON_START_URL
+        ? path.join(__dirname, '..', 'cpp')
+        : path.join(__dirname, '..', '..', '..', 'cpp'),
 };
 
 autoUpdater.on('update-available', async (info) => {
@@ -76,6 +79,11 @@ autoUpdater.on('update-available', async (info) => {
 });
 
 autoUpdater.on('update-downloaded', async (info) => {
+    // workaround for https://github.com/electron-userland/electron-builder/issues/4046
+    if (process.env.DESKTOPINTEGRATION === 'AppImageLauncher') {
+        process.env.APPIMAGE = process.env.ARGV0;
+    }
+
     const { response } = await dialog.showMessageBox({
         type: 'question',
         message: `Update downloaded. It will be installed after you quit the app. Quit now?`,
