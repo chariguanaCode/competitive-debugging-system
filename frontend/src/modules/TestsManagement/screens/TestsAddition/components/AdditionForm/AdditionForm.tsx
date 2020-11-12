@@ -5,7 +5,7 @@ import { AdditionFormPropsModel, AdditionFormStateModel } from './AdditionForm.d
 import { Button, TextField } from '@material-ui/core';
 import { ArrowForward as ArrowForwardIcon, ArrowBack as ArrowBackIcon } from '@material-ui/icons';
 import { mergeArrays } from 'utils/tools';
-import { PathsList } from 'modules/TasksManagement/components';
+import { PathsList } from 'modules/TestsManagement/components';
 import { Form } from '..';
 import { FileModel } from 'components/FileManager/FileManager.d';
 

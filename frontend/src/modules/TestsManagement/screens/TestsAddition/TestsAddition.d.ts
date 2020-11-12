@@ -8,4 +8,5 @@ export interface TasksAdditionStateModel {
     inputsFiles: Array<FileModel>;
     outputsFiles: Array<FileModel>;
     mergedFiles: Array<MergedFilesModel>;
+    selectedTestsGroupId: string;
 }

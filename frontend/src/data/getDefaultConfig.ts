@@ -30,7 +30,16 @@ const getDefaultConfig = () => {
                 },
             },
         },
-        tests: [],
+        tests: {
+            groups: {
+                '1': {
+                    name: 'Tests Group 1',
+                    tests: {},
+                },
+            },
+            nextGroupId: '2',
+            nextTestId: '1',
+        },
         watchesIdsActions: {},
         layouts: getDefaultLayouts(),
         layoutSelection: 'empty',

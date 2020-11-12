@@ -23,7 +23,13 @@ const useStyles = makeStyles({
         display: 'flex',
         flexDirection: 'column',
     },
-    submitButton: { minHeight: '30px' },
+    submitButton: { minHeight: '50px', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
+    groupSelectLabel: {
+        fontSize: '0.875rem',
+    },
+    submitButtonRoot: {
+        width: '500px',
+    },
 });
 
 export default useStyles;

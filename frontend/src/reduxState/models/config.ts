@@ -17,6 +17,17 @@ export interface TestModel {
     outputPath: string | null;
 }
 
+export interface TestGroupsModel {
+    groups: {
+        [key: string]: {
+            name: string;
+            tests: { [key: string]: TestModel };
+        };
+    };
+    nextTestId: string;
+    nextGroupId: string;
+}
+
 export interface watchIdActionsModel {
     [key: string]: [
         {
@@ -55,7 +66,7 @@ export interface ConfigModel {
             };
         };
     };
-    tests: Array<TestModel>;
+    tests: TestGroupsModel;
     watchesIdsActions: watchIdActionsModel;
     layouts: {
         debugging: LayoutModel;

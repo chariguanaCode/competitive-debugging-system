@@ -24,8 +24,8 @@ export default () => {
         const defaultTestsOutputDirectory = remote.getGlobal('paths').testsOutputs;
         const projectTestsOutputDirectory = defaultTestsOutputDirectory + '/' + config.projectInfo.uuid + '/';
 
-        await removeDirectory(projectTestsOutputDirectory).catch(err => {});
-        await createDirectory(projectTestsOutputDirectory).catch(err => {});
+        await removeDirectory(projectTestsOutputDirectory).catch((err) => {});
+        await createDirectory(projectTestsOutputDirectory).catch((err) => {});
 
         try {
             setExecutionState({ state: ExecutionState.Compiling, details: '' });
@@ -45,22 +45,25 @@ export default () => {
             console.log('Running tests...');
             console.log('Found tests:', tests);
             const testPromises = new PromiseQueue(4);
+            const groupId = Object.keys(tests.groups)[0];
+            const groupTests = tests.groups[groupId].tests;
             await Promise.all(
-                tests.map(({ inputPath, outputPath }, id) => {
-                    const inputBasename = getFileBasename(inputPath);
+                // TODO: add groups handling
+                Object.keys(groupTests).map((testId) => {
+                    const inputBasename = testId;//getFileBasename(groupTests[testId].inputPath);
                     console.log(inputBasename, projectTestsOutputDirectory);
                     return testPromises
                         .enqueue(
                             () =>
                                 cppActions.executeTest(
                                     binaryPath,
-                                    inputPath,
+                                    groupTests[testId].inputPath,
                                     projectTestsOutputDirectory + inputBasename + '.out',
                                     projectTestsOutputDirectory + inputBasename + '.err'
                                 ),
-                            beginTest(id)
+                            beginTest(Number(testId))
                         )
-                        .then(finishTest(id, projectTestsOutputDirectory + inputBasename + '.out', outputPath), testError(id));
+                        .then(finishTest(Number(testId), projectTestsOutputDirectory + inputBasename + '.out', groupTests[testId].outputPath), testError(Number(testId)));
                 })
             );
             setExecutionState({ state: ExecutionState.Finished, details: '' });

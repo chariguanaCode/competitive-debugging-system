@@ -4,7 +4,7 @@ import { Add, AddBox } from '@material-ui/icons';
 import { Layout, Model, TabNode } from 'flexlayout-react';
 import 'flexlayout-react/style/dark.css';
 import useStyles from './Content.css';
-import { Tasks, Watches, Outputs, TasksManagement, AddTabDialog, TrackedObject, TasksProgressBar } from 'modules';
+import { Tasks, Watches, Outputs, TestsManagement, AddTabDialog, TrackedObject, TasksProgressBar } from 'modules';
 import { useAddTrackedObjectDialogActions, useConfigActions } from 'reduxState/actions';
 import { ContextMenu } from 'components';
 
@@ -35,8 +35,8 @@ const Content: React.FunctionComponent = () => {
                 return <TrackedObject config={node.getConfig()} />;
             case 'outputs':
                 return <Outputs />;
-            case 'tasks management':
-                return <TasksManagement />;
+            case 'tests management':
+                return <TestsManagement />;
             default:
                 return <>Invalid tab</>;
         }
