@@ -39,6 +39,7 @@ export const lightTheme = createMuiTheme({
             pointer: '#FF80FF',
 
             selected: grey[200],
+            bracketArrow: grey[600],
         },
         header: {
             background: amber[500],
@@ -109,6 +110,7 @@ export const darkTheme = createMuiTheme({
             pointer: '#FF80FF',
 
             selected: grey[800],
+            bracketArrow: grey[500],
         },
         header: {
             background: grey[800],

@@ -2,23 +2,26 @@ import { ConvertResult } from 'backend/watchParse';
 
 export type Watch = {
     call_id: string;
+    variable_id: number;
     line: string;
     data_type: string;
     config: any;
 } & ConvertResult;
 
 export interface Watchblock {
-    id: string; //to be removed
     call_id: string;
     children: Array<Watchblock | Watch>;
     type: 'watchblock';
     line: string;
     name: string;
-    state: {
-        expanded: boolean;
-    };
     //config: any;
 }
+
+export type WatchNodeData = (Watchblock | Watch) & {
+    id: string;
+    depth: number;
+    bracketState?: boolean;
+};
 
 export enum TaskState {
     Pending,

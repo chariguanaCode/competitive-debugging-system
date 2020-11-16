@@ -1,19 +1,13 @@
 import React, { ReactElement } from 'react';
 import useStyles from './Watches.css';
-import JSONTree from 'components/JSONTree';
-import { Watchblock, Watch } from 'reduxState/models';
 import { useCurrentTaskState, useWatchHistoryLocation } from 'reduxState/selectors';
-import { useTaskStatesActions, useWatchActionsHistoryActions } from 'reduxState/actions';
+import { useWatchActionsHistoryActions } from 'reduxState/actions';
+import { WatchTree } from 'modules/Watches/components';
 
 function Watches(): ReactElement {
     const classes = useStyles();
 
     const currentTask = useCurrentTaskState();
-    const { setCurrentTaskWatchblocksChildren } = useTaskStatesActions();
-    const updateWatchblocks = (newWatchblocks: Array<Watchblock | Watch>) => {
-        console.log({ newWatchblocks });
-        setCurrentTaskWatchblocksChildren(newWatchblocks);
-    };
 
     const { setWatchHistoryLocation } = useWatchActionsHistoryActions();
     const location = useWatchHistoryLocation();
@@ -31,7 +25,7 @@ function Watches(): ReactElement {
 
     return (
         <div onKeyUp={handleKey} className={classes.wrapper}>
-            <JSONTree data={currentTask.watchblocks.children || []} updateData={updateWatchblocks} />
+            <WatchTree data={currentTask.watchblocks || []} />
         </div>
     );
 }
