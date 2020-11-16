@@ -1,3 +1,5 @@
+import { TestModel} from 'reduxState/models'
+
 export interface TestsListPropsModel {
     rerenderValue: number;
     selectedTestsSet: { [key: string]: Set<string> };
