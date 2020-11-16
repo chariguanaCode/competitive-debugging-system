@@ -40,7 +40,7 @@ const Tasks = ({ node }: Props) => {
     const [filters, setFilters] = useState({ state: [] as string[], name: '', executionTime: '' });
     let taskStates = taskData;
     if (filters.state.length > 0) taskStates = taskStates.filter((val) => filters.state.includes(TaskState[val.state]));
-    if (filters.name.length > 0) taskStates = taskStates.filter((val, index) => testConfig[index].name.includes(filters.name));
+    //if (filters.name.length > 0) taskStates = taskStates.filter((val, index) => testConfig[index].name.includes(filters.name));
     if (filters.executionTime.length > 0)
         taskStates = taskStates.filter((val) => val.executionTime.includes(filters.executionTime));
 
@@ -165,7 +165,7 @@ const Tasks = ({ node }: Props) => {
                         >
                             {TaskState[state]}
                         </TableCell>
-                        <TableCell>{testConfig[id] && testConfig[id].name}</TableCell>
+                        <TableCell>{/*testConfig[id] && testConfig[id].name*/}</TableCell>
                         <TableCell>{executionTime}</TableCell>
                         <TableCell style={{ paddingTop: 8, paddingBottom: 8 }}>
                             {state === TaskState.Running && (

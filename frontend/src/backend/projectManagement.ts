@@ -142,13 +142,13 @@ export const useLoadProject = () => {
 
         // TODO: rozdzielic do innej funkcji
         taskStates.current = [];
-        for (const key in newConfig.tests) {
+        /*for (const key in newConfig.tests) {
             if (newConfig.tests.hasOwnProperty(key)) {
                 taskStates.current[key] = {
                     state: TaskState.Pending,
                 } as Task;
             }
-        }
+        }*/
 
         reloadTasks();
     };
