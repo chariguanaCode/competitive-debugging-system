@@ -79,8 +79,8 @@ const getDefaultLayouts = () => {
                         children: [
                             {
                                 type: 'tab',
-                                name: 'Tasks Management',
-                                component: 'tasks management',
+                                name: 'Tests Management',
+                                component: 'tests management',
                             },
                         ],
                     },

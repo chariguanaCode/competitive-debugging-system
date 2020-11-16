@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 export const useFocus = () => {
     const htmlElRef = useRef(null);
@@ -74,3 +74,16 @@ export const getTimeMark = () => {
     const currentDate = new Date();
     return `${currentDate.getFullYear()}${currentDate.getMonth()+1}${currentDate.getDate()}${currentDate.getHours()}${currentDate.getMinutes()}${currentDate.getSeconds()}${currentDate.getMilliseconds()}`;
 };
+
+// Hook useful when you want to keep current state in eventListener function.
+/*export const useStateRef = (initialState) => {
+    const stateRef = useRef(initialState);
+    //eslint-disable-next-line
+    const [state, _setState] = useState(initialState);
+    const setState = (newState) => {
+      stateRef.current = newState;
+      _setState(newState);
+    };
+    return [stateRef, setState];
+  };*/  
+  

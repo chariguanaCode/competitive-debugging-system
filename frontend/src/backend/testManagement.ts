@@ -1,6 +1,7 @@
 import { TaskState, Task } from 'reduxState/models';
 import { useTaskStatesActions } from 'reduxState/actions';
 import { useAllTasksState } from 'reduxState/selectors';
+import { compareFiles } from './asyncFileActions';
 
 let hrstart: [number, number];
 
@@ -25,18 +26,33 @@ export const useFinishTest = () => {
     const { reloadTasks } = useTaskStatesActions();
     const taskStates = useAllTasksState();
 
-    return (id: number) => () => {
-        const execTime = window.process.hrtime(taskStates.current[id].startTime);
-        taskStates.current[id] = {
-            state: TaskState.Successful,
-            childProcess: null,
-            executionTime: `${execTime[0]}s ${execTime[1] / 1000000}ms`,
-        } as Task;
+    return (id: number, outputPath: string, outputToComparePath: string | null) => () => {
+        const asyncInside = async () => {
+            const execTime = window.process.hrtime(taskStates.current[id].startTime);
 
-        reloadTasks();
+            let isAnswerRight: number = -1;
+            if (outputToComparePath) isAnswerRight = Number(await compareFiles(outputPath, outputToComparePath, true));
+
+            const finalTaskState: TaskState =
+                isAnswerRight == -1
+                    ? TaskState.Successful
+                    : isAnswerRight == 0
+                    ? TaskState.WrongAnswer
+                    : isAnswerRight == 1
+                    ? TaskState.Successful
+                    : TaskState.Successful;
+
+            taskStates.current[id] = {
+                state: finalTaskState,
+                childProcess: null,
+                executionTime: `${execTime[0]}s ${execTime[1] / 1000000}ms`,
+            } as Task;
+
+            reloadTasks();
+        };
+        asyncInside();
     };
 };
-
 export const useKillTest = () => {
     const { reloadTasks } = useTaskStatesActions();
     const taskStates = useAllTasksState();
@@ -45,7 +61,6 @@ export const useKillTest = () => {
         if (taskStates.current[id].state !== TaskState.Running) return;
 
         console.log(window.process.hrtime(hrstart), 'killed', id);
-
         taskStates.current[id].childProcess.kill();
 
         const execTime = window.process.hrtime(taskStates.current[id].startTime);

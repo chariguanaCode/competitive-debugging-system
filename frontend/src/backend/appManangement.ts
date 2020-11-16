@@ -9,10 +9,12 @@ const remote = window.require('electron').remote;
 export const getAppConfig = async (): Promise<CdsConfigModel> => {
     const paths = remote.getGlobal('paths');
     const appDataDirectory = paths.cdsData;
+    const testsOutputsDirectory = paths.testsOutputs;
     const notSavedProjectsDirectory = paths.notSavedProjects;
     const configFilePath = paths.configFile;
     await asyncFileActions.createDirectory(appDataDirectory).catch((err) => {});
     await asyncFileActions.createDirectory(notSavedProjectsDirectory).catch((err) => {});
+    await asyncFileActions.createDirectory(testsOutputsDirectory).catch((err) => {});
     if (!(await asyncFileActions.fileExist(configFilePath).catch())) {
         await asyncFileActions.saveFile(configFilePath, JSON.stringify(getDefaultCdsConfig()));
     }
@@ -23,6 +25,8 @@ export const getAppConfig = async (): Promise<CdsConfigModel> => {
     console.log(readConfig); // TODO: CRITICAL ERROR, SOMETIMES "" DONT NOW WHY
     return JSON.parse(readConfig) as CdsConfigModel;
 }; //TODO: add update of CDS file
+
+
 
 export const useAppSetup = () => {
     const { setCdsConfig } = useCdsConfigActions();
