@@ -6,22 +6,24 @@ import { List, AutoSizer } from 'react-virtualized';
 import { useConfig } from 'reduxState/selectors';
 import { TestModel } from 'reduxState/models';
 import { useConfigActions } from 'reduxState/actions';
+import { useCommonState } from 'utils';
 
 const arePropsEqual = (prevProps: TestsListPropsModel, nextProps: TestsListPropsModel) => {
     return prevProps.rerenderValue === nextProps.rerenderValue && prevProps.searchText === nextProps.searchText;
 };
 
 export const TestsList: React.FunctionComponent<TestsListPropsModel> = memo(
-    ({ selectedTestsSet, rerenderValue, rerenderTestsList, searchText }) => {
+    ({ selectedTestsSet, rerenderValue, rerenderTestsList, searchText, openTestEditionDialog, openGroupEditionDialog }) => {
         const classes = useStyles();
         const config = useConfig();
-        const [state, _setState] = useState<TestsListStateModel>({
+        const [state, setState] = useCommonState<TestsListStateModel>({
             expandedGroupsIds: new Set(),
             selectedGroupsIds: new Set(),
             filteredTests: {},
         });
+
+        // filter text by searchText
         useEffect(() => {
-            console.log('render');
             let regexExp: RegExp | null = null;
             try {
                 regexExp = new RegExp(searchText);
@@ -41,13 +43,6 @@ export const TestsList: React.FunctionComponent<TestsListPropsModel> = memo(
             setState('filteredTests', newFilteredTests);
         }, [config.tests.groups, searchText]);
 
-        const setState = (type: string, value: any | ((arg1: any) => any)) => {
-            _setState((pvState: any) => ({
-                ...pvState,
-                [type]: typeof value === 'function' ? value(pvState) : value,
-            }));
-        };
-
         const { removeTests, removeTestsGroups } = useConfigActions();
 
         const setAllCheckboxesValues = (groupId: string, newCheckboxesValue: boolean) => {
@@ -56,6 +51,7 @@ export const TestsList: React.FunctionComponent<TestsListPropsModel> = memo(
                 if (newCheckboxesValue) selectedTestsSet[groupId].add(test.id);
                 else selectedTestsSet[groupId].delete(test.id);
             });
+            if (selectedTestsSet[groupId].size === 0) delete selectedTestsSet[groupId];
             rerenderTestsList();
         };
 
@@ -65,22 +61,30 @@ export const TestsList: React.FunctionComponent<TestsListPropsModel> = memo(
             groupId: string
         ) => {
             const testId = sourceArray[index].id;
-            if (!selectedTestsSet.hasOwnProperty(groupId)) selectedTestsSet[groupId] = new Set();
             return (
                 <div key={key} style={style}>
                     <TestListElement
                         testObject={sourceArray[index]}
-                        isSelected={selectedTestsSet[groupId].has(testId)}
+                        isSelected={groupId in selectedTestsSet && selectedTestsSet[groupId].has(testId)}
                         setCheckboxValue={(newValue: boolean) => {
+                            if(!(groupId in selectedTestsSet))
+                                selectedTestsSet[groupId] = new Set();
                             if (newValue) selectedTestsSet[groupId].add(testId);
                             else selectedTestsSet[groupId].delete(testId);
+                            if (selectedTestsSet[groupId].size === 0) {
+                                delete selectedTestsSet[groupId];
+                            }
                             rerenderTestsList();
                         }}
-                        clickRemoveButton={() =>
+                        clickRemoveButton={(e: any) =>
                             removeTests({
                                 [groupId]: [testId],
                             })
                         }
+                        clickEditButton={(e: any) => {
+                            e.persist();
+                            openTestEditionDialog(testId, groupId, e.currentTarget);
+                        }}
                     />
                 </div>
             );
@@ -106,6 +110,10 @@ export const TestsList: React.FunctionComponent<TestsListPropsModel> = memo(
                                         else newExpandedGroupsIdsSet.add(groupId);
                                         setState('expandedGroupsIds', newExpandedGroupsIdsSet);
                                     }}
+                                    clickEditButton={(e: any) => {
+                                        e.persist();
+                                        openGroupEditionDialog(groupId, e.currentTarget);
+                                    }}
                                     isSelected={state.selectedGroupsIds.has(groupId)}
                                     setCheckboxValue={(newValue: boolean) => {
                                         let selectedGroupsIdsSet = new Set(state.selectedGroupsIds);
@@ -125,7 +133,7 @@ export const TestsList: React.FunctionComponent<TestsListPropsModel> = memo(
                                                     height={height}
                                                     rowCount={groupTests ? groupTests.length : 0}
                                                     rowHeight={30}
-                                                    overscanRowCount={10}
+                                                    overscanRowCount={5}
                                                 ></List>
                                             )}
                                         </AutoSizer>

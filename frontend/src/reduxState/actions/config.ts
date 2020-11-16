@@ -9,6 +9,8 @@ export enum ConfigActions {
     SET_PROJECT_INFO = 'SET_PROJECT_INFO',
     ADD_TESTS = 'ADD_TESTS',
     REMOVE_TESTS = 'REMOVE_TESTS',
+    MOVE_TESTS = 'MOVE_TESTS',
+    EDIT_TESTS = 'EDIT_TESTS',
     REMOVE_TESTS_GROUPS = 'REMOVE_TESTS_GROUPS',
     SET_LAYOUT = 'SET_LAYOUT',
     SELECT_LAYOUT = 'SELECT_LAYOUT',
@@ -24,6 +26,10 @@ const actions = {
     setProjectInfo: createAction<ProjectInfoModel>(ConfigActions.SET_PROJECT_INFO),
     addTests: createAction<TestGroupsModel['groups']>(ConfigActions.ADD_TESTS),
     removeTests: createAction<{ [key: string]: Array<string> }>(ConfigActions.REMOVE_TESTS),
+    moveTests: createAction<{ testsToMove: { [key: string]: Array<string> }; destinationGroupId: string }>(
+        ConfigActions.MOVE_TESTS
+    ),
+    editTests: createAction<{ [key: string]: { [key: string]: { [key: string]: any } } }>(ConfigActions.EDIT_TESTS),
     removeTestsGroups: createAction<Array<string>>(ConfigActions.REMOVE_TESTS_GROUPS),
     setLayout: createAction<{ key: keyof ConfigModel['layouts']; value: LayoutModel }>(ConfigActions.SET_LAYOUT),
     selectLayout: createAction<keyof ConfigModel['layouts']>(ConfigActions.SELECT_LAYOUT),

@@ -6,7 +6,7 @@ const useStyles = makeStyles({
         flexGrow: 1
     },
     FilesTable: {
-        border: '1px solid black',
+        border: '1px solid #616161',
     },
     FilesTableRow: {
         '& div': {

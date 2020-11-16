@@ -43,7 +43,7 @@ export const GroupListElement: React.FunctionComponent<GroupListElementPropsMode
                     >
                         {isExpanded ? <ArrowDropDownIcon /> : <ArrowDropUpIcon />}
                     </Button>
-                    <Button className={clsx(classes.EditButton)} classes={{ root: classes.Button }}>
+                    <Button onClick={clickEditButton} className={clsx(classes.EditButton)} classes={{ root: classes.Button }}>
                         <EditIcon />
                     </Button>
                     <Button

@@ -2,7 +2,6 @@ import { handleActions } from 'redux-actions';
 import { ConfigActions, ConfigActionPayload } from '../actions';
 import { ConfigModel, TestModel, ProjectInfoModel, LayoutModel, TrackedObject, TestGroupsModel } from '../models';
 import getDefaultConfig from 'data/getDefaultConfig';
-import { group } from 'console';
 
 export const configReducer = handleActions<ConfigModel, ConfigActionPayload>(
     {
@@ -23,15 +22,56 @@ export const configReducer = handleActions<ConfigModel, ConfigActionPayload>(
             // TODO: do it in a better way
             const payload: { [key: string]: Array<string> } = action.payload as { [key: string]: Array<string> };
             let newGroups: TestGroupsModel['groups'] = {};
-            console.log(payload);
+
             Object.entries(payload).forEach(([groupId, testsIds]) => {
-                console.log(groupId, testsIds);
                 newGroups[groupId] = Object.assign({}, state.tests.groups[groupId]);
-                console.log(state.tests.groups, groupId, newGroups[groupId]);
                 newGroups[groupId].tests = Object.assign({}, state.tests.groups[groupId].tests);
                 for (let testId of testsIds) {
                     delete newGroups[groupId].tests[testId];
                 }
+            });
+            return {
+                ...state,
+                tests: {
+                    ...state.tests,
+                    groups: {
+                        ...state.tests.groups,
+                        ...newGroups,
+                    },
+                },
+            };
+        },
+        [ConfigActions.EDIT_TESTS]: (state, action) => {
+            // TODO: do it in a better way
+            const payload: {
+                [key: string]: { [key: string]: { [key: string]: any } };
+            } = action.payload as {
+                [key: string]: { [key: string]: { [key: string]: any } };
+            };
+            let newGroups: TestGroupsModel['groups'] = {};
+
+            Object.entries(payload).forEach(([groupId, tests]) => {
+                if (!(groupId in newGroups)) {
+                    newGroups[groupId] = Object.assign({}, state.tests.groups[groupId]);
+                    newGroups[groupId].tests = Object.assign({}, state.tests.groups[groupId].tests);
+                }
+                Object.entries(tests).forEach(([testId, testValue]) => {
+                    let newTestValue = Object.assign({}, state.tests.groups[groupId].tests[testId]);
+                    for (let property of ['name', 'inputPath', 'outputPath'] as Array<keyof TestModel>) {
+                        if (property in testValue) newTestValue[property] = testValue[property];
+                    }
+                    if ('groupId' in testValue) {
+                        if (!(testValue['groupId'] in newGroups)) {
+                            newGroups[testValue['groupId']] = Object.assign({}, state.tests.groups[testValue['groupId']]);
+                            newGroups[testValue['groupId']].tests = Object.assign(
+                                {},
+                                state.tests.groups[testValue['groupId']].tests
+                            );
+                        }
+                        delete newGroups[groupId].tests[testId];
+                        newGroups[testValue['groupId']].tests[testId] = newTestValue;
+                    } else newGroups[groupId].tests[testId] = newTestValue;
+                });
             });
             return {
                 ...state,
@@ -61,6 +101,43 @@ export const configReducer = handleActions<ConfigModel, ConfigActionPayload>(
                 },
             };
         },
+        [ConfigActions.MOVE_TESTS]: (state, action) => {
+            // TODO: do it in a better way
+            const {
+                testsToMove,
+                destinationGroupId,
+            }: {
+                testsToMove: { [key: string]: Array<string> };
+                destinationGroupId: string;
+            } = action.payload as {
+                testsToMove: { [key: string]: Array<string> };
+                destinationGroupId: string;
+            };
+            let newGroups: TestGroupsModel['groups'] = {};
+            let testsToAdd: { [key: string]: TestModel } = {};
+            for (let groupId in testsToMove) {
+                if (groupId in state.tests.groups) {
+                    newGroups[groupId] = Object.assign({}, state.tests.groups[groupId]);
+                    newGroups[groupId].tests = Object.assign({}, state.tests.groups[groupId].tests);
+                    for (let testId of testsToMove[groupId]) {
+                        testsToAdd[testId] = Object.assign({}, newGroups[groupId].tests[testId]);
+                        delete newGroups[groupId].tests[testId];
+                    }
+                }
+            }
+            newGroups[destinationGroupId] = state.tests.groups[destinationGroupId];
+            newGroups[destinationGroupId].tests = Object.assign({}, state.tests.groups[destinationGroupId].tests, testsToAdd);
+            return {
+                ...state,
+                tests: {
+                    ...state.tests,
+                    groups: {
+                        ...state.tests.groups,
+                        ...newGroups,
+                    },
+                },
+            };
+        },
         [ConfigActions.ADD_TESTS]: (state, action) => {
             // TODO: do it in a better way
             const payload: TestGroupsModel['groups'] = action.payload as TestGroupsModel['groups'];
@@ -68,7 +145,10 @@ export const configReducer = handleActions<ConfigModel, ConfigActionPayload>(
             for (let groupId in payload) {
                 if (groupId in state.tests.groups) {
                     newGroups[groupId] = { tests: {}, name: '' };
-                    newGroups[groupId].tests = Object.assign({}, state.tests.groups[groupId].tests, payload[groupId].tests);
+                    newGroups[groupId].tests =
+                        Object.keys(newGroups[groupId]).length > 0
+                            ? Object.assign({}, state.tests.groups[groupId].tests, payload[groupId].tests)
+                            : state.tests.groups[groupId].tests;
                     if ('name' in payload[groupId]) {
                         newGroups[groupId].name = payload[groupId].name;
                     } else {

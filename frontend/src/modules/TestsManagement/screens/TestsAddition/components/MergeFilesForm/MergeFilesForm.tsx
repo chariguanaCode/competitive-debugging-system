@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import useStyles from './MergeFilesForm.css';
 import { MergeFilesFormPropsModel, MergeFilesFormStateModel } from './MergeFilesForm.d';
-import { MergedFilesModel } from '../../TasksAddition.d';
+import { MergedFilesModel } from '../../TestsAddition.d';
 import { Button, Select, MenuItem, Checkbox, FormControlLabel } from '@material-ui/core';
 import mergingFilesDefaultFunctions from 'data/mergingFilesDefaultFunctions';
-
+import { useCommonState } from 'utils';
 export const MergeFilesForm: React.FunctionComponent<MergeFilesFormPropsModel> = ({
     inputsFiles,
     outputsFiles,
@@ -14,17 +14,10 @@ export const MergeFilesForm: React.FunctionComponent<MergeFilesFormPropsModel> =
     const classes = useStyles();
     const mergingFunctionsNames = Object.keys(mergingFilesDefaultFunctions);
     const mergingFunctionsArray = Object.entries(mergingFilesDefaultFunctions);
-    const [state, _setState] = useState<MergeFilesFormStateModel>({
+    const [state, setState] = useCommonState<MergeFilesFormStateModel>({
         selectedMergeFunction: mergingFunctionsArray[0][1].name,
         doAddInputsWithoutOutputs: false,
     });
-
-    const setState = (type: string, value: any | ((arg1: any) => any)) => {
-        _setState((pvState: any) => ({
-            ...pvState,
-            [type]: typeof value === 'function' ? value(pvState) : value,
-        }));
-    };
 
     const mergeFiles = () => {
         let newMergedFilesObject: { [key: string]: MergedFilesModel } = {};
@@ -57,7 +50,7 @@ export const MergeFilesForm: React.FunctionComponent<MergeFilesFormPropsModel> =
                         value={state.selectedMergeFunction}
                         onChange={(e) => {
                             e.persist();
-                            setState('selectedMergeFunction', e.target.value);
+                            setState('selectedMergeFunction', e.target.value as string);
                         }}
                         label={'merge rule'}
                     >

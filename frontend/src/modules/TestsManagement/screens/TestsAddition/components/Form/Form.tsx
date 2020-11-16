@@ -6,20 +6,15 @@ import { FileModel } from 'components/FileManager/FileManager.d';
 import { loadFilesOnDirectoryAncestors } from 'backend/filesHandlingFunctions';
 import { asyncForEach, mergeArrays } from 'utils/tools';
 import { FolderOpen as FolderOpenIcon } from '@material-ui/icons';
+import { useCommonState } from 'utils';
 
 export const Form: React.FunctionComponent<FormPropsModel> = ({ setFileManager, title, mirrored, setSelectedFiles }) => {
     const classes = useStyles({ mirrored: mirrored });
-    const [state, _setState] = useState<FormStateModel>({
+    const [state, setState] = useCommonState<FormStateModel>({
         pendingFiles: [],
         regex: '',
     });
 
-    const setState = (type: string, value: any | ((arg1: any) => any)) => {
-        _setState((pvState: any) => ({
-            ...pvState,
-            [type]: typeof value === 'function' ? value(pvState) : value,
-        }));
-    };
     useEffect(() => {
         let regexp = new RegExp('');
         try {
@@ -46,7 +41,8 @@ export const Form: React.FunctionComponent<FormPropsModel> = ({ setFileManager, 
 
             return filesToSet.push(file);
         });
-        setState('pendingFiles', (pvState: FormStateModel) => mergeArrays(pvState.pendingFiles, filesToSet));
+        // TO DO FIX MERGING OBJECTS
+        setState('pendingFiles', (pvPendingFiles) => mergeArrays(pvPendingFiles, filesToSet));
     };
 
     return (

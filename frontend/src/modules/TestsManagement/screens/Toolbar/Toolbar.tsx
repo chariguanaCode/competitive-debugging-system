@@ -1,19 +1,49 @@
 import React from 'react';
 import useStyles from './Toolbar.css';
 import { Button, InputAdornment, TextField } from '@material-ui/core';
-import { Add as AddIcon, Delete as DeleteIcon, Search as SearchIcon } from '@material-ui/icons';
+import { Add as AddIcon, Delete as DeleteIcon, Search as SearchIcon, AllInbox as AllInboxIcon } from '@material-ui/icons';
 import { ToolbarPropsModel, ToolbarStateModel } from './Toolbar.d';
-
+import { useCommonState } from 'utils';
+import { AnchoredDialog } from 'components';
+import { TestsMove } from '../';
 export const Toolbar: React.FunctionComponent<ToolbarPropsModel> = ({
     clickAddTestsButton,
     clickRemoveTestsButton,
+    clickMoveTestsButton,
     setSearchText,
     searchText,
+    areButtonsForSelectedTestsDisabled,
 }) => {
     const classes = useStyles();
+    const [state, setState] = useCommonState<ToolbarStateModel>({
+        moveTestsDialogProps: {
+            open: false,
+        },
+    });
     return (
         <>
             <div className={classes.Toolbar}>
+                <AnchoredDialog
+                    closeOnClickOutside
+                    closeDialog={() => {
+                        setState('moveTestsDialogProps', {
+                            open: false,
+                        });
+                    }}
+                    content={
+                        <TestsMove
+                            moveTests={clickMoveTestsButton}
+                            closeDialog={() => {
+                                setState('moveTestsDialogProps', {
+                                    open: false,
+                                });
+                            }}
+                        />
+                    }
+                    position="right-top"
+                    anchorPosition="left-top"
+                    {...state.moveTestsDialogProps}
+                />
                 <TextField
                     InputProps={{
                         endAdornment: (
@@ -30,10 +60,27 @@ export const Toolbar: React.FunctionComponent<ToolbarPropsModel> = ({
                     }}
                 />
                 <Button classes={{ root: classes.ButtonRoot }} onClick={clickAddTestsButton}>
-                    <AddIcon></AddIcon>
+                    <AddIcon />
                 </Button>
-                <Button classes={{ root: classes.ButtonRoot }} onClick={clickRemoveTestsButton}>
-                    <DeleteIcon></DeleteIcon>
+                <Button
+                    disabled={areButtonsForSelectedTestsDisabled}
+                    classes={{ root: classes.ButtonRoot }}
+                    onClick={clickRemoveTestsButton}
+                >
+                    <DeleteIcon />
+                </Button>
+                <Button
+                    disabled={areButtonsForSelectedTestsDisabled}
+                    classes={{ root: classes.ButtonRoot }}
+                    onClick={(e) => {
+                        e.persist();
+                        setState('moveTestsDialogProps', {
+                            open: true,
+                            anchorEl: e.currentTarget,
+                        });
+                    }}
+                >
+                    <AllInboxIcon />
                 </Button>
             </div>
         </>

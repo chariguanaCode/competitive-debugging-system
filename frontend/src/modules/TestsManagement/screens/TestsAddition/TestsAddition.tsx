@@ -5,26 +5,22 @@ import { AdditionForm, MergedFilesTable, MergeFilesForm, TestsGroupForm } from '
 import { useFileManagerActions, useConfigActions } from 'reduxState/actions';
 import { Button } from '@material-ui/core';
 import { useConfig } from 'reduxState/selectors';
-import { forEachChild } from 'typescript';
 import { TestModel } from 'reduxState/models';
+import { FileModel } from 'components/FileManager/FileManager.d';
+import { useCommonState } from 'utils';
 
 export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = ({}) => {
     const classes = useStyles();
     const config = useConfig();
     const { addTests, increaseNextTestId, increaseNextGroupId } = useConfigActions();
     const { setFileManager } = useFileManagerActions();
-    const [state, _setState] = useState<TasksAdditionStateModel>({
+    const [state, setState] = useCommonState<TasksAdditionStateModel>({
         inputsFiles: [],
         outputsFiles: [],
         mergedFiles: [],
         selectedTestsGroupId: Object.keys(config.tests.groups)[0], // TODO: better way
     });
-    const setState = (type: string, value: any | ((arg1: any) => any)) => {
-        _setState((pvState: any) => ({
-            ...pvState,
-            [type]: typeof value === 'function' ? value(pvState[type]) : value,
-        }));
-    };
+
     const _addTests = () => {
         const localNextTestId = Number(config.tests.nextTestId);
         increaseNextTestId(state.mergedFiles.length); // TODO: maybe add it to reducer
@@ -63,7 +59,7 @@ export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = (
                             setFileManager={setFileManager}
                             title={'INPUTS'}
                             selectedFiles={state.inputsFiles}
-                            setSelectedFiles={(newPaths: Array<string>) => {
+                            setSelectedFiles={(newPaths: Array<FileModel>) => {
                                 setState('inputsFiles', newPaths);
                             }}
                         />
@@ -84,7 +80,7 @@ export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = (
                             setFileManager={setFileManager}
                             title={'OUTPUTS'}
                             selectedFiles={state.outputsFiles}
-                            setSelectedFiles={(newPaths: Array<string>) => {
+                            setSelectedFiles={(newPaths: Array<FileModel>) => {
                                 setState('outputsFiles', newPaths);
                             }}
                             mirrored={true}

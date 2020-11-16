@@ -8,7 +8,7 @@ const useStyles = makeStyles({
         flexDirection: 'column',
     },
     pathsListTitle: { width: '100%', textAlign: 'center', fontWeight: 700 },
-    pathsListContainer: { width: '100%', flexGrow: 1, border: '1px solid black' },
+    pathsListContainer: { width: '100%', flexGrow: 1, border: '1px solid #616161' },
     pathRow: {
         // TODO: reversed ellipsis
         overflow: 'hidden',

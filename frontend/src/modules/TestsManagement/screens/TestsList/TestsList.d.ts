@@ -3,6 +3,8 @@ export interface TestsListPropsModel {
     selectedTestsSet: { [key: string]: Set<string> };
     rerenderTestsList: () => any;
     searchText: string;
+    openTestEditionDialog: (testId: string, groupId: string, anchorEl: any) => void;
+    openGroupEditionDialog: (groupId: string, anchorEl: any) => void;
 }
 
 export interface TestsListStateModel {

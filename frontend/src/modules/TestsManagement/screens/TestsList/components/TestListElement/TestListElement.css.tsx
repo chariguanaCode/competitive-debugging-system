@@ -5,7 +5,7 @@ const useStyles = makeStyles({
         fontSize: '15px',
         paddingLeft: '30px',
         marginBottom: '10px',
-        fontWeight: 500,
+        fontWeight: 400,
         textAlign: 'center',
         alignItems: 'center',
         width: '100%',

@@ -2,13 +2,12 @@ import React, { useRef } from 'react';
 import useStyles from './TestListElement.css';
 import { Button, Checkbox } from '@material-ui/core';
 import { TestListElementPropsModel, TestListElementStateModel } from './TestListElement.d';
-import { Edit as EditIcon, Delete as DeleteIcon, ArrowDropDown as ArrowDropDownIcon, ArrowDropDown } from '@material-ui/icons';
+import { Info as InfoIcon, Edit as EditIcon, Delete as DeleteIcon, ArrowDropDown as ArrowDropDownIcon, ArrowDropDown } from '@material-ui/icons';
 import clsx from 'clsx';
 
 export const TestListElement: React.FunctionComponent<TestListElementPropsModel> = ({
-    clickRemoveButton = () => {},
-    clickEditButton = () => {},
-    clickCheckbox = () => {},
+    clickRemoveButton,
+    clickEditButton,
     setCheckboxValue,
     testObject,
     isSelected,
@@ -28,11 +27,11 @@ export const TestListElement: React.FunctionComponent<TestListElementPropsModel>
                     {testObject.name}
                 </div>
                 <div className={classes.buttons}>
-                    <Button className={clsx(classes.EditButton)} classes={{ root: classes.Button }}>
+                    <Button onClick = {clickEditButton} className={clsx(classes.EditButton)} classes={{ root: classes.Button }}>
                         <EditIcon />
                     </Button>
                     <Button
-                        onClick={() => clickRemoveButton()}
+                        onClick={clickRemoveButton}
                         className={clsx(classes.RemoveButton)}
                         classes={{ root: classes.Button }}
                     >

@@ -18,7 +18,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     directoryOnStart = null,
     closeFileManager = () => {},
     withFilesStats = false,
-    lastDirectory = '/'
+    lastDirectory = '/',
     //config,
 }) => {
     // TODO: add loading circular to file manager
@@ -40,13 +40,11 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
     // TODO: zoom
 
     useEffect(() => {
-        if(directoryOnStart)
-            loadDirectory({ path: directoryOnStart });
+        if (directoryOnStart) loadDirectory({ path: directoryOnStart });
     }, [directoryOnStart]);
 
     useEffect(() => {
-        if(!directoryOnStart)
-            loadDirectory({ path: lastDirectory });
+        if (!directoryOnStart) loadDirectory({ path: lastDirectory });
     }, [lastDirectory]);
 
     useEffect(() => {
@@ -58,7 +56,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
 
     const __closeFileManager = () => {
         closeFileManager(state.currentPath);
-    }
+    };
 
     const loadDirectory = async ({ path, regex }: { path: string; regex?: string }) => {
         //setLoadingState(true);
@@ -106,6 +104,7 @@ export const FileManager: React.FunctionComponent<FileManagerPropsModel> = ({
                 }}
                 open={!!open}
                 maxWidth={'xl'}
+                onClose={__closeFileManager}
             >
                 <div className={classes.FileManager}>
                     <div className={classes.HeaderContainer}>

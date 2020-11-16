@@ -1,6 +1,6 @@
 export interface GroupListElementPropsModel {
     clickRemoveButton?: () => any;
-    clickEditButton?: () => any;
+    clickEditButton?: (e: any) => any;
     clickExpandGroupButton: () => void;
     setCheckboxValue: (newValue: boolean) => void;
     isExpanded: boolean;

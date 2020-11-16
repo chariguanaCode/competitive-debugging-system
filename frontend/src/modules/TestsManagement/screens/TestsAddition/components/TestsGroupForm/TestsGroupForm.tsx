@@ -9,9 +9,7 @@ export const TestsGroupForm: React.FunctionComponent<TestsGroupFormPropsModel> =
     setSelectedTestsGroupId,
     addGroup,
 }) => {
-    console.log(selectedTestsGroupId);
     const classes = useStyles();
-    console.log(testsGroupsArray);
     return (
         <>
             <div className={classes.TestsGroupForm}>
