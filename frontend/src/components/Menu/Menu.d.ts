@@ -2,6 +2,7 @@ import { SectorButton } from 'modules/Menu/screens/MainMenu/components/SectorsBu
 
 export interface MenuPropsModel {
     sectors: Array<string>;
+    defaultSelectedSector?: string;
     contents: { [key: string]: React.ElementType };
     buttons: Array<SectorButton>;
     contentsProps?: Iterable;

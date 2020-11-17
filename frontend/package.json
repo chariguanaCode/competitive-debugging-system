@@ -20,6 +20,7 @@
         "@types/redux-actions": "^2.6.1",
         "clsx": "^1.1.1",
         "flexlayout-react": "^0.4.9",
+        "md5-wasm": "^1.2.0",
         "react": "^16.13.1",
         "react-addons-create-fragment": "^15.6.2",
         "react-custom-scrollbars": "^4.2.1",

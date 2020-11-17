@@ -69,11 +69,9 @@ export const TasksManagement: React.FunctionComponent<TestsManagementPropsModel>
                 <Dialog
                     maxWidth={'xl'}
                     open={state.tasksAdditionDialogVisibility}
-                    onClose={() => {
-                        setState('tasksAdditionDialogVisibility', false);
-                    }}
+                    onClose={() => setState('tasksAdditionDialogVisibility', false)}
                 >
-                    <TestsAddition />
+                    <TestsAddition closeDialog={() => setState('tasksAdditionDialogVisibility', false)} />
                 </Dialog>
 
                 <Toolbar

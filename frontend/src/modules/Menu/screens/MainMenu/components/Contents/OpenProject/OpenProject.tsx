@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { Button } from '@material-ui/core';
 import { useLoadProject } from 'backend/projectManagement';
 import { ContentProps } from '../Types';
@@ -15,7 +15,9 @@ export const OpenProject: React.FunctionComponent<ContentProps> = memo(({ setFil
         loadProject(files[0]);
         closeMainMenu();
     };
-
+    useEffect(() => {
+        openProject();
+    }, []);
     const openProject = () => {
         return setFileManagerConfig({
             maxNumberOfSelectedFiles: 1,
@@ -26,11 +28,9 @@ export const OpenProject: React.FunctionComponent<ContentProps> = memo(({ setFil
         });
     };
     return (
-        <div>
-            <Button disabled={isLoading} onClick={() => openProject()}>
+        <div>{/*<Button disabled={isLoading} onClick={() => openProject()}>
                 Open project
-            </Button>
-        </div>
+    </Button>*/}</div>
     );
 });
 

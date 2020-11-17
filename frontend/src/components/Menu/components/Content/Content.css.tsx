@@ -5,6 +5,7 @@ const useStyles = makeStyles((theme) =>
         Content: {
             color: theme.palette.mainMenu.fontColor,
             padding: '20px',
+            width: '100%'
         },
     })
 );

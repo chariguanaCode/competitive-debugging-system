@@ -4,6 +4,10 @@ import { MenuList, MenuItem } from '@material-ui/core';
 import { useTheme } from '@material-ui/core/styles';
 import { SidebarPropsModel } from './Sidebar.d';
 
+const arePropsEqual = (previousProps: SidebarPropsModel, currentProps: SidebarPropsModel) => {
+    return previousProps === currentProps && JSON.stringify(previousProps.buttons) === JSON.stringify(currentProps.buttons);
+};
+
 export const Sidebar: React.FunctionComponent<SidebarPropsModel> = memo(({ buttons, selectSector, selectedSector }) => {
     const classes = useStyles();
     const theme = useTheme();
@@ -38,6 +42,6 @@ export const Sidebar: React.FunctionComponent<SidebarPropsModel> = memo(({ butto
             </div>
         </>
     );
-});
+}, arePropsEqual);
 
 export default Sidebar;

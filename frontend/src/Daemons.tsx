@@ -7,6 +7,7 @@ import {
     useWatchHistoryLocation,
     useWatchActionsHistory,
     useCdsConfig,
+    useProjectFile,
 } from 'reduxState/selectors';
 import {
     TaskState,
@@ -19,19 +20,40 @@ import { useTaskStatesActions, useTrackedObjectsActions } from 'reduxState/actio
 import { readFileStream } from 'backend/outputFileTracking';
 import { useParseWatchblocks } from 'backend/watchParse';
 import { useSaveCdsConfigToFile } from 'backend/appManangement';
-import { useSaveTemporaryProjectFile } from 'backend/projectManagement';
+import { useSaveTemporaryProjectFile, useSaveProject } from 'backend/projectManagement';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 export default function Daemons(): ReactElement {
+    const saveProject = useSaveProject();
+    const projectFile = useProjectFile();
+    const config = useConfig();
     const cdsConfig = useCdsConfig();
-    const saveCdsConfigToFile = useSaveCdsConfigToFile();
+    const saveCdsConfigToFile = useSaveCdsConfigToFile(); /* TEMPORARY MOVED TO HEADER */
+
+    /* useHotkeys(
+        'ctrl+s',
+        () => {
+            saveProject().catch((err) => {
+                switch (err.code) {
+                    case 0:
+                        break;
+                }
+            });
+        },
+        {},
+        [projectFile, config]
+    ); */
+
     useEffect(() => {
         if (Object.keys(cdsConfig).length) saveCdsConfigToFile();
     }, [cdsConfig]);
-    const config = useConfig();
+
     const saveTemporaryProjectFile = useSaveTemporaryProjectFile();
     useEffect(() => {
-        if (Object.keys(config).length) saveTemporaryProjectFile();
-    }, [config]);
+        if (Object.keys(config).length) {
+            saveTemporaryProjectFile();
+        }
+    }, [config.projectInfo, config.settings, config.tests, config.trackedObjects, config.watchesIdsActions]);
 
     const taskStates = useAllTasksState();
     const currentTask = useCurrentTaskState();
@@ -46,6 +68,7 @@ export default function Daemons(): ReactElement {
 
     const randomGroup = Object.keys(config.tests.groups)[0] // TODO: TEMPORARY!!!
     useEffect(() => {
+        
         if (![TaskState.Pending, TaskState.Running, undefined].includes(currentTaskProgress)) {
             readFileStream(
                 config.tests.groups[randomGroup].tests[currentTask.id].inputPath + '.out',

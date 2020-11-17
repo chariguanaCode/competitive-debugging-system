@@ -9,7 +9,7 @@ import { TestModel } from 'reduxState/models';
 import { FileModel } from 'components/FileManager/FileManager.d';
 import { useCommonState } from 'utils';
 
-export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = ({}) => {
+export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = ({ closeDialog }) => {
     const classes = useStyles();
     const config = useConfig();
     const { addTests, increaseNextTestId, increaseNextGroupId } = useConfigActions();
@@ -27,7 +27,7 @@ export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = (
         let newTestsObject: { [key: string]: TestModel } = {};
         state.mergedFiles.forEach((file, index) => {
             newTestsObject[(localNextTestId + index).toString()] = {
-                name: file.inputPath.path,
+                name: file.name,
                 inputPath: file.inputPath.path,
                 outputPath: file.outputPath ? file.outputPath.path : null,
             };
