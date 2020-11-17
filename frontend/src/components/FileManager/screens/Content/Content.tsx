@@ -15,6 +15,7 @@ export const Content: React.FunctionComponent<ContentPropsModel> = ({
     currentPath,
     searchText,
     zoomFactor,
+    setZoomFactor,
 }) => {
     const classes = useStyles();
     return (
@@ -34,6 +35,7 @@ export const Content: React.FunctionComponent<ContentPropsModel> = ({
                             maxNumberOfSelectedFiles={maxNumberOfSelectedFiles}
                             loadDirectory={loadDirectory}
                             zoomFactor={zoomFactor}
+                            setZoomFactor={setZoomFactor}
                         />
                     </div>
                     <div className={classes.SelectedFilesLayout}>

@@ -4,7 +4,10 @@ import { FileManagerModel } from '../models';
 
 export const FileManagerReducer = handleActions<FileManagerModel>(
     {
-        [FileManagerActions.SET_FILE_MANAGER]: (state, action) => action.payload,
+        [FileManagerActions.SET_FILE_MANAGER]: (state, action) => ({
+            lastDirectory: state.lastDirectory,
+            ...action.payload
+        })
     },
     {
         open: false,

@@ -8,7 +8,9 @@ let mainWindow;
 const createWindow = async () => {
     if (process.env.ELECTRON_START_URL) {
         const extensions = [
-            'C:\\Users\\LegwanXDL\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\4.8.2_0',
+            'C:\\Users\\LegwanXDL\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\4.9.0_0',
+            'C:\\Users\\LegwanXDL\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\baocaagndhipibgklemoalmkljaimfdj\\2.0.5_0',
+          //  'C:\\Users\\LegwanXDL\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\lmhkpmbekcpmknklioeibfkpmmfibljd\\2.17.0_0',
             '/home/charodziej/snap/chromium/common/chromium/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0/',
             '/home/charodziej/snap/chromium/common/chromium/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.8.2_0/',
         ];
@@ -30,8 +32,7 @@ const createWindow = async () => {
         });
 
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        show: false,
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true,
@@ -44,6 +45,7 @@ const createWindow = async () => {
     mainWindow.loadURL(startUrl);
 
     mainWindow.once('ready-to-show', () => {
+        mainWindow.maximize()
         mainWindow.show();
     });
 
@@ -63,6 +65,8 @@ global.paths = {
     cppFiles: process.env.ELECTRON_START_URL
         ? path.join(__dirname, '..', 'cpp')
         : path.join(__dirname, '..', '..', '..', 'cpp'),
+    testsOutputs: `${app.getPath('userData')}/CDSData/TestsOutputs`
+    
 };
 
 autoUpdater.on('update-available', async (info) => {

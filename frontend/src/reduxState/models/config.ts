@@ -2,6 +2,7 @@ import { TrackedObject } from './trackedObjects';
 
 export interface ProjectInfoModel {
     files: Array<string>;
+    uuid: string;
     name: string;
     author: string;
     createDate: string;
@@ -14,6 +15,17 @@ export interface TestModel {
     name: string;
     inputPath: string;
     outputPath: string | null;
+}
+
+export interface TestGroupsModel {
+    groups: {
+        [key: string]: {
+            name: string;
+            tests: { [key: string]: TestModel };
+        };
+    };
+    nextTestId: string;
+    nextGroupId: string;
 }
 
 export interface watchIdActionsModel {
@@ -54,7 +66,7 @@ export interface ConfigModel {
             };
         };
     };
-    tests: Array<TestModel>;
+    tests: TestGroupsModel;
     watchesIdsActions: watchIdActionsModel;
     layouts: {
         debugging: LayoutModel;

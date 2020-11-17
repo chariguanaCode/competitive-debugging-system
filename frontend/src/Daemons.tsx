@@ -20,6 +20,9 @@ import { readFileStream } from 'backend/outputFileTracking';
 import { useParseWatchblocks } from 'backend/watchParse';
 import { useSaveCdsConfigToFile } from 'backend/appManangement';
 import { useSaveTemporaryProjectFile } from 'backend/projectManagement';
+import { getFileBasename } from 'backend/asyncFileActions';
+
+const remote = window.require('electron').remote;
 
 export default function Daemons(): ReactElement {
     const cdsConfig = useCdsConfig();
@@ -44,10 +47,15 @@ export default function Daemons(): ReactElement {
         setCurrentTaskWatchblocksSize,
     } = useTaskStatesActions();
 
+    const defaultTestsOutputDirectory = remote.getGlobal('paths').testsOutputs;
+    const projectTestsOutputDirectory = defaultTestsOutputDirectory + '/' + config.projectInfo.uuid + '/';
+
+    const randomGroup = Object.keys(config.tests.groups)[0]; // TODO: TEMPORARY!!!
     useEffect(() => {
         if (![TaskState.Pending, TaskState.Running, undefined].includes(currentTaskProgress)) {
+            const inputBasename = getFileBasename(config.tests.groups[randomGroup].tests[currentTask.id].inputPath);
             readFileStream(
-                config.tests[currentTask.id].inputPath + '.out',
+                projectTestsOutputDirectory + inputBasename + '.out',
                 false,
                 (data: string) => setCurrentTaskStdout(data),
                 setCurrentTaskStdoutSize,
@@ -55,7 +63,7 @@ export default function Daemons(): ReactElement {
                 () => {}
             );
             readFileStream(
-                config.tests[currentTask.id].inputPath + '.err',
+                projectTestsOutputDirectory + inputBasename + '.err',
                 true,
                 (data: string) => parseWatchblocks(data),
                 setCurrentTaskWatchblocksSize,
