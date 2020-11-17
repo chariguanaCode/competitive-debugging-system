@@ -66,11 +66,12 @@ export default function Daemons(): ReactElement {
         setCurrentTaskWatchblocksSize,
     } = useTaskStatesActions();
 
+    const randomGroup = Object.keys(config.tests.groups)[0] // TODO: TEMPORARY!!!
     useEffect(() => {
         
         if (![TaskState.Pending, TaskState.Running, undefined].includes(currentTaskProgress)) {
             readFileStream(
-                config.tests[currentTask.id].inputPath + '.out',
+                config.tests.groups[randomGroup].tests[currentTask.id].inputPath + '.out',
                 false,
                 (data: string) => setCurrentTaskStdout(data),
                 setCurrentTaskStdoutSize,
@@ -78,7 +79,7 @@ export default function Daemons(): ReactElement {
                 () => {}
             );
             readFileStream(
-                config.tests[currentTask.id].inputPath + '.err',
+                config.tests.groups[randomGroup].tests[currentTask.id].inputPath + '.err',
                 true,
                 (data: string) => parseWatchblocks(data),
                 setCurrentTaskWatchblocksSize,
