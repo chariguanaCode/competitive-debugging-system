@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useStyles from './Footer.css';
-import { useConfig } from 'reduxState/selectors';
+import { useConfig, useCurrentTaskState } from 'reduxState/selectors';
 
 export const Footer = () => {
     const classes = useStyles();
@@ -25,9 +25,12 @@ export const Footer = () => {
         //second: 'numeric', VERY DISTRACTING
     }).format(currentTime);
 
-    const projectName = useConfig().projectInfo.name;
+    const config = useConfig();
+    const projectName = config.projectInfo.name;
+    const currentTestState = useCurrentTaskState();
+    const currentTest = config.tests.groups[currentTestState.groupId]?.tests?.[currentTestState.id].name;
 
-    const leftElements = [<>{projectName}</>];
+    const leftElements = [<>{projectName}</>, <>{currentTest}</>];
     const rightElements = [
         <>
             {process.env.REACT_APP_NAME} {process.env.REACT_APP_VERSION}

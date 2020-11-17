@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Button, Menu, MenuItem, ListItemText, ListItemIcon } from '@material-ui/core';
-import { Apps, Settings, PlayArrow, Refresh, ViewQuilt, BugReport, Assessment, ViewList } from '@material-ui/icons';
+import { Apps, Settings, PlayArrow, Refresh, ViewQuilt, BugReport, Assessment, ViewList, Add } from '@material-ui/icons';
 import { ReactComponent as Logo } from 'assets/cds_logo.svg';
 import { useRunTasks } from 'backend/main';
 import { useLoadProject } from 'backend/projectManagement';
@@ -23,6 +23,10 @@ export const HeaderBar: React.FunctionComponent = () => {
     const [menuAnchor, setMenuAnchor] = useState<(EventTarget & HTMLButtonElement) | null>(null);
     const { selectLayout } = useConfigActions();
     const layoutSelection = useLayoutSelection();
+
+    const addNewTab = () => {
+        document.dispatchEvent(new Event('addNewTab'));
+    };
 
     return (
         <>
@@ -53,6 +57,9 @@ export const HeaderBar: React.FunctionComponent = () => {
 
                     <div style={{ flexGrow: 1 }} />
 
+                    <IconButton color="inherit" onClick={addNewTab}>
+                        <Add color="inherit" />
+                    </IconButton>
                     <IconButton color="inherit" onClick={runTasks}>
                         <PlayArrow color="inherit" />
                     </IconButton>

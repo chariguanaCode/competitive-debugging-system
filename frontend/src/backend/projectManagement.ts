@@ -37,7 +37,7 @@ export const useSaveProjectAs = () => {
         if (!(await syncFileActions.isDirectory(directory))) {
             return;
         }
-        
+
         const path = asyncFileActions.parsePath(directory, true) + name + '.cdsp';
         syncFileActions.saveFile(path, JSON.stringify(config));
         return path;
@@ -141,14 +141,18 @@ export const useLoadProject = () => {
         setAllTrackedObjects(newTrackedObjects);
 
         // TODO: rozdzielic do innej funkcji
-        taskStates.current = [];
-        /*for (const key in newConfig.tests) {
-            if (newConfig.tests.hasOwnProperty(key)) {
-                taskStates.current[key] = {
-                    state: TaskState.Pending,
-                } as Task;
+        taskStates.current = {};
+        for (const groupId in newConfig.tests.groups) {
+            if (Object.prototype.hasOwnProperty.call(newConfig.tests.groups, groupId)) {
+                for (const key in newConfig.tests.groups[groupId].tests) {
+                    if (Object.prototype.hasOwnProperty.call(newConfig.tests.groups[groupId].tests, key)) {
+                        taskStates.current[key] = {
+                            state: TaskState.Pending,
+                        } as Task;
+                    }
+                }
             }
-        }*/
+        }
 
         reloadTasks();
     };

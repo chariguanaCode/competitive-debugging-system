@@ -50,10 +50,9 @@ export default function Daemons(): ReactElement {
     const defaultTestsOutputDirectory = remote.getGlobal('paths').testsOutputs;
     const projectTestsOutputDirectory = defaultTestsOutputDirectory + '/' + config.projectInfo.uuid + '/';
 
-    const randomGroup = Object.keys(config.tests.groups)[0]; // TODO: TEMPORARY!!!
     useEffect(() => {
         if (![TaskState.Pending, TaskState.Running, undefined].includes(currentTaskProgress)) {
-            const inputBasename = getFileBasename(config.tests.groups[randomGroup].tests[currentTask.id].inputPath);
+            const inputBasename = getFileBasename(config.tests.groups[currentTask.groupId].tests[currentTask.id].inputPath);
             readFileStream(
                 projectTestsOutputDirectory + inputBasename + '.out',
                 false,

@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { TestsList, Toolbar } from './screens';
 import useStyles from './Tasks.css';
-import { Tasks as TasksScreen } from './screens';
-import { TabNode } from 'flexlayout-react';
+import { TasksPropsModel, TasksStateModel } from './Tasks.d';
 
-interface Props {
-    node: TabNode;
-}
-
-export const Tasks = ({ node }: Props) => {
+export const Tasks: React.FunctionComponent<TasksPropsModel> = ({}) => {
     const classes = useStyles();
-    return <TasksScreen node={node} />;
+    const [searchText, setSeachText] = useState('-1');
+
+    return (
+        <>
+            <div className={classes.Tasks}>
+                <Toolbar setSearch={setSeachText} />
+                <TestsList searchText={searchText} />
+            </div>
+        </>
+    );
 };
 
 export default Tasks;

@@ -24,14 +24,16 @@ const useRunTasks = () => {
             return;
         }
 
-        for (let id = 0; id < taskStates.current.length; id++) {
-            if (taskStates.current[id].childProcess) {
-                taskStates.current[id].childProcess.kill();
-            }
+        for (const id in taskStates.current) {
+            if (Object.prototype.hasOwnProperty.call(taskStates.current, id)) {
+                if (taskStates.current[id].childProcess) {
+                    taskStates.current[id].childProcess.kill();
+                }
 
-            taskStates.current[id] = {
-                state: TaskState.Pending,
-            } as Task;
+                taskStates.current[id] = {
+                    state: TaskState.Pending,
+                } as Task;
+            }
         }
 
         reloadTasks();

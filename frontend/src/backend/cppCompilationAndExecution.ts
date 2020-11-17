@@ -2,7 +2,7 @@ import * as cppActions from './cppActions';
 import { fileExist, createDirectory, removeDirectory, getFileBasename, compareFiles } from './asyncFileActions';
 import PromiseQueue from '../utils/parallelPromiseQueue';
 import { useBeginTest, useFinishTest, useTestError } from './testManagement';
-import { ExecutionState } from 'reduxState/models';
+import { ExecutionState, TestModel } from 'reduxState/models';
 import { useConfig } from 'reduxState/selectors';
 import { useExecutionStateActions } from 'reduxState/actions';
 
@@ -19,12 +19,18 @@ export default () => {
         const sourcePath = config.projectInfo.files[0];
         const modifiedSourcePath = sourcePath.replace(/\.cpp$/, '.tmp.cpp');
         const binaryPath = sourcePath.replace(/\.cpp$/, '.bin');
-        const tests = config.tests;
+        const tests: Array<[string, TestModel]> = [];
         const defaultTestsOutputDirectory = remote.getGlobal('paths').testsOutputs;
         const projectTestsOutputDirectory = defaultTestsOutputDirectory + '/' + config.projectInfo.uuid + '/';
 
         await removeDirectory(projectTestsOutputDirectory).catch((err) => {});
         await createDirectory(projectTestsOutputDirectory).catch((err) => {});
+
+        for (const groupId in config.tests.groups) {
+            if (Object.prototype.hasOwnProperty.call(config.tests.groups, groupId)) {
+                tests.push(...Object.entries(config.tests.groups[groupId].tests));
+            }
+        }
 
         try {
             setExecutionState({ state: ExecutionState.Compiling, details: '' });
@@ -44,31 +50,23 @@ export default () => {
             console.log('Running tests...');
             console.log('Found tests:', tests);
             const testPromises = new PromiseQueue(4);
-            const groupId = Object.keys(tests.groups)[0];
-            const groupTests = tests.groups[groupId].tests;
             await Promise.all(
-                // TODO: add groups handling
-                Object.keys(groupTests).map((testId) => {
-                    const inputBasename = getFileBasename(groupTests[testId].inputPath);
-                    console.log(inputBasename, projectTestsOutputDirectory);
+                tests.map(([testId, testVal]) => {
+                    const inputBasename = getFileBasename(testVal.inputPath);
                     return testPromises
                         .enqueue(
                             () =>
                                 cppActions.executeTest(
                                     binaryPath,
-                                    groupTests[testId].inputPath,
+                                    testVal.inputPath,
                                     projectTestsOutputDirectory + inputBasename + '.out',
                                     projectTestsOutputDirectory + inputBasename + '.err'
                                 ),
-                            beginTest(Number(testId))
+                            beginTest(testId)
                         )
                         .then(
-                            finishTest(
-                                Number(testId),
-                                projectTestsOutputDirectory + inputBasename + '.out',
-                                groupTests[testId].outputPath
-                            ),
-                            testError(Number(testId))
+                            finishTest(testId, projectTestsOutputDirectory + inputBasename + '.out', testVal.outputPath),
+                            testError(testId)
                         );
                 })
             );

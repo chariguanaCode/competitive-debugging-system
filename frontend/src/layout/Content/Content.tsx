@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Fab } from '@material-ui/core';
 import { Add, AddBox } from '@material-ui/icons';
 import { Layout, Model, TabNode } from 'flexlayout-react';
@@ -12,8 +12,16 @@ import { useLayoutSelection, useLayouts } from 'reduxState/selectors';
 
 const Content: React.FunctionComponent = () => {
     const classes = useStyles();
+
     const { openAddTrackedObjectDialog } = useAddTrackedObjectDialogActions();
     const [addTabOpen, setAddTabOpen] = useState(false);
+    useEffect(() => {
+        const addTab = () => setAddTabOpen(true);
+        document.addEventListener('addNewTab', addTab);
+        return () => {
+            document.removeEventListener('addNewTab', addTab);
+        };
+    }, []);
 
     const layoutRef = useRef<Layout>(null);
 
@@ -28,7 +36,7 @@ const Content: React.FunctionComponent = () => {
 
         switch (type) {
             case 'tasks':
-                return <Tasks node={node} />;
+                return <Tasks />;
             case 'watches':
                 return <Watches />;
             case 'trackedObject':
@@ -56,16 +64,6 @@ const Content: React.FunctionComponent = () => {
             <div className={classes.layoutWrapper}>
                 <Layout model={model} factory={factory} onModelChange={setModel} ref={layoutRef} />
                 <AddTabDialog open={addTabOpen} onClose={addTab} />
-                <Fab
-                    variant="extended"
-                    color="primary"
-                    size="medium"
-                    className={classes.addTabButton}
-                    onClick={() => setAddTabOpen(true)}
-                >
-                    <Add style={{ marginRight: 8 }} />
-                    Add new tab
-                </Fab>
             </div>
             <TasksProgressBar />
         </ContextMenu>

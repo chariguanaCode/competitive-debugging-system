@@ -5,7 +5,7 @@ import { WatchBlockOptions } from '@material-ui/core/styles/createPalette';
 import { WatchNodeData } from 'reduxState/models';
 import { useWatchHistoryLocation } from 'reduxState/selectors';
 import { useWatchActionsHistoryActions } from 'reduxState/actions';
-import { ArrowDropDown, ArrowRight, ExpandMore } from '@material-ui/icons';
+import { ArrowDropDown, ArrowRight } from '@material-ui/icons';
 
 interface Props {
     node: WatchNodeData;
@@ -76,7 +76,7 @@ function WatchNode({ node, style, setBracketState }: Props): ReactElement {
         }
 
         if (line !== undefined) {
-            if (node.type == 'watchblock' || node.variable_id === 0) {
+            if (node.type === 'watchblock' || node.variable_id === 0) {
                 result.push(
                     <span>
                         {colored({ line })}: {colored({ name })}

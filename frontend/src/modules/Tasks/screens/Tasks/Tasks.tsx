@@ -35,14 +35,15 @@ const Tasks = ({ node }: Props) => {
     const taskData = useAllTasksState().current;
     const { setCurrentTaskId } = useTaskStatesActions();
 
-    const testConfig = useConfig().tests;
+    const groupId = Object.keys(useConfig().tests.groups)[0];
+    const testConfig = useConfig().tests.groups[groupId].tests;
 
     const [filters, setFilters] = useState({ state: [] as string[], name: '', executionTime: '' });
-    let taskStates = taskData;
-    if (filters.state.length > 0) taskStates = taskStates.filter((val) => filters.state.includes(TaskState[val.state]));
-    //if (filters.name.length > 0) taskStates = taskStates.filter((val, index) => testConfig[index].name.includes(filters.name));
+    let taskStates = Object.entries(taskData);
+    if (filters.state.length > 0) taskStates = taskStates.filter((val) => filters.state.includes(TaskState[val[1].state]));
+    if (filters.name.length > 0) taskStates = taskStates.filter((val) => testConfig[val[0]].name.includes(filters.name));
     if (filters.executionTime.length > 0)
-        taskStates = taskStates.filter((val) => val.executionTime.includes(filters.executionTime));
+        taskStates = taskStates.filter((val) => val[1].executionTime.includes(filters.executionTime));
 
     const tableRef = useRef<null | HTMLTableElement>(null);
     const [page, setPage] = useState(0);
@@ -51,13 +52,13 @@ const Tasks = ({ node }: Props) => {
 
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, taskStates.length - page * rowsPerPage);
 
-    const debugTask = (id: number) => {
-        setCurrentTaskId(id);
+    const debugTask = (id: string, groupId: string) => {
+        setCurrentTaskId({ id, groupId });
         selectLayout('debugging');
     };
 
-    const viewTaskOutput = (id: number) => {
-        setCurrentTaskId(id);
+    const viewTaskOutput = (id: string, groupId: string) => {
+        setCurrentTaskId({ id, groupId });
         selectLayout('outputs');
     };
 
@@ -155,7 +156,7 @@ const Tasks = ({ node }: Props) => {
                 </TableRow>
             </TableHead>
             <TableBody>
-                {taskStates.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map(({ state, executionTime }, id) => (
+                {taskStates.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map(([id, { state, executionTime }]) => (
                     <TableRow key={`Tasks-TableRow-${id}`}>
                         <TableCell
                             style={{
@@ -165,7 +166,7 @@ const Tasks = ({ node }: Props) => {
                         >
                             {TaskState[state]}
                         </TableCell>
-                        <TableCell>{/*testConfig[id] && testConfig[id].name*/}</TableCell>
+                        <TableCell>{testConfig[id] && testConfig[id].name}</TableCell>
                         <TableCell>{executionTime}</TableCell>
                         <TableCell style={{ paddingTop: 8, paddingBottom: 8 }}>
                             {state === TaskState.Running && (
@@ -178,12 +179,12 @@ const Tasks = ({ node }: Props) => {
                             {state !== TaskState.Pending && state !== TaskState.Running && (
                                 <>
                                     <Tooltip title="View output" placement="bottom" arrow>
-                                        <IconButton style={{ padding: 6 }} onClick={() => viewTaskOutput(id)}>
+                                        <IconButton style={{ padding: 6 }} onClick={() => viewTaskOutput(id, groupId)}>
                                             <Assessment fontSize="small" />
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Debug" placement="bottom" arrow>
-                                        <IconButton style={{ padding: 6 }} onClick={() => debugTask(id)}>
+                                        <IconButton style={{ padding: 6 }} onClick={() => debugTask(id, groupId)}>
                                             <BugReport fontSize="small" />
                                         </IconButton>
                                     </Tooltip>
