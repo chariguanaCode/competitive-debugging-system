@@ -12,9 +12,17 @@ const useStyles = makeStyles((theme) => ({
         '& path': {
             fill: theme.palette.type === 'dark' ? theme.palette.primary.main : theme.palette.primary.contrastText,
         },
+        position: 'relative',
+        bottom: '5px',
     },
     margin: {
         marginLeft: theme.spacing(2),
+    },
+    ExecutionStateContainer: {
+        marginLeft: theme.spacing(2),
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center'
     },
     '@keyframes appbar-grow': {
         '0%': {

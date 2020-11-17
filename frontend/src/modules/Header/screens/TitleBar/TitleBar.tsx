@@ -1,10 +1,10 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, memo } from 'react';
 import { Minimize, Close, Fullscreen } from '@material-ui/icons';
 import { useTheme } from '@material-ui/core/styles';
 import { useStyles } from './TitleBar.css';
 const { remote } = window.require('electron');
 
-export default function TitleBar(): ReactElement {
+export const TitleBar: React.FunctionComponent = memo(() => {
     const classes = useStyles();
     const theme = useTheme();
     const browserWindow = remote.BrowserWindow;
@@ -24,7 +24,7 @@ export default function TitleBar(): ReactElement {
             >
                 <Fullscreen fontSize="inherit" />
             </button>
-            
+
             <button
                 className={classes.button}
                 style={{
@@ -36,4 +36,6 @@ export default function TitleBar(): ReactElement {
             </button>
         </div>
     );
-}
+});
+
+export default TitleBar;

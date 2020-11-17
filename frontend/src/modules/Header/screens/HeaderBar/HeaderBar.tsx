@@ -1,24 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Button, Menu, MenuItem, ListItemText, ListItemIcon } from '@material-ui/core';
 import { Apps, Settings, PlayArrow, Refresh, ViewQuilt, BugReport, Assessment, ViewList } from '@material-ui/icons';
 import { ReactComponent as Logo } from 'assets/cds_logo.svg';
+import { ReactComponent as LoadingIcon } from 'assets/icons/loading.svg';
 import { useRunTasks } from 'backend/main';
-import { useLoadProject } from 'backend/projectManagement';
+import { useLoadProject, useSaveProject } from 'backend/projectManagement';
 import { useConfig, useProjectFile, useExecutionState, useLayoutSelection } from 'reduxState/selectors';
 import { ExecutionState } from 'reduxState/models';
 import useStyles from './HeaderBar.css';
 import { MainMenu } from 'modules/Menu/screens';
 import { useConfigActions } from 'reduxState/actions';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { useCommonState } from 'utils';
 
-export const HeaderBar: React.FunctionComponent = () => {
+export const HeaderBar: React.FunctionComponent = memo(() => {
     const classes = useStyles();
-    const [menuOpen, setMenuOpen] = useState(false);
+    const [menuState, setMenuState, __setMenuState, _setMenuState] = useCommonState<{
+        open: boolean;
+        defaultSelectedSector?: string;
+    }>({ open: false });
     const config = useConfig();
     const runTasks = useRunTasks();
     const loadProject = useLoadProject();
     const projectFile = useProjectFile();
+    const saveProject = useSaveProject();
     //const reloadProject = useReloadProject()
     const executionState = useExecutionState();
+
+    useHotkeys(
+        //temporary here until i will figure out how to nicely send that information to that component
+        'ctrl+s',
+        () => {
+            saveProject().catch((err) => {
+                switch (err.code) {
+                    case 0:
+                        _setMenuState({
+                            open: true,
+                            defaultSelectedSector: 'SaveAs',
+                        });
+                        break;
+                }
+            });
+        },
+        {},
+        [projectFile, config]
+    );
 
     const [menuAnchor, setMenuAnchor] = useState<(EventTarget & HTMLButtonElement) | null>(null);
     const { selectLayout } = useConfigActions();
@@ -28,7 +54,10 @@ export const HeaderBar: React.FunctionComponent = () => {
         <>
             <AppBar position="relative" className={classes.appBar}>
                 <Toolbar variant="dense">
-                    <IconButton onClick={() => setMenuOpen((previousState) => !previousState)} color="inherit">
+                    <IconButton
+                        onClick={() => _setMenuState((previousState) => ({ open: !previousState.open, defaultSelectedSector: undefined }))}
+                        color="inherit"
+                    >
                         <Apps color="inherit" />
                     </IconButton>
                     <Logo className={classes.logo} width={66} height={50} />
@@ -47,8 +76,11 @@ export const HeaderBar: React.FunctionComponent = () => {
                         {projectFile && config.projectInfo.name}
                         {projectFile && !projectFile.isSaved && ' *'}
                     </Typography>
-                    <Typography className={classes.margin} color="inherit">
+                    <Typography className={classes.ExecutionStateContainer} color="inherit">
                         {ExecutionState[executionState.state]}
+                        {ExecutionState[executionState.state] === 'Compiling' ? (
+                            <LoadingIcon height={'18px'} width={'18px'} style={{ marginLeft: '8px' }} />
+                        ) : null}
                     </Typography>
 
                     <div style={{ flexGrow: 1 }} />
@@ -67,7 +99,12 @@ export const HeaderBar: React.FunctionComponent = () => {
                     </IconButton>
                 </Toolbar>
             </AppBar>
-            <MainMenu open={menuOpen} isAnyProjectOpen={!!projectFile} handleClose={() => setMenuOpen(false)} />
+            <MainMenu
+                deafultSelectedSector={menuState.defaultSelectedSector}
+                open={menuState.open}
+                isAnyProjectOpen={!!projectFile}
+                handleClose={() => setMenuState('open', false)}
+            />
             <Menu anchorEl={menuAnchor} open={!!menuAnchor} onClose={() => setMenuAnchor(null)}>
                 {[
                     { icon: <BugReport color="inherit" />, label: 'Debugging', layout: 'debugging' as 'debugging' },
@@ -89,6 +126,6 @@ export const HeaderBar: React.FunctionComponent = () => {
             </Menu>
         </>
     );
-};
+});
 
 export default HeaderBar;

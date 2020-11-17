@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         alignItems: 'center',
         width: '300px', // TODO: scrollbar handle
-        overflow: 'scroll',
+        overflow: 'overlay',
         '&::-webkit-scrollbar': {
             width: '0 !important',
             height: '1 !important',

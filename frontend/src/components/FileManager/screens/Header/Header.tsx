@@ -28,9 +28,9 @@ export const Header: React.FunctionComponent<HeaderPropsModel> = memo(
                     <div className={classes.SearchContainer}>
                         <Search setSearchText={setSearchText} currentPath={currentPath} />
                     </div>
-                    <div className={classes.OperationalButtonsContainer}>
+                    {/*<div className={classes.OperationalButtonsContainer}>
                         <OperationalButtons dialogClose={dialogClose} />
-                    </div>
+                    </div>*/}
                 </div>
             </>
         );

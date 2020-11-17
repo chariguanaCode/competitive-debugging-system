@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
         width: 'min(90vw, 1400px)',
         display: 'flex',
         flexDirection: 'column',
-        padding: '30px 10px 10px 10px',
+        padding: '10px 10px 10px 10px',
         overflow: 'hidden',
         '&::-webkit-scrollbar-thumb': {
             backgroundColor: 'red',
