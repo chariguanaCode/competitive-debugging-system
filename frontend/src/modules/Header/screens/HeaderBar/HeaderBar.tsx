@@ -1,6 +1,6 @@
 import React, { useState, memo } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Button, Menu, MenuItem, ListItemText, ListItemIcon } from '@material-ui/core';
-import { Apps, Settings, PlayArrow, Refresh, ViewQuilt, BugReport, Assessment, ViewList } from '@material-ui/icons';
+import { Apps, Settings, PlayArrow, Refresh, ViewQuilt, BugReport, Assessment, ViewList, Add } from '@material-ui/icons';
 import { ReactComponent as Logo } from 'assets/cds_logo.svg';
 import { ReactComponent as LoadingIcon } from 'assets/icons/loading.svg';
 import { useRunTasks } from 'backend/main';
@@ -50,6 +50,10 @@ export const HeaderBar: React.FunctionComponent = memo(() => {
     const { selectLayout } = useConfigActions();
     const layoutSelection = useLayoutSelection();
 
+    const addNewTab = () => {
+        document.dispatchEvent(new Event('addNewTab'));
+    };
+
     return (
         <>
             <AppBar position="relative" className={classes.appBar}>
@@ -85,6 +89,9 @@ export const HeaderBar: React.FunctionComponent = memo(() => {
 
                     <div style={{ flexGrow: 1 }} />
 
+                    <IconButton color="inherit" onClick={addNewTab}>
+                        <Add color="inherit" />
+                    </IconButton>
                     <IconButton color="inherit" onClick={runTasks}>
                         <PlayArrow color="inherit" />
                     </IconButton>

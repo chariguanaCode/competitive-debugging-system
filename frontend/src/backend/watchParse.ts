@@ -36,9 +36,6 @@ export type ConvertResult = (
     | {
           type: 'array' | 'struct' | 'pair';
           children: Array<ConvertResult>;
-          state: {
-              expanded: boolean;
-          };
       }
     | {
           type: 'number' | 'string' | 'bitset' | 'invalid';
@@ -49,7 +46,6 @@ export type ConvertResult = (
           closingType: 'array' | 'struct' | 'pair' | 'watchblock';
       }
 ) & {
-    id: string; //to be removed
     call_id: string;
     name?: string;
     pointer?: true;
@@ -68,25 +64,17 @@ const convertContents = (
     switch (contents[start]) {
         case array_start:
             result = {
-                id: call_id,
                 call_id,
                 type: 'array' as 'array',
                 children: [] as Array<ConvertResult>,
-                state: { expanded: true },
             };
             while (contents[val_end + 1] !== array_end) {
-                let val = convertContents(contents, val_end + 1, call_id + `.${idCounter}`);
+                let val = convertContents(contents, val_end + 1, call_id);
                 val.result.name = `${idCounter++}`;
                 result.children.push(val.result);
                 val_end = val.end;
                 valueString += `${val.valueString},`;
             }
-            result.children.push({
-                id: `${call_id}.end`,
-                call_id: `${call_id}.end`,
-                type: 'closing',
-                closingType: 'array',
-            });
 
             return {
                 result,
@@ -96,32 +84,24 @@ const convertContents = (
 
         case struct_start:
             result = {
-                id: call_id,
                 call_id,
                 type: 'struct' as 'struct',
                 children: [] as Array<ConvertResult>,
-                state: { expanded: true },
             };
 
             while (contents[val_end + 1] !== struct_end) {
-                const name = convertContents(contents, val_end + 1, call_id + `.${idCounter}`) as {
+                const name = convertContents(contents, val_end + 1, call_id) as {
                     result: { type: 'string'; value: string };
                     end: number;
                 };
                 val_end = name.end;
 
-                const val = convertContents(contents, val_end + 1, call_id + `.${idCounter++}`);
+                const val = convertContents(contents, val_end + 1, call_id);
                 val.result.name = name.result.value as string;
 
                 result.children.push(val.result);
                 val_end = val.end;
             }
-            result.children.push({
-                id: `${call_id}.end`,
-                call_id: `${call_id}.end`,
-                type: 'closing',
-                closingType: 'struct',
-            });
 
             return {
                 result,
@@ -130,30 +110,19 @@ const convertContents = (
             };
 
         case pair_start:
-            let first = convertContents(contents, start + 1, call_id + '.first');
+            let first = convertContents(contents, start + 1, call_id);
             first.result.name = 'first';
             val_end = first.end;
             valueString += `"first": ${first.valueString},`;
-            let second = convertContents(contents, val_end + 1, call_id + '.second');
+            let second = convertContents(contents, val_end + 1, call_id);
             second.result.name = 'second';
             val_end = second.end;
             valueString += `"second": ${first.valueString}`;
             return {
                 result: {
-                    id: call_id,
                     call_id,
                     type: 'pair' as 'pair',
-                    children: [
-                        first.result,
-                        second.result,
-                        {
-                            id: `${call_id}.end`,
-                            call_id: `${call_id}.end`,
-                            type: 'closing',
-                            closingType: 'pair',
-                        },
-                    ],
-                    state: { expanded: true },
+                    children: [first.result, second.result],
                 },
                 end: val_end,
                 valueString: `{${valueString}}`,
@@ -186,7 +155,6 @@ const convertContents = (
 
             return {
                 result: {
-                    id: call_id,
                     call_id,
                     type,
                     value: contents[start + 1],
@@ -210,15 +178,15 @@ export const useParseWatchblocks = () => {
     const clearWatchblocks = () => {
         watchblockStack.current = [
             {
-                id: '-1',
                 call_id: '-1',
                 children: [],
                 type: 'watchblock',
                 line: '-1',
                 name: '',
-                state: { expanded: true },
             },
         ];
+        tempWatchActionsHistory.current = {};
+        watchActionsHistoryPreviousKey.current = '-1';
     };
 
     const parseWatchblocks = (dataString: string) => {
@@ -236,7 +204,7 @@ export const useParseWatchblocks = () => {
                 [call_id, line, config] = data.slice(loc + 1, loc + 4);
                 loc += 4;
 
-                let variables = [];
+                let variables: Array<Watch> = [];
                 let variablesValuesStrings: Array<string> = [];
                 while (data[loc] !== watch_end) {
                     switch (data[loc]) {
@@ -245,9 +213,9 @@ export const useParseWatchblocks = () => {
                             variables.push({
                                 name: data[loc + 1],
                                 data_type: data[loc + 2],
+                                variable_id: variables.length,
                                 ...result,
-                                id: result.id + variables.length,
-                            });
+                            } as Watch);
                             variablesValuesStrings.push(valueString);
                             loc = end + 1;
                             break;
@@ -281,41 +249,27 @@ export const useParseWatchblocks = () => {
 
                 variables.forEach((variable) => {
                     watchblockStack.current[watchblockStack.current.length - 1].children.push({
+                        ...variable,
                         line,
                         config,
-                        ...variable,
                     });
-                    line = ' '.repeat(line.length);
                 });
                 break;
             case watchblock_start:
                 [call_id, name, line] = data.slice(loc + 1, loc + 4);
                 topOfStack = watchblockStack.current[watchblockStack.current.length - 1];
                 topOfStack.children.push({
-                    id: call_id,
                     call_id,
                     name,
                     line,
                     type: 'watchblock',
                     children: [] as Array<Watchblock | Watch>,
-                    state: { expanded: true },
                 });
 
                 watchblockStack.current.push(topOfStack.children[topOfStack.children.length - 1] as Watchblock);
 
                 break;
             case watchblock_end:
-                topOfStack = watchblockStack.current[watchblockStack.current.length - 1];
-                topOfStack.children.push({
-                    id: topOfStack.call_id + '.end',
-                    call_id: topOfStack.call_id + '.end',
-                    name: '',
-                    line: '-1',
-                    type: 'closing',
-                    config: '',
-                    data_type: '',
-                    closingType: 'watchblock',
-                });
                 watchblockStack.current.pop();
 
                 break;

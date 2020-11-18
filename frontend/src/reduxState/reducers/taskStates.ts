@@ -10,7 +10,8 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
         [TaskStateAction.SET_CURRENT_TASK_ID]: (state, action) => ({
             ...state,
             currentTask: {
-                id: (action.payload as unknown) as number,
+                id: (action.payload as { id: string; groupId: string }).id,
+                groupId: (action.payload as { id: string; groupId: string }).groupId,
                 stdout: '',
                 stdoutFileSize: 0,
                 watchblocks: { children: [] as Array<Watchblock | Watch> } as Watchblock,
@@ -21,21 +22,21 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
             ...state,
             currentTask: {
                 ...state.currentTask,
-                stdout: (action.payload as unknown) as string,
+                stdout: action.payload as string,
             },
         }),
         [TaskStateAction.SET_CURRENT_TASK_STDOUT_SIZE]: (state, action) => ({
             ...state,
             currentTask: {
                 ...state.currentTask,
-                stdoutFileSize: (action.payload as unknown) as number,
+                stdoutFileSize: action.payload as number,
             },
         }),
         [TaskStateAction.SET_CURRENT_TASK_WATCHBLOCKS]: (state, action) => ({
             ...state,
             currentTask: {
                 ...state.currentTask,
-                watchblocks: (action.payload as unknown) as Watchblock,
+                watchblocks: action.payload as Watchblock,
             },
         }),
         [TaskStateAction.SET_CURRENT_TASK_WATCHBLOCKS_CHILDREN]: (state, action) => ({
@@ -44,7 +45,7 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
                 ...state.currentTask,
                 watchblocks: {
                     ...state.currentTask.watchblocks,
-                    children: (action.payload as unknown) as Array<Watchblock | Watch>,
+                    children: action.payload as Array<Watchblock | Watch>,
                 },
             },
         }),
@@ -52,19 +53,20 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
             ...state,
             currentTask: {
                 ...state.currentTask,
-                watchblockFileSize: (action.payload as unknown) as number,
+                watchblockFileSize: action.payload as number,
             },
         }),
     },
     {
         allTasks: {
-            current: [] as AllTasksModel,
+            current: {} as AllTasksModel,
             timeout: null,
             shouldReload: false,
             reload: 0,
         },
         currentTask: {
-            id: -1,
+            id: '-1',
+            groupId: '-1',
             stdout: '',
             stdoutFileSize: 0,
             watchblocks: { children: [] as Array<Watchblock | Watch> } as Watchblock,

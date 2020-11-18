@@ -4,6 +4,7 @@ const useStyles = makeStyles((theme) => ({
     cell: {
         padding: 8,
         fontFamily: 'Roboto Mono, monospace',
+        whiteSpace: 'pre',
         fontSize: 14,
         borderRight: `1px solid ${theme.palette.contentLayout.borders}`,
         borderBottom: `1px solid ${theme.palette.contentLayout.borders}`,

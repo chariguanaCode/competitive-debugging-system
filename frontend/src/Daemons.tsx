@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useRef } from 'react';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import {
     useAllTasksState,
     useCurrentTaskState,
@@ -21,7 +21,10 @@ import { readFileStream } from 'backend/outputFileTracking';
 import { useParseWatchblocks } from 'backend/watchParse';
 import { useSaveCdsConfigToFile } from 'backend/appManangement';
 import { useSaveTemporaryProjectFile, useSaveProject } from 'backend/projectManagement';
+import { getFileBasename } from 'backend/asyncFileActions';
 import { useHotkeys } from 'react-hotkeys-hook';
+
+const remote = window.require('electron').remote;
 
 export default function Daemons(): ReactElement {
     const saveProject = useSaveProject();
@@ -55,6 +58,7 @@ export default function Daemons(): ReactElement {
         }
     }, [config.projectInfo, config.settings, config.tests, config.trackedObjects, config.watchesIdsActions]);
 
+    // output parsing
     const taskStates = useAllTasksState();
     const currentTask = useCurrentTaskState();
     const { parseWatchblocks, readWatchblocks, clearWatchblocks } = useParseWatchblocks();
@@ -66,12 +70,30 @@ export default function Daemons(): ReactElement {
         setCurrentTaskWatchblocksSize,
     } = useTaskStatesActions();
 
-    const randomGroup = Object.keys(config.tests.groups)[0] // TODO: TEMPORARY!!!
+    const defaultTestsOutputDirectory = remote.getGlobal('paths').testsOutputs;
+    const projectTestsOutputDirectory = defaultTestsOutputDirectory + '/' + config.projectInfo.uuid + '/';
+
+    // trackedObjects
+    const watchHistoryLocation = useWatchHistoryLocation();
+    const { setAllTrackedObjects } = useTrackedObjectsActions();
+    const trackedObjects = useTrackedObjects();
+    const actionsHistory = useWatchActionsHistory();
+    const previousHistoryLocation = useRef('-1');
+
+    // forcing reloading of trackedObjects on watch changes
+    const [shouldTrackedObjectsReload, setForceTrackedObjectsCounter] = useState(0);
+
+    const forceTrackedObjectsReload = () => {
+        previousHistoryLocation.current = '-1';
+        setForceTrackedObjectsCounter((val) => (val + 1) % 1000000000);
+    };
+
+    // output parsing
     useEffect(() => {
-        
         if (![TaskState.Pending, TaskState.Running, undefined].includes(currentTaskProgress)) {
+            const inputBasename = getFileBasename(config.tests.groups[currentTask.groupId].tests[currentTask.id].inputPath);
             readFileStream(
-                config.tests.groups[randomGroup].tests[currentTask.id].inputPath + '.out',
+                projectTestsOutputDirectory + inputBasename + '.out',
                 false,
                 (data: string) => setCurrentTaskStdout(data),
                 setCurrentTaskStdoutSize,
@@ -79,13 +101,14 @@ export default function Daemons(): ReactElement {
                 () => {}
             );
             readFileStream(
-                config.tests.groups[randomGroup].tests[currentTask.id].inputPath + '.err',
+                projectTestsOutputDirectory + inputBasename + '.err',
                 true,
                 (data: string) => parseWatchblocks(data),
                 setCurrentTaskWatchblocksSize,
                 () => clearWatchblocks(),
                 () => {
                     setCurrentTaskWatchblocks(readWatchblocks());
+                    forceTrackedObjectsReload();
                 }
             );
         }
@@ -98,12 +121,7 @@ export default function Daemons(): ReactElement {
         setCurrentTaskWatchblocksSize,
     ]);
 
-    const watchHistoryLocation = useWatchHistoryLocation();
-    const { setAllTrackedObjects } = useTrackedObjectsActions();
-    const trackedObjects = useTrackedObjects();
-    const actionsHistory = useWatchActionsHistory();
-    const previousHistoryLocation = useRef('-1');
-
+    // trackedObjects
     useEffect(() => {
         if (previousHistoryLocation.current === watchHistoryLocation) return;
 
@@ -157,6 +175,7 @@ export default function Daemons(): ReactElement {
         while (notFinished > 0 && loc !== startLocation) {
             for (let i = 0; i < actionsHistory[loc].actions.length && notFinished > 0; i++) {
                 const currAction = actionsHistory[loc].actions[i];
+                /* // buggy optimization
                 let shouldSkip = false as boolean;
                 switch (currAction.action) {
                     case OneDimensionArrayActionType.set_cell:
@@ -171,8 +190,10 @@ export default function Daemons(): ReactElement {
                         break;
                 }
                 if (shouldSkip) continue;
+                */
 
                 seekingState[currAction.targetObject].actionStack.push(currAction);
+                /* // buggy optimization
                 switch (currAction.action) {
                     case OneDimensionArrayActionType.set_whole:
                     case TwoDimensionArrayActionType.set_whole:
@@ -185,6 +206,7 @@ export default function Daemons(): ReactElement {
                         notFinished--;
                         break;
                 }
+                */
             }
 
             loc = actionsHistory[loc].previousKey;
@@ -299,7 +321,7 @@ export default function Daemons(): ReactElement {
         previousHistoryLocation.current = watchHistoryLocation;
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [watchHistoryLocation]);
+    }, [watchHistoryLocation, shouldTrackedObjectsReload]);
 
     return <></>;
 }

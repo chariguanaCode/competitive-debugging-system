@@ -32,7 +32,6 @@
         "react-redux": "^7.2.1",
         "react-scripts": "^3.4.3",
         "react-virtualized": "^9.22.2",
-        "react-virtualized-tree": "^3.4.0",
         "redux": "^4.0.5",
         "redux-actions": "^2.6.5",
         "typeface-roboto": "0.0.75",

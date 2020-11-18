@@ -52,7 +52,7 @@ export const AnchoredDialog: React.FunctionComponent<AnchoredDialogPropsModel> =
     useEffect(() => {
         if (dialogRef.current && (anchorEl || (anchorElRef && anchorElRef.current)))
             setDialogPosition(dialogRef.current, anchorEl ? anchorEl : anchorElRef.current);
-    }, [dialogRef, anchorElRef, anchorEl]);
+    }, [dialogRef, anchorElRef, anchorElRef?.current, anchorEl]);
 
     return (
         <>

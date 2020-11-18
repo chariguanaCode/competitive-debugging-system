@@ -3,13 +3,11 @@ import { useTaskStatesActions } from 'reduxState/actions';
 import { useAllTasksState } from 'reduxState/selectors';
 import { compareFiles } from './asyncFileActions';
 
-let hrstart: [number, number];
-
 export const useBeginTest = () => {
     const { reloadTasks } = useTaskStatesActions();
     const taskStates = useAllTasksState();
 
-    return (id: number) => (childProcess: any) => {
+    return (id: string) => (childProcess: any) => {
         taskStates.current[id] = {
             state: TaskState.Running,
             childProcess,
@@ -26,7 +24,7 @@ export const useFinishTest = () => {
     const { reloadTasks } = useTaskStatesActions();
     const taskStates = useAllTasksState();
 
-    return (id: number, outputPath: string, outputToComparePath: string | null) => () => {
+    return (id: string, outputPath: string, outputToComparePath: string | null) => () => {
         const asyncInside = async () => {
             const execTime = window.process.hrtime(taskStates.current[id].startTime);
 
@@ -45,7 +43,9 @@ export const useFinishTest = () => {
             taskStates.current[id] = {
                 state: finalTaskState,
                 childProcess: null,
-                executionTime: `${execTime[0]}s ${execTime[1] / 1000000}ms`,
+                executionTime: `${execTime[0]}s ${Math.round(execTime[1] / 1000000)
+                    .toString()
+                    .padStart(3, ' ')}ms`,
             } as Task;
 
             reloadTasks();
@@ -57,17 +57,18 @@ export const useKillTest = () => {
     const { reloadTasks } = useTaskStatesActions();
     const taskStates = useAllTasksState();
 
-    return (id: number) => () => {
+    return (id: string) => () => {
         if (taskStates.current[id].state !== TaskState.Running) return;
 
-        console.log(window.process.hrtime(hrstart), 'killed', id);
         taskStates.current[id].childProcess.kill();
 
         const execTime = window.process.hrtime(taskStates.current[id].startTime);
         taskStates.current[id] = {
             state: TaskState.Killed,
             childProcess: null,
-            executionTime: `${execTime[0]}s ${execTime[1] / 1000000}ms`,
+            executionTime: `${execTime[0]}s ${Number(execTime[1] / 1000000)
+                .toString()
+                .padStart(3, ' ')}ms`,
         } as Task;
 
         reloadTasks();
@@ -78,7 +79,7 @@ export const useTestError = () => {
     const { reloadTasks } = useTaskStatesActions();
     const taskStates = useAllTasksState();
 
-    return (id: number) => (err: any) => {
+    return (id: string) => (err: any) => {
         if (taskStates.current[id].state === TaskState.Running) {
             const execTime = window.process.hrtime(taskStates.current[id].startTime);
 
@@ -90,7 +91,7 @@ export const useTestError = () => {
                     signal: err.signal,
                     stderr: err.stderr,
                 },
-                executionTime: `${execTime[0]}s ${execTime[1] / 1000000}ms`,
+                executionTime: `${execTime[0]}s ${(execTime[1] / 1000000).toFixed(6).padStart(10, ' ')}ms`,
             } as Task;
         }
 

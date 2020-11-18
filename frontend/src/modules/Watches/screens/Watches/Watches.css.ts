@@ -4,6 +4,8 @@ const useStyles = makeStyles({
     wrapper: {
         width: '100%',
         height: '100%',
+        userSelect: 'none',
+        padding: 10,
     },
 });
 

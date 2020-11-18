@@ -22,7 +22,7 @@ export const watchActionsHistoryReducer = handleActions<WatchActionsHistoryModel
             };
         },
         [WatchActionsHistoryActions.SET_WATCH_HISTORY_LOCATION]: (state, action) => {
-            const payload = (action.payload as unknown) as string;
+            const payload = action.payload as string;
             return {
                 ...state,
                 location: payload,
@@ -31,7 +31,8 @@ export const watchActionsHistoryReducer = handleActions<WatchActionsHistoryModel
     },
     {
         location: '-1',
-        history: {
+        history: {},
+        /*{
             '0': {
                 previousKey: '-1',
                 nextKey: '1',
@@ -152,7 +153,7 @@ export const watchActionsHistoryReducer = handleActions<WatchActionsHistoryModel
                         },
                     ])
             ),
-        },
+        },*/
     }
 );
 

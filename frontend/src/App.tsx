@@ -16,10 +16,12 @@ import 'typeface-roboto-mono';
 export default function App(): ReactElement {
     const [theme, setTheme] = useState(darkTheme);
     //const [theme, setTheme] = useState(lightTheme);
+
     const appSetup = useAppSetup();
     useEffect(() => {
         appSetup();
     }, []);
+
     return (
         <ThemeProvider theme={theme}>
             <>

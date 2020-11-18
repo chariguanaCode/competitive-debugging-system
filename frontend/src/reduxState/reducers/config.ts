@@ -170,7 +170,7 @@ export const configReducer = handleActions<ConfigModel, ConfigActionPayload>(
             };
         },
         [ConfigActions.SET_LAYOUT]: (state, action) => {
-            const payload = (action.payload as unknown) as { key: keyof ConfigModel['layouts']; value: LayoutModel };
+            const payload = action.payload as { key: keyof ConfigModel['layouts']; value: LayoutModel };
             return {
                 ...state,
                 layouts: {
@@ -181,14 +181,11 @@ export const configReducer = handleActions<ConfigModel, ConfigActionPayload>(
         },
         [ConfigActions.SELECT_LAYOUT]: (state, action) => ({
             ...state,
-            layoutSelection: (action.payload as unknown) as keyof ConfigModel['layouts'],
+            layoutSelection: action.payload as keyof ConfigModel['layouts'],
         }),
         [ConfigActions.ADD_TRACKED_OBJECT]: (state, action) => ({
             ...state,
-            trackedObjects: [
-                ...state.trackedObjects,
-                (action.payload as unknown) as { name: string; type: TrackedObject['type'] },
-            ],
+            trackedObjects: [...state.trackedObjects, action.payload as { name: string; type: TrackedObject['type'] }],
         }),
     },
     getDefaultConfig()
