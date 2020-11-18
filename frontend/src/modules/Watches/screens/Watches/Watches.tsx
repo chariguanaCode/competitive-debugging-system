@@ -13,11 +13,11 @@ function Watches(): ReactElement {
     const location = useWatchHistoryLocation();
 
     const handleKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
-        let newLocation = 0;
-        if (event.key === 'ArrowRight') {
+        let newLocation = -1;
+        if (event.key === 'ArrowDown') {
             newLocation = parseInt(location) + 1;
         }
-        if (event.key === 'ArrowLeft') {
+        if (event.key === 'ArrowUp') {
             newLocation = parseInt(location) - 1;
         }
         if (newLocation >= 0) setWatchHistoryLocation(newLocation.toString());

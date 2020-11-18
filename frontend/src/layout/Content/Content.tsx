@@ -35,7 +35,7 @@ const Content: React.FunctionComponent = () => {
         const type = node.getComponent();
 
         switch (type) {
-            case 'tasks':
+            case 'tests':
                 return <Tasks />;
             case 'watches':
                 return <Watches />;

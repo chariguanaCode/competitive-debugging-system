@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useRef } from 'react';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import {
     useAllTasksState,
     useCurrentTaskState,
@@ -36,6 +36,7 @@ export default function Daemons(): ReactElement {
         if (Object.keys(config).length) saveTemporaryProjectFile();
     }, [config]);
 
+    // output parsing
     const taskStates = useAllTasksState();
     const currentTask = useCurrentTaskState();
     const { parseWatchblocks, readWatchblocks, clearWatchblocks } = useParseWatchblocks();
@@ -50,6 +51,22 @@ export default function Daemons(): ReactElement {
     const defaultTestsOutputDirectory = remote.getGlobal('paths').testsOutputs;
     const projectTestsOutputDirectory = defaultTestsOutputDirectory + '/' + config.projectInfo.uuid + '/';
 
+    // trackedObjects
+    const watchHistoryLocation = useWatchHistoryLocation();
+    const { setAllTrackedObjects } = useTrackedObjectsActions();
+    const trackedObjects = useTrackedObjects();
+    const actionsHistory = useWatchActionsHistory();
+    const previousHistoryLocation = useRef('-1');
+
+    // forcing reloading of trackedObjects on watch changes
+    const [shouldTrackedObjectsReload, setForceTrackedObjectsCounter] = useState(0);
+
+    const forceTrackedObjectsReload = () => {
+        previousHistoryLocation.current = '-1';
+        setForceTrackedObjectsCounter((val) => (val + 1) % 1000000000);
+    };
+
+    // output parsing
     useEffect(() => {
         if (![TaskState.Pending, TaskState.Running, undefined].includes(currentTaskProgress)) {
             const inputBasename = getFileBasename(config.tests.groups[currentTask.groupId].tests[currentTask.id].inputPath);
@@ -69,6 +86,7 @@ export default function Daemons(): ReactElement {
                 () => clearWatchblocks(),
                 () => {
                     setCurrentTaskWatchblocks(readWatchblocks());
+                    forceTrackedObjectsReload();
                 }
             );
         }
@@ -81,12 +99,7 @@ export default function Daemons(): ReactElement {
         setCurrentTaskWatchblocksSize,
     ]);
 
-    const watchHistoryLocation = useWatchHistoryLocation();
-    const { setAllTrackedObjects } = useTrackedObjectsActions();
-    const trackedObjects = useTrackedObjects();
-    const actionsHistory = useWatchActionsHistory();
-    const previousHistoryLocation = useRef('-1');
-
+    // trackedObjects
     useEffect(() => {
         if (previousHistoryLocation.current === watchHistoryLocation) return;
 
@@ -140,6 +153,7 @@ export default function Daemons(): ReactElement {
         while (notFinished > 0 && loc !== startLocation) {
             for (let i = 0; i < actionsHistory[loc].actions.length && notFinished > 0; i++) {
                 const currAction = actionsHistory[loc].actions[i];
+                /* // buggy optimization
                 let shouldSkip = false as boolean;
                 switch (currAction.action) {
                     case OneDimensionArrayActionType.set_cell:
@@ -154,8 +168,10 @@ export default function Daemons(): ReactElement {
                         break;
                 }
                 if (shouldSkip) continue;
+                */
 
                 seekingState[currAction.targetObject].actionStack.push(currAction);
+                /* // buggy optimization
                 switch (currAction.action) {
                     case OneDimensionArrayActionType.set_whole:
                     case TwoDimensionArrayActionType.set_whole:
@@ -168,6 +184,7 @@ export default function Daemons(): ReactElement {
                         notFinished--;
                         break;
                 }
+                */
             }
 
             loc = actionsHistory[loc].previousKey;
@@ -282,7 +299,7 @@ export default function Daemons(): ReactElement {
         previousHistoryLocation.current = watchHistoryLocation;
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [watchHistoryLocation]);
+    }, [watchHistoryLocation, shouldTrackedObjectsReload]);
 
     return <></>;
 }

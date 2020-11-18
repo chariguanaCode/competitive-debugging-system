@@ -6,7 +6,7 @@ import useStyles from './TestsList.css';
 import { TestsListPropsModel, TestsListStateModel } from './TestsList.d';
 import { GroupListElement, TestListElement } from './components';
 
-export const TestsList: React.FunctionComponent<TestsListPropsModel> = ({ searchText }) => {
+export const TestsList: React.FunctionComponent<TestsListPropsModel> = ({ searchText, testStateFilter, sorting }) => {
     const classes = useStyles();
     const groups = useConfig().tests.groups;
     const currentTests = useAllTasksState();
@@ -22,14 +22,14 @@ export const TestsList: React.FunctionComponent<TestsListPropsModel> = ({ search
             regexExp = new RegExp(searchText);
         } catch {}
 
-        const testState = parseInt(searchText);
-
         let newFilteredTests: typeof filteredTests = {};
         Object.entries(groups).forEach(([groupId, groupObject]) => {
             newFilteredTests[groupId] = [];
             Object.entries(groupObject.tests).forEach(([testId, testObject]) => {
-                //       if (!regexExp || regexExp.test(testObject.name)) {
-                if (testState === -1 || testState === currentTests.current[testId]?.state) {
+                if (
+                    (!regexExp || regexExp.test(testObject.name)) &&
+                    (testStateFilter.size === 0 || testStateFilter.has(currentTests.current[testId]?.state))
+                ) {
                     newFilteredTests[groupId].push({
                         id: testId,
                         executionTime: currentTests.current[testId]?.executionTime,
@@ -38,10 +38,42 @@ export const TestsList: React.FunctionComponent<TestsListPropsModel> = ({ search
                     });
                 }
             });
+            switch (sorting.type) {
+                case 'name':
+                    newFilteredTests[groupId].sort((val1, val2) => {
+                        let res = 0;
+                        if (val1.name < val2.name) res = -1;
+                        if (val1.name > val2.name) res = 1;
+                        if (sorting.direction === 'asc') res *= -1;
+                        return res;
+                    });
+                    break;
+                case 'time':
+                    newFilteredTests[groupId].sort((val1, val2) => {
+                        let res = 0;
+                        let tmp1 = val1.executionTime?.split('s');
+                        let tmp2 = val2.executionTime?.split('s');
+                        if (tmp1 && !tmp2) return -1;
+                        if (!tmp1 && tmp2) return 1;
+                        if (!tmp1 && !tmp2) return 0;
+
+                        let values1 = [parseInt(tmp1[0]), parseInt(tmp1[1])];
+                        let values2 = [parseInt(tmp2[0]), parseInt(tmp2[1])];
+                        if (values1[0] < values2[0]) res = -1;
+                        if (values1[0] > values2[0]) res = 1;
+                        if (values1[0] === values2[0]) {
+                            if (values1[1] < values2[1]) res = -1;
+                            if (values1[1] > values2[1]) res = 1;
+                        }
+                        if (sorting.direction === 'asc') res *= -1;
+                        return res;
+                    });
+                    break;
+            }
         });
 
         setFilteredTests(newFilteredTests);
-    }, [groups, searchText, currentTests.reload]);
+    }, [groups, searchText, testStateFilter, currentTests.reload, sorting.type, sorting.direction]);
 
     const renderRow = (
         { index, key, style }: { index: number; key: string; style: any },
@@ -50,7 +82,7 @@ export const TestsList: React.FunctionComponent<TestsListPropsModel> = ({ search
     ) => {
         return (
             <div key={key} style={style}>
-                <TestListElement testObject={sourceArray[index]} />
+                <TestListElement testObject={sourceArray[index]} groupId={groupId} />
             </div>
         );
     };

@@ -185,6 +185,8 @@ export const useParseWatchblocks = () => {
                 name: '',
             },
         ];
+        tempWatchActionsHistory.current = {};
+        watchActionsHistoryPreviousKey.current = '-1';
     };
 
     const parseWatchblocks = (dataString: string) => {

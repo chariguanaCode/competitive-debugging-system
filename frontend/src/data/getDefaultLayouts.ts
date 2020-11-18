@@ -13,8 +13,8 @@ const getDefaultLayouts = () => {
                 {
                     type: 'tab',
                     enableClose: false,
-                    name: 'Tasks',
-                    component: 'tasks',
+                    name: 'Tests',
+                    component: 'tests',
                 },
             ],
         },
@@ -92,7 +92,7 @@ const getDefaultLayouts = () => {
                             {
                                 type: 'tab',
                                 name: 'Tests',
-                                component: 'tasks',
+                                component: 'tests',
                             },
                         ],
                     },

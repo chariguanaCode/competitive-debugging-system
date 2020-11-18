@@ -1,7 +1,6 @@
-export interface TasksPropsModel {
+export interface TasksPropsModel {}
 
-}
-
-export interface TasksStateModel {
-
+export interface TestsSortingModel {
+    type: 'name' | 'time';
+    direction: 'asc' | 'desc';
 }

@@ -36,9 +36,13 @@ function WatchNode({ node, style, setBracketState }: Props): ReactElement {
     const classes = useStyles();
     const theme = useTheme();
 
-    const colored = (val: { [key in keyof WatchBlockOptions]: any }) => {
+    const colored = (val: { [key in keyof WatchBlockOptions]: any }, key?: string) => {
         const [type, content] = Object.entries(val)[0] as [keyof WatchBlockOptions, any];
-        return <Colored type={type}>{content}</Colored>;
+        return (
+            <Colored key={key} type={type}>
+                {content}
+            </Colored>
+        );
     };
 
     const bracketMap = {
@@ -71,35 +75,35 @@ function WatchNode({ node, style, setBracketState }: Props): ReactElement {
         }
 
         if (node.type === 'closing') {
-            result.push(<>{colored({ [node.closingType]: bracketMap[node.closingType][1] })}</>);
+            result.push(colored({ [node.closingType]: bracketMap[node.closingType][1] }, '0'));
             return result;
         }
 
         if (line !== undefined) {
             if (node.type === 'watchblock' || node.variable_id === 0) {
                 result.push(
-                    <span>
+                    <span key="1">
                         {colored({ line })}: {colored({ name })}
                         {' = '}
                     </span>
                 );
             } else {
                 result.push(
-                    <span>
+                    <span key="1">
                         {colored({ name })}
                         {' = '}
                     </span>
                 );
             }
         } else {
-            result.push(<>{colored({ array: name })} : </>);
+            result.push(<React.Fragment key="1">{colored({ array: name })} : </React.Fragment>);
         }
 
-        if (node.type !== 'watchblock' && node.pointer) result.push(<>{colored({ pointer: '*' })}</>);
+        if (node.type !== 'watchblock' && node.pointer) result.push(colored({ pointer: '*' }, '2'));
 
-        if (node.type === 'string') result.push(<>{colored({ string: `"${node.value}"` })}</>);
-        if (node.type === 'bitset') result.push(<>{colored({ bitset: `${node.value}` })}</>);
-        if (node.type === 'number') result.push(<>{colored({ number: node.value })}</>);
+        if (node.type === 'string') result.push(colored({ string: `"${node.value}"` }, '3'));
+        if (node.type === 'bitset') result.push(colored({ bitset: `${node.value}` }, '3'));
+        if (node.type === 'number') result.push(colored({ number: node.value }, '3'));
 
         if (node.type === 'array' || node.type === 'struct' || node.type === 'pair' || node.type === 'watchblock') {
             const toggleExpand = () => {
@@ -107,17 +111,17 @@ function WatchNode({ node, style, setBracketState }: Props): ReactElement {
             };
 
             result.push(
-                <span onClick={toggleExpand} style={{ cursor: expandable() ? 'pointer' : 'auto' }}>
+                <span key="4" onClick={toggleExpand} style={{ cursor: expandable() ? 'pointer' : 'auto' }}>
                     {open && node.children.length - 1 ? (
                         <>
                             <ArrowDropDown viewBox="4 4 13 13" fontSize="inherit" className={classes.bracketArrow} />{' '}
-                            {colored({ [node.type]: bracketMap[node.type][0] })}
+                            {colored({ [node.type]: bracketMap[node.type][0] }, '5')}
                         </>
                     ) : (
                         <>
                             <ArrowRight viewBox="4 4 13 13" fontSize="inherit" className={classes.bracketArrow} />{' '}
-                            {colored({ [node.type]: bracketMap[node.type][0] })} {node.children.length - 1}{' '}
-                            {colored({ [node.type]: bracketMap[node.type][1] })}
+                            {colored({ [node.type]: bracketMap[node.type][0] }, '5')} {node.children.length - 1}{' '}
+                            {colored({ [node.type]: bracketMap[node.type][1] }, '6')}
                         </>
                     )}
                 </span>
