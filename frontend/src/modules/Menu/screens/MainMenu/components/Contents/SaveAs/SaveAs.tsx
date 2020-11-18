@@ -5,12 +5,13 @@ import { useSaveProjectAs, useLoadProject } from 'backend/projectManagement';
 import { ContentProps } from '../Types';
 import { SaveAsFormValues } from './Types';
 import useStyles from './SaveAs.css';
-import { useConfig } from 'reduxState/selectors';
+import { useConfig, useProjectFile } from 'reduxState/selectors';
 import { useConfigActions } from 'reduxState/actions';
 
 export const SaveAs: React.FunctionComponent<ContentProps> = memo(({ setFileManagerConfig, closeMainMenu }) => {
     const classes = useStyles();
     const saveProjectAs = useSaveProjectAs();
+    const projectFile = useProjectFile();
     const loadProject = useLoadProject();
     const isUpdatedConfigSaved = useRef<boolean>(true);
     const wasConfigUpdated = useRef<boolean>(false);
@@ -19,11 +20,11 @@ export const SaveAs: React.FunctionComponent<ContentProps> = memo(({ setFileMana
     const config = useConfig();
     const { setConfig } = useConfigActions();
     const [formValues, setFormValues] = useState<SaveAsFormValues>({
-        projectName: '',
-        projectLocation: '',
-        projectDescription: '',
-        projectAuthor: '',
-        projectFilename: '',
+        projectName: config ? config.projectInfo.name : '',
+        projectLocation: projectFile ? (projectFile.hasSaveLocation ? projectFile.directory : '') : '',
+        projectDescription: config ? config.projectInfo.description : '',
+        projectAuthor: config ? config.projectInfo.author : '',
+        projectFilename: projectFile ? (projectFile.hasSaveLocation ? projectFile.filename : '') : '',
     });
     // TODO: ? set default values from current config (has prons and cons)
     // TODO: better location handling
@@ -96,6 +97,9 @@ export const SaveAs: React.FunctionComponent<ContentProps> = memo(({ setFileMana
                     name="projectName"
                     value={formValues.projectName}
                     onChange={setFormValue}
+                    onFocus={(e) => {
+                        //e.target.select();
+                    }}
                 />
                 <TextField
                     label="Project file name"

@@ -1,8 +1,11 @@
 import { FileModel } from 'components/FileManager/FileManager.d';
-export interface TasksAdditionPropsModel {}
+export interface TasksAdditionPropsModel {
+    closeDialog: () => any;
+}
 export type MergedFilesModel = {
     inputPath: FileModel;
     outputPath: FileModel | null;
+    name: string;
 };
 export interface TasksAdditionStateModel {
     inputsFiles: Array<FileModel>;

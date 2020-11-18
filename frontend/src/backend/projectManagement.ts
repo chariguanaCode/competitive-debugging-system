@@ -13,6 +13,7 @@ import {
 } from 'reduxState/actions';
 import { getTimeMark } from 'utils/tools';
 import { getDefaultConfig } from 'data';
+import { useRef } from 'react';
 const remote = window.require('electron').remote;
 const md5 = window.require('md5');
 
@@ -20,12 +21,16 @@ export const useSaveTemporaryProjectFile = () => {
     const projectFile = useProjectFile();
     const config = useConfig();
     const { setProjectFileSaveState } = useProjectFileActions();
-
+    const lastTemporaryProjectFileTime = useRef<number>(0);
     return async () => {
         if (!projectFile) return;
         // TODO: handling errors
-        await asyncFileActions.saveFile(projectFile.path, JSON.stringify(config)).catch();
-        setProjectFileSaveState(md5(JSON.stringify(config)) === projectFile.savedFileHash);
+        if (new Date().getTime() - lastTemporaryProjectFileTime.current > 10000) {
+            lastTemporaryProjectFileTime.current = 100000000000000000;
+            await asyncFileActions.saveFile(projectFile.path, JSON.stringify(config)).catch();
+            lastTemporaryProjectFileTime.current = new Date().getTime();
+        }
+        if (projectFile.isSaved) setProjectFileSaveState(false); //md5(JSON.stringify(config)) === projectFile.savedFileHash);
         return projectFile.path;
     };
 };
@@ -48,16 +53,15 @@ export const useSaveProject = () => {
     const projectFile = useProjectFile();
     const config = useConfig();
     const { updateProjectFile } = useProjectFileActions();
-
     return async () => {
         if (!projectFile) return;
-        // TODO: handling errors
+        if (!projectFile.hasSaveLocation) throw { msg: 'No save location', code: 0 };
         const path = projectFile.directory + projectFile.filename + '.cdsp';
         const stringifiedConfig = JSON.stringify(config);
         await asyncFileActions.saveFile(projectFile.directory + projectFile.filename + '.cdsp', stringifiedConfig).catch();
         updateProjectFile({
             isSaved: true,
-            savedFileHash: md5(stringifiedConfig),
+            //savedFileHash: md5(stringifiedConfig),
         } as ProjectFileModel);
         return path;
     };

@@ -60,15 +60,15 @@ export const CreateProject: React.FunctionComponent<ContentProps> = memo(({ setF
     const newEmptyProject = () => setNewConfig(null);
 
     return (
-        <div>
+        <div className={classes.Buttons}>
             <Button disabled={isLoading} onClick={() => newProjectFromOneCppFile()}>
-                New project from one .cpp file
+                One .cpp file
             </Button>
-            <Button disabled={isLoading} onClick={() => newEmptyProject()}>
-                New empty project
+            <Button disabled={true || isLoading} onClick={() => newEmptyProject()}>
+                Empty
             </Button>
-            <Button disabled={isLoading} onClick={() => newProjectFromManyCppFiles()}>
-                New project from many .cpp files
+            <Button disabled={true || isLoading} onClick={() => newProjectFromManyCppFiles()}>
+                Many .cpp files
             </Button>
         </div>
     );

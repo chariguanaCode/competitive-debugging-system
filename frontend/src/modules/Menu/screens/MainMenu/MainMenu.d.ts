@@ -1,7 +1,8 @@
 export interface MainMenuProps {
     open: boolean;
-    handleClose: Function;
+    handleClose: () => any;
     isAnyProjectOpen: boolean;
+    deafultSelectedSector?: string;
 }
 
 export interface OptionsContentProps {
