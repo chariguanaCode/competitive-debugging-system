@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import { TaskState, TestModel } from 'reduxState/models';
-import { useAllTasksState, useConfig } from 'reduxState/selectors';
+import { useAllTasksState, useAllTasksStateReload, useConfig } from 'reduxState/selectors';
 import useStyles from './TestsList.css';
 import { TestsListPropsModel, TestsListStateModel } from './TestsList.d';
 import { GroupListElement, TestListElement } from './components';
@@ -10,6 +10,7 @@ export const TestsList: React.FunctionComponent<TestsListPropsModel> = ({ search
     const classes = useStyles();
     const groups = useConfig().tests.groups;
     const currentTests = useAllTasksState();
+    const currentTestsReload = useAllTasksStateReload();
 
     const [filteredTests, setFilteredTests] = useState<{
         [key: string]: Array<TestModel & { id: string; executionTime: string; state: TaskState }>;
@@ -73,7 +74,7 @@ export const TestsList: React.FunctionComponent<TestsListPropsModel> = ({ search
         });
 
         setFilteredTests(newFilteredTests);
-    }, [groups, searchText, testStateFilter, currentTests.reload, sorting.type, sorting.direction]);
+    }, [groups, searchText, testStateFilter, currentTestsReload, sorting.type, sorting.direction]);
 
     const renderRow = (
         { index, key, style }: { index: number; key: string; style: any },

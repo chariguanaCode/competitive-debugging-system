@@ -15,7 +15,7 @@ export default () => {
     const finishTest = useFinishTest();
     const testError = useTestError();
 
-    return async () => {
+    return async (filter: { groups?: string[]; tests?: string[] }) => {
         const sourcePath = config.projectInfo.files[0];
         const modifiedSourcePath = sourcePath.replace(/\.cpp$/, '.tmp.cpp');
         const binaryPath = sourcePath.replace(/\.cpp$/, '.bin');
@@ -23,12 +23,21 @@ export default () => {
         const defaultTestsOutputDirectory = remote.getGlobal('paths').testsOutputs;
         const projectTestsOutputDirectory = defaultTestsOutputDirectory + '/' + config.projectInfo.uuid + '/';
 
-        await removeDirectory(projectTestsOutputDirectory).catch((err) => {});
-        await createDirectory(projectTestsOutputDirectory).catch((err) => {});
+        if (!filter.groups && !filter.tests) {
+            await removeDirectory(projectTestsOutputDirectory).catch((err) => {});
+            await createDirectory(projectTestsOutputDirectory).catch((err) => {});
+        }
 
         for (const groupId in config.tests.groups) {
-            if (Object.prototype.hasOwnProperty.call(config.tests.groups, groupId)) {
-                tests.push(...Object.entries(config.tests.groups[groupId].tests));
+            if (
+                Object.prototype.hasOwnProperty.call(config.tests.groups, groupId) &&
+                (!filter.groups || filter.groups.includes(groupId))
+            ) {
+                tests.push(
+                    ...Object.entries(config.tests.groups[groupId].tests).filter(
+                        ([id, val]) => !filter.tests || filter.tests.includes(id)
+                    )
+                );
             }
         }
 

@@ -9,7 +9,7 @@ export const modifyCppSource = async (originalSourcePath: string, newSourcePath:
     const cppFolder = remote.getGlobal('paths').cppFiles;
     let source = await readFile(originalSourcePath);
 
-    source = `#include "${cppFolder}/universal_print_17.h"\n` + `#define CDS_DEBUG 1\n` + `\n` + source;
+    source = `#include "${cppFolder}/universal_print_17.h"\n` + `#define DEBUG 1\n` + `#define CDS_DEBUG 1\n` + `\n` + source;
 
     await saveFile(newSourcePath, source);
 };

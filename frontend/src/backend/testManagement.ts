@@ -91,7 +91,9 @@ export const useTestError = () => {
                     signal: err.signal,
                     stderr: err.stderr,
                 },
-                executionTime: `${execTime[0]}s ${(execTime[1] / 1000000).toFixed(6).padStart(10, ' ')}ms`,
+                executionTime: `${execTime[0]}s ${Math.round(execTime[1] / 1000000)
+                    .toString()
+                    .padStart(3, ' ')}ms`,
             } as Task;
         }
 

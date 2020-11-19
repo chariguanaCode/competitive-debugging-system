@@ -3,9 +3,13 @@ import { RootState } from '../';
 
 export const useAllTasksState = () => {
     return useSelector(
-        (state: RootState) => state.taskStates.allTasks,
-        (prev, curr) => prev.reload === curr.reload
-    );
+        (state: RootState) => state.taskStates,
+        (prev, curr) => prev.reloadAllTasks === curr.reloadAllTasks
+    ).allTasks;
+};
+
+export const useAllTasksStateReload = () => {
+    return useSelector((state: RootState) => state.taskStates.reloadAllTasks);
 };
 
 export const useCurrentTaskState = () => {

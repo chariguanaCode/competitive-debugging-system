@@ -63,7 +63,7 @@ export interface TaskStateModel {
         current: AllTasksModel;
         timeout: NodeJS.Timeout | null;
         shouldReload: boolean;
-        reload: number;
     };
+    reloadAllTasks: number;
     currentTask: CurrentTaskModel;
 }
