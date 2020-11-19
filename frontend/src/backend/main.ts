@@ -12,36 +12,46 @@ const loadTests = require('./handleTests').loadTests
 const loadTestsCANCEL = require('./handleTests').loadTestsCANCEL
 */
 
-const useRunTasks = () => {
+export const useRunTasks = () => {
     const config = useConfig();
     const taskStates = useAllTasksState();
     const { reloadTasks } = useTaskStatesActions();
     const compilationAndExecution = useCompilationAndExecution();
 
-    return () => {
+    return (filter: { groups?: string[]; tests?: string[] }) => {
         if (!config) {
             //webserver.sendError('No project selected!', '')
             return;
         }
 
-        for (const id in taskStates.current) {
-            if (Object.prototype.hasOwnProperty.call(taskStates.current, id)) {
-                if (taskStates.current[id].childProcess) {
-                    taskStates.current[id].childProcess.kill();
-                }
+        for (const groupId in config.tests.groups) {
+            if (
+                Object.prototype.hasOwnProperty.call(config.tests.groups, groupId) &&
+                (!filter.groups || filter.groups.includes(groupId))
+            ) {
+                for (const id in config.tests.groups[groupId].tests) {
+                    if (
+                        Object.prototype.hasOwnProperty.call(config.tests.groups[groupId].tests, id) &&
+                        (!filter.tests || filter.tests.includes(id))
+                    ) {
+                        if (taskStates.current[id].childProcess) {
+                            taskStates.current[id].childProcess.kill();
+                        }
 
-                taskStates.current[id] = {
-                    state: TaskState.Pending,
-                } as Task;
+                        taskStates.current[id] = {
+                            state: TaskState.Pending,
+                        } as Task;
+                    }
+                }
             }
         }
 
         reloadTasks();
-        compilationAndExecution();
+        compilationAndExecution(filter);
     };
 };
 
-const useAddTestFiles = () => {
+export const useAddTestFiles = () => {
     const config = useConfig();
     const { setConfig } = useConfigActions();
 
@@ -72,5 +82,3 @@ const loadTestsMain = (obj) => {
     loadTests(obj, addTestFiles)
 }
 */
-
-export { useRunTasks, useAddTestFiles };

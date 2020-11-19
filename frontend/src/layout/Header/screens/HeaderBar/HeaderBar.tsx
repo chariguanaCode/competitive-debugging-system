@@ -1,17 +1,29 @@
 import React, { useState, memo } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Button, Menu, MenuItem, ListItemText, ListItemIcon } from '@material-ui/core';
-import { Apps, Settings, PlayArrow, Refresh, ViewQuilt, BugReport, Assessment, ViewList, Add } from '@material-ui/icons';
+import {
+    Apps,
+    Settings,
+    PlayArrow,
+    Refresh,
+    ViewQuilt,
+    BugReport,
+    Assessment,
+    ViewList,
+    Add,
+    FastForward,
+} from '@material-ui/icons';
 import { ReactComponent as Logo } from 'assets/cds_logo.svg';
 import { ReactComponent as LoadingIcon } from 'assets/icons/loading.svg';
 import { useRunTasks } from 'backend/main';
 import { useLoadProject, useSaveProject } from 'backend/projectManagement';
-import { useConfig, useProjectFile, useExecutionState, useLayoutSelection } from 'reduxState/selectors';
+import { useConfig, useProjectFile, useExecutionState, useLayoutSelection, useCurrentTaskState } from 'reduxState/selectors';
 import { ExecutionState } from 'reduxState/models';
 import useStyles from './HeaderBar.css';
 import { MainMenu } from 'modules/Menu/screens';
 import { useConfigActions } from 'reduxState/actions';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useCommonState } from 'utils';
+import { IconButtonWithTooltip } from 'components';
 
 export const HeaderBar: React.FunctionComponent = memo(() => {
     const classes = useStyles();
@@ -26,6 +38,7 @@ export const HeaderBar: React.FunctionComponent = memo(() => {
     const saveProject = useSaveProject();
     //const reloadProject = useReloadProject()
     const executionState = useExecutionState();
+    const currentTaskState = useCurrentTaskState();
 
     useHotkeys(
         //temporary here until i will figure out how to nicely send that information to that component
@@ -59,7 +72,9 @@ export const HeaderBar: React.FunctionComponent = memo(() => {
             <AppBar position="relative" className={classes.appBar}>
                 <Toolbar variant="dense">
                     <IconButton
-                        onClick={() => _setMenuState((previousState) => ({ open: !previousState.open, defaultSelectedSector: undefined }))}
+                        onClick={() =>
+                            _setMenuState((previousState) => ({ open: !previousState.open, defaultSelectedSector: undefined }))
+                        }
                         color="inherit"
                     >
                         <Apps color="inherit" />
@@ -89,21 +104,39 @@ export const HeaderBar: React.FunctionComponent = memo(() => {
 
                     <div style={{ flexGrow: 1 }} />
 
-                    <IconButton color="inherit" onClick={addNewTab}>
+                    <IconButtonWithTooltip color="inherit" tooltipText="Add new tab" onClick={addNewTab}>
                         <Add color="inherit" />
-                    </IconButton>
-                    <IconButton color="inherit" onClick={runTasks}>
-                        <PlayArrow color="inherit" />
-                    </IconButton>
-                    <IconButton
+                    </IconButtonWithTooltip>
+                    <IconButtonWithTooltip
                         color="inherit"
+                        tooltipText="Rerun current test"
+                        disabled={
+                            currentTaskState.id === '-1' ||
+                            [ExecutionState.Compiling, ExecutionState.Running].includes(executionState.state)
+                        }
+                        onClick={() => runTasks({ tests: [currentTaskState.id] })}
+                    >
+                        <PlayArrow color="inherit" />
+                    </IconButtonWithTooltip>
+                    <IconButtonWithTooltip
+                        color="inherit"
+                        tooltipText="Run all tests"
+                        disabled={[ExecutionState.Compiling, ExecutionState.Running].includes(executionState.state)}
+                        onClick={() => runTasks({})}
+                    >
+                        <FastForward color="inherit" />
+                    </IconButtonWithTooltip>
+                    <IconButtonWithTooltip
+                        color="inherit"
+                        tooltipText="Reload - WIP"
+                        disabled={true}
                         onClick={() => loadProject('./cpp/testConfig.cdsp')} /*onClick={/*reloadProject}*/
                     >
                         <Refresh color="inherit" />
-                    </IconButton>
-                    <IconButton color="inherit">
+                    </IconButtonWithTooltip>
+                    <IconButtonWithTooltip color="inherit" tooltipText="Settings - WIP" disabled={true}>
                         <Settings color="inherit" />
-                    </IconButton>
+                    </IconButtonWithTooltip>
                 </Toolbar>
             </AppBar>
             <MainMenu

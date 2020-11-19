@@ -1,4 +1,4 @@
-import React, { ReactElement, memo } from 'react';
+import React, { memo } from 'react';
 import { Minimize, Close, Fullscreen } from '@material-ui/icons';
 import { useTheme } from '@material-ui/core/styles';
 import { useStyles } from './TitleBar.css';

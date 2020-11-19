@@ -5,7 +5,7 @@ import { TaskStateModel, AllTasksModel, Watchblock, Watch } from '../models';
 export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPayload>(
     {
         [TaskStateAction.RELOAD_TASKS]: (state, action) => {
-            return { ...state, allTasks: { ...state.allTasks, reload: state.allTasks.reload + 1 } };
+            return { ...state, reloadAllTasks: state.reloadAllTasks + 1 };
         },
         [TaskStateAction.SET_CURRENT_TASK_ID]: (state, action) => ({
             ...state,
@@ -62,8 +62,8 @@ export const taskStateReducer = handleActions<TaskStateModel, TaskStateActionPay
             current: {} as AllTasksModel,
             timeout: null,
             shouldReload: false,
-            reload: 0,
         },
+        reloadAllTasks: 0,
         currentTask: {
             id: '-1',
             groupId: '-1',
