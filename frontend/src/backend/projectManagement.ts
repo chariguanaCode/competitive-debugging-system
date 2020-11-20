@@ -10,6 +10,7 @@ import {
     useProjectFileActions,
     useCdsConfigActions,
     useTrackedObjectsActions,
+    ConfigActions,
 } from 'reduxState/actions';
 import { getTimeMark } from 'utils/tools';
 import { getDefaultConfig } from 'data';
@@ -77,13 +78,58 @@ export const useSaveNotSavedProjectFile = () => {
     };
 };
 
-export const useLoadProject = () => {
-    const { setConfig } = useConfigActions();
+export const useDeleteGivenTestsStates = () => {
     const taskStates = useAllTasksState();
     const { reloadTasks } = useTaskStatesActions();
+    return (testsToDelete: Array<string>) => {
+        for (const key of testsToDelete) delete taskStates.current[key];
+        reloadTasks();
+    };
+};
+
+export const useResetGivenGroupsTestsStates = () => {
+    const taskStates = useAllTasksState();
+    const { reloadTasks } = useTaskStatesActions();
+    const config = useConfig();
+    return (groupsToReset: Array<string>) => {
+        for (const groupId of groupsToReset)
+            for (const key in config.tests.groups[groupId].tests) {
+                if (!taskStates.current[key])
+                    taskStates.current[key] = {
+                        state: TaskState.Pending,
+                    } as Task;
+            }
+        reloadTasks();
+    };
+};
+
+export const useResetAllTestsStates = () => {
+    const taskStates = useAllTasksState();
+    const { reloadTasks } = useTaskStatesActions();
+    const config = useConfig();
+
+    return (overwriteExistingTests?: boolean, newConfig?: ConfigModel) => {
+        taskStates.current = {};
+        const currentConfig: ConfigModel = newConfig ? newConfig : config;
+        for (const groupId in currentConfig.tests.groups) {
+            for (const key in currentConfig.tests.groups[groupId].tests) {
+                if (overwriteExistingTests || !taskStates.current[key])
+                    taskStates.current[key] = {
+                        state: TaskState.Pending,
+                    } as Task;
+            }
+        }
+
+        reloadTasks();
+    };
+};
+
+export const useLoadProject = () => {
+    const { setConfig } = useConfigActions();
     const { setProjectFile } = useProjectFileActions();
     const { pushProjectToProjectsHistory } = useCdsConfigActions();
     const { setAllTrackedObjects } = useTrackedObjectsActions();
+    const resetAllTestsStates = useResetAllTestsStates();
 
     return async (sourceFilePath: string) => {
         let path = asyncFileActions.parsePath(sourceFilePath, false);
@@ -144,21 +190,7 @@ export const useLoadProject = () => {
         }
         setAllTrackedObjects(newTrackedObjects);
 
-        // TODO: rozdzielic do innej funkcji
-        taskStates.current = {};
-        for (const groupId in newConfig.tests.groups) {
-            if (Object.prototype.hasOwnProperty.call(newConfig.tests.groups, groupId)) {
-                for (const key in newConfig.tests.groups[groupId].tests) {
-                    if (Object.prototype.hasOwnProperty.call(newConfig.tests.groups[groupId].tests, key)) {
-                        taskStates.current[key] = {
-                            state: TaskState.Pending,
-                        } as Task;
-                    }
-                }
-            }
-        }
-
-        reloadTasks();
+        resetAllTestsStates(true, newConfig);
     };
 };
 /*

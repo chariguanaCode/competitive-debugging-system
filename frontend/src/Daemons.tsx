@@ -20,15 +20,22 @@ import { useTaskStatesActions, useTrackedObjectsActions } from 'reduxState/actio
 import { readFileStream } from 'backend/outputFileTracking';
 import { useParseWatchblocks } from 'backend/watchParse';
 import { useSaveCdsConfigToFile } from 'backend/appManangement';
-import { useSaveTemporaryProjectFile, useSaveProject } from 'backend/projectManagement';
+import {
+    useSaveTemporaryProjectFile,
+    useSaveProject,
+    useResetGivenGroupsTestsStates,
+    useDeleteGivenTestsStates,
+} from 'backend/projectManagement';
 import { getFileBasename } from 'backend/asyncFileActions';
-import { useHotkeys } from 'react-hotkeys-hook';
+import { usePreviousEffect } from 'utils';
 
 const remote = window.require('electron').remote;
 
 export default function Daemons(): ReactElement {
-    const saveProject = useSaveProject();
-    const projectFile = useProjectFile();
+    // const saveProject = useSaveProject();
+    // const projectFile = useProjectFile();
+    const resetGivenGroupsTestsStates = useResetGivenGroupsTestsStates();
+    const deleteGivenTestsStates = useDeleteGivenTestsStates();
     const config = useConfig();
     const cdsConfig = useCdsConfig();
     const saveCdsConfigToFile = useSaveCdsConfigToFile(); /* TEMPORARY MOVED TO HEADER */
@@ -51,6 +58,28 @@ export default function Daemons(): ReactElement {
         if (Object.keys(cdsConfig).length) saveCdsConfigToFile();
     }, [cdsConfig]);
 
+    usePreviousEffect(
+        ([pvGroupsIndicators]: [typeof config.tests.groups]) => {
+            let groupsToResetIds: Array<string> = [];
+            let deletedTests: Array<string> = [];
+            for (const groupId in config.tests.groups) {
+                const isGroupIdInPvGroupsIndicators = groupId in pvGroupsIndicators;
+                if (!isGroupIdInPvGroupsIndicators || config.tests.groups[groupId] !== pvGroupsIndicators[groupId]) {
+                    if (isGroupIdInPvGroupsIndicators) {
+                        deletedTests.push(
+                            ...Object.keys(pvGroupsIndicators[groupId].tests).filter(
+                                (testId) => !(testId in config.tests.groups[groupId].tests)
+                            )
+                        );
+                    }
+                }
+            }
+            console.log(deletedTests, groupsToResetIds)
+            groupsToResetIds.length && resetGivenGroupsTestsStates(groupsToResetIds);
+            deletedTests.length && deleteGivenTestsStates(deletedTests);
+        },
+        [config.tests.groups]
+    );
     const saveTemporaryProjectFile = useSaveTemporaryProjectFile();
     useEffect(() => {
         if (Object.keys(config).length) {
@@ -85,7 +114,7 @@ export default function Daemons(): ReactElement {
 
     const forceTrackedObjectsReload = () => {
         previousHistoryLocation.current = '-1';
-        setForceTrackedObjectsCounter((val) => (val + 1) % 1000000000);
+        setForceTrackedObjectsCounter((val) => val + 1);
     };
 
     // output parsing
