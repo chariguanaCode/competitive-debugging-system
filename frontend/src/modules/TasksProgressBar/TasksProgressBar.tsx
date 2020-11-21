@@ -15,6 +15,7 @@ const TasksProgressBar = () => {
         [TaskState.Pending]: 0,
         [TaskState.Running]: 0,
         [TaskState.Successful]: 0,
+        [TaskState.OK]: 0,
         [TaskState.Timeout]: 0,
         [TaskState.WrongAnswer]: 0,
         [TaskState.Crashed]: 0,
@@ -29,6 +30,7 @@ const TasksProgressBar = () => {
         <div className={classes.wrapper}>
             {[
                 TaskState.Successful,
+                TaskState.OK,
                 TaskState.Timeout,
                 TaskState.WrongAnswer,
                 TaskState.Crashed,

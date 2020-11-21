@@ -81,6 +81,7 @@ export const lightTheme = createMuiTheme({
             [TaskState.WrongAnswer]: red[400],
             [TaskState.Crashed]: purple[400],
             [TaskState.Killed]: grey[400],
+            [TaskState.OK]: teal[400],
         },
         scrollbar: {
             thumb: grey[200],
@@ -152,6 +153,7 @@ export const darkTheme = createMuiTheme({
             [TaskState.WrongAnswer]: red[400],
             [TaskState.Crashed]: purple[400],
             [TaskState.Killed]: grey[400],
+            [TaskState.OK]: teal[400],
         },
         scrollbar: {
             thumb: grey[800],

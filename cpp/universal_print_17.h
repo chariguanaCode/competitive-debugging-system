@@ -107,7 +107,9 @@ namespace cupl {
 
 #define declare_struct(...) \
     void print_process() { \
+        cupl::print_cds(cupl::struct_start); \
         _CALL_MACRO_FOR_EACH(_PRINT_STRUCT_MEMBER, ##__VA_ARGS__); \
+        cupl::print_cds(cupl::struct_end); \
     }
 
 /** =============================================================================
@@ -199,9 +201,9 @@ namespace cupl {
     // Temporary fix to compilation issues
     template <size_t   S> void print_process(std::bitset<S> &x);
     template <typename U, typename H> void print_process(std::pair<U, H> &x);
-    template <typename T> void print_process(std::stack<T> &x);
-    template <typename T> void print_process(std::queue<T> &x);
-    template <typename T> void print_process(std::priority_queue<T> &x);
+    template <typename T, typename C            > void print_process(std::stack<T, C>             &x);
+    template <typename T, typename C            > void print_process(std::queue<T, C>             &x);
+    template <typename T, typename C, typename D> void print_process(std::priority_queue<T, C, D> &x);
     //
 
     template <typename T, size_t   N > void print_array         (T                    (&x)[N]);
@@ -210,9 +212,9 @@ namespace cupl {
     template <typename T             > void print_class_struct  (T                         &x);
     template <typename T             > void print_pointer       (T                         &x);
     template <typename U, typename H > void print_pair          (std::pair          <U, H> &x);
-    template <typename T             > void print_stack         (std::stack         <T   > &x);
-    template <typename T             > void print_queue         (std::queue         <T   > &x);
-    template <typename T             > void print_priority_queue(std::priority_queue<T   > &x);
+    template <typename T, typename C            > void print_stack(std::stack<T, C>                      &x);
+    template <typename T, typename C            > void print_queue(std::queue<T, C>                      &x);
+    template <typename T, typename C, typename D> void print_priority_queue(std::priority_queue<T, C, D> &x);
     template <size_t   T             > void print_bitset        (std::bitset        <T   > &x);
                                        void print_string        (std::string               &x);
 }
@@ -318,19 +320,19 @@ namespace cupl {
         print_pair(x);
     }
 
-    template <typename T>
-    void print_process(stack<T> &x) {
+    template <typename T, typename C>
+    void print_process(stack<T, C> &x) {
         print_stack(x);
     }
 
-    template <typename T>
-    void print_process(queue<T> &x) {
+    template <typename T, typename C>
+    void print_process(queue<T, C> &x) {
         print_queue(x);
     }
 
-    template <typename T>
-    void print_process(priority_queue<T> &x) {
-        print_priority_queue(x);
+    template <typename T, typename C, typename D>
+    void print_process(priority_queue<T, C, D> &x) {
+       print_priority_queue(x);
     }
     //
 
@@ -394,9 +396,9 @@ namespace cupl {
         print_process(x.second);
     }
 
-    template <typename T>
-    void print_stack(stack<T> &x) {
-        stack<T>  tmp = x;
+    template <typename T, typename C>
+    void print_stack(std::stack<T, C> &x) {
+        std::stack<T, C> tmp = x;
         vector<T> result;
         while (!tmp.empty()) {
             result.push_back(tmp.top());
@@ -405,9 +407,9 @@ namespace cupl {
         print_process(result);
     }
 
-    template <typename T>
-    void print_queue(queue<T> &x) {
-        queue<T>  tmp = x;
+    template <typename T, typename C>
+    void print_queue(std::queue<T, C> &x) {
+        std::queue<T, C> tmp = x;
         vector<T> result;
         while (!tmp.empty()) {
             result.push_back(tmp.front());
@@ -416,9 +418,9 @@ namespace cupl {
         print_process(result);
     }
 
-    template <typename T>
-    void print_priority_queue(priority_queue<T> &x) {
-        priority_queue<T> tmp = x;
+    template <typename T, typename C, typename D>
+    void print_priority_queue(std::priority_queue<T, C, D> &x) {
+        std::priority_queue<T, C, D> tmp = x;
         vector<T> result;
         while (!tmp.empty()) {
             result.push_back(tmp.top());

@@ -38,6 +38,7 @@ export const TestStateFilter: React.FunctionComponent<TestStateFilterPropsModel>
 
     const testStateOrder = [
         TaskState.Successful,
+        TaskState.OK,
         TaskState.WrongAnswer,
         TaskState.Timeout,
         TaskState.Crashed,

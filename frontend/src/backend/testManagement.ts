@@ -30,13 +30,12 @@ export const useFinishTest = () => {
 
             let isAnswerRight: number = -1;
             if (outputToComparePath) isAnswerRight = Number(await compareFiles(outputPath, outputToComparePath, true));
-
             const wasTimeLimitExceeded: boolean = !!(timeLimit && execTime[1] / 1000000 > timeLimit);
 
             const finalTaskState: TaskState = wasTimeLimitExceeded
                 ? TaskState.Timeout
                 : isAnswerRight === -1
-                ? TaskState.Successful
+                ? TaskState.OK
                 : isAnswerRight === 0
                 ? TaskState.WrongAnswer
                 : isAnswerRight === 1
@@ -83,6 +82,7 @@ export const useTestError = () => {
     const taskStates = useAllTasksState();
 
     return (id: string) => (err: any) => {
+        console.log(err);
         if (taskStates.current[id].state === TaskState.Running) {
             const execTime = window.process.hrtime(taskStates.current[id].startTime);
             taskStates.current[id] = {
