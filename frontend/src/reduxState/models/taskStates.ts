@@ -31,6 +31,7 @@ export enum TaskState {
     WrongAnswer,
     Crashed,
     Killed,
+    OK
 }
 
 export interface Task {

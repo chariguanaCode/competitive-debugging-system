@@ -96,15 +96,20 @@ export const TestsList: React.FunctionComponent<TestsListPropsModel> = ({ search
                     const isGroupExpanded = expandedGroupsIds.has(groupId);
                     const testsAmounts = {
                         [TaskState.Successful]: 0,
+                        [TaskState.OK]: 0,
                         [TaskState.WrongAnswer]: 0,
                         [TaskState.Timeout]: 0,
                         [TaskState.Crashed]: 0,
                     } as { [key in TaskState]: number };
                     for (const test of groupTests) {
                         if (
-                            [TaskState.Successful, TaskState.WrongAnswer, TaskState.Timeout, TaskState.Crashed].includes(
-                                test.state
-                            )
+                            [
+                                TaskState.Successful,
+                                TaskState.OK,
+                                TaskState.WrongAnswer,
+                                TaskState.Timeout,
+                                TaskState.Crashed,
+                            ].includes(test.state)
                         ) {
                             testsAmounts[test.state]++;
                         }

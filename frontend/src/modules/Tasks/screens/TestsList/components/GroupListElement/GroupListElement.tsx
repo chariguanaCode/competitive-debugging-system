@@ -26,7 +26,7 @@ export const GroupListElement: React.FunctionComponent<GroupListElementPropsMode
                 <div className={classes.groupName}>{groupObject.name}</div>
                 <div className={classes.groupTestsAmountLabel}>
                     (<span>{groupObject.allTestsAmount}</span>
-                    {[TaskState.Successful, TaskState.WrongAnswer, TaskState.Timeout, TaskState.Crashed].map((state) => (
+                    {[TaskState.Successful, TaskState.OK, TaskState.WrongAnswer, TaskState.Timeout, TaskState.Crashed].map((state) => (
                         <span key={state} style={{ color: theme.palette.taskState[state] }}>
                             {' '}
                             {groupObject.testsAmounts[state]}

@@ -1,4 +1,4 @@
-import { parse } from "path";
+import { parse } from 'path';
 
 const fs = window.require('fs');
 const path = window.require('path');
@@ -7,16 +7,15 @@ const os = window.require('os');
 const Diff = require('diff');
 
 export const compareFiles = async (filePath1: string, filePath2: string, returnBoolean = false) => {
-    const fileString1 = (await readFile(filePath1)).toString();
-    const fileString2 = (await readFile(filePath2)).toString();
+    // TODO: add better parsing
+    const fileString1 = (await readFile(filePath1)).toString().split('\r').join('');
+    const fileString2 = (await readFile(filePath2)).toString().split('\r').join('');
 
     const diff = await Diff.diffTrimmedLines(fileString1, fileString2);
-
-    if(returnBoolean)
-        return diff.length <= 1;
+    if (returnBoolean) return diff.length <= 1;
 
     return 0;
-}
+};
 
 export const fileExist = (filePath: string) =>
     new Promise((resolve, reject) => {
@@ -28,11 +27,11 @@ export const fileExist = (filePath: string) =>
         });
     });
 
-    // TO DO: CHANGE TO PROMISE
+// TO DO: CHANGE TO PROMISE
 export const getFileBasename = (filePath: string) => {
     const parsedPath = parsePath(filePath);
     return path.basename(parsedPath);
-}
+};
 
 export const saveFile = (filePath: string, content: any) =>
     new Promise((resolve, reject) => {
@@ -88,9 +87,9 @@ export const removeDirectory = (directoryPath: string) =>
         fileExist(path).then((result) =>
             result
                 ? fs.rmdir(path, { recursive: true }, (err: any) => {
-                    if (err) reject(err);
-                    resolve('Success');
-                })
+                      if (err) reject(err);
+                      resolve('Success');
+                  })
                 : reject("Directory doesn't exist")
         );
     });
@@ -110,6 +109,6 @@ export const parsePath = (directory: string, followingSeparator?: boolean) => {
     if (parsedPath[0] === '/' && os.platform() == 'win32') parsedPath = getSystemRootPath() + parsedPath.slice(1);
     parsedPath = parsedPath.split('\\').join('/');
     if (followingSeparator && parsedPath[parsedPath.length - 1] !== '/') parsedPath += '/';
-    else if(!followingSeparator && parsedPath[parsedPath.length - 1] === '/') parsedPath = parsedPath.slice(0,-1)
-    return parsedPath
+    else if (!followingSeparator && parsedPath[parsedPath.length - 1] === '/') parsedPath = parsedPath.slice(0, -1);
+    return parsedPath;
 };

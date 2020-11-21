@@ -72,14 +72,14 @@ export const useCompilationAndExecution = () => {
                                     cppActions.executeTest(
                                         binaryPath,
                                         testVal.inputPath,
-                                        projectTestsOutputDirectory + inputBasename + '.out',
-                                        projectTestsOutputDirectory + inputBasename + '.err',
+                                        projectTestsOutputDirectory + testId + '.out',
+                                        projectTestsOutputDirectory + testId + '.err',
                                         groupTimeout
                                     ),
                                 beginTest(testId)
                             )
                             .then(
-                                finishTest(testId, projectTestsOutputDirectory + inputBasename + '.out', testVal.outputPath, groupTimeLimit),
+                                finishTest(testId, projectTestsOutputDirectory + testId + '.out', testVal.outputPath, groupTimeLimit),
                                 testError(testId)
                             );
                     })
