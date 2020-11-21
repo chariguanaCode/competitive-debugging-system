@@ -34,6 +34,10 @@ const useStyles = makeStyles({
         width: '330px',
         height: '50px',
     },
+    FormElementNumberTextFieldContainer: {
+        width: '230px',
+        minWidth: '230px'
+    },
     FooterButtonsContainer: {
         display: 'flex',
         flexDirection: 'row',

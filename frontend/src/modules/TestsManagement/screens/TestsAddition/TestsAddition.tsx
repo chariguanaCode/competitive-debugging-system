@@ -35,6 +35,8 @@ export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = (
         addTests({
             [state.selectedTestsGroupId]: {
                 name: config.tests.groups[state.selectedTestsGroupId].name,
+                timeLimit: config.tests.groups[state.selectedTestsGroupId].timeLimit,
+                maximumRunningTime: config.tests.groups[state.selectedTestsGroupId].maximumRunningTime,
                 tests: newTestsObject,
             },
         });
@@ -46,6 +48,8 @@ export const TasksAddition: React.FunctionComponent<TasksAdditionPropsModel> = (
             [localNextGroupId]: {
                 name: `Tests Group ${localNextGroupId}`,
                 tests: {},
+                timeLimit: '-1',
+                maximumRunningTime: '-1',
             },
         });
         return localNextGroupId;

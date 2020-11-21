@@ -14,7 +14,7 @@ import {
 } from '@material-ui/icons';
 import { ReactComponent as Logo } from 'assets/cds_logo.svg';
 import { ReactComponent as LoadingIcon } from 'assets/icons/loading.svg';
-import { useRunTasks } from 'backend/main';
+import { useRunTests } from 'backend/main';
 import { useLoadProject, useSaveProject } from 'backend/projectManagement';
 import { useConfig, useProjectFile, useExecutionState, useLayoutSelection, useCurrentTaskState } from 'reduxState/selectors';
 import { ExecutionState } from 'reduxState/models';
@@ -32,7 +32,7 @@ export const HeaderBar: React.FunctionComponent = memo(() => {
         defaultSelectedSector?: string;
     }>({ open: false });
     const config = useConfig();
-    const runTasks = useRunTasks();
+    const runTests = useRunTests();
     const loadProject = useLoadProject();
     const projectFile = useProjectFile();
     const saveProject = useSaveProject();
@@ -114,7 +114,7 @@ export const HeaderBar: React.FunctionComponent = memo(() => {
                             currentTaskState.id === '-1' ||
                             [ExecutionState.Compiling, ExecutionState.Running].includes(executionState.state)
                         }
-                        onClick={() => runTasks({ tests: [currentTaskState.id] })}
+                        onClick={() => runTests({ [currentTaskState.groupId]: [currentTaskState.id] })}
                     >
                         <PlayArrow color="inherit" />
                     </IconButtonWithTooltip>
@@ -122,7 +122,7 @@ export const HeaderBar: React.FunctionComponent = memo(() => {
                         color="inherit"
                         tooltipText="Run all tests"
                         disabled={[ExecutionState.Compiling, ExecutionState.Running].includes(executionState.state)}
-                        onClick={() => runTasks({})}
+                        onClick={() => runTests()}
                     >
                         <FastForward color="inherit" />
                     </IconButtonWithTooltip>

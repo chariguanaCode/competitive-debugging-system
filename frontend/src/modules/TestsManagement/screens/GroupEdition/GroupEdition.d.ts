@@ -5,4 +5,8 @@ export interface GroupEditionPropsModel {
 
 export interface GroupEditionStateModel {
     name: string;
+    timeLimit: string;
+    maximumRunningTime: string;
+    isTimeLimitEnabled: boolean;
+    isMaximumRunningTimeEnabled: boolean;
 }

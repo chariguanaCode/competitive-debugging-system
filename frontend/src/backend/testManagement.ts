@@ -24,21 +24,24 @@ export const useFinishTest = () => {
     const { reloadTasks } = useTaskStatesActions();
     const taskStates = useAllTasksState();
 
-    return (id: string, outputPath: string, outputToComparePath: string | null) => () => {
+    return (id: string, outputPath: string, outputToComparePath: string | null, timeLimit?: number) => () => {
         const asyncInside = async () => {
             const execTime = window.process.hrtime(taskStates.current[id].startTime);
 
             let isAnswerRight: number = -1;
             if (outputToComparePath) isAnswerRight = Number(await compareFiles(outputPath, outputToComparePath, true));
 
-            const finalTaskState: TaskState =
-                isAnswerRight == -1
-                    ? TaskState.Successful
-                    : isAnswerRight == 0
-                    ? TaskState.WrongAnswer
-                    : isAnswerRight == 1
-                    ? TaskState.Successful
-                    : TaskState.Successful;
+            const wasTimeLimitExceeded: boolean = !!(timeLimit && execTime[1] / 1000000 > timeLimit);
+
+            const finalTaskState: TaskState = wasTimeLimitExceeded
+                ? TaskState.Timeout
+                : isAnswerRight === -1
+                ? TaskState.Successful
+                : isAnswerRight === 0
+                ? TaskState.WrongAnswer
+                : isAnswerRight === 1
+                ? TaskState.Successful
+                : TaskState.Crashed;
 
             taskStates.current[id] = {
                 state: finalTaskState,
@@ -82,7 +85,6 @@ export const useTestError = () => {
     return (id: string) => (err: any) => {
         if (taskStates.current[id].state === TaskState.Running) {
             const execTime = window.process.hrtime(taskStates.current[id].startTime);
-
             taskStates.current[id] = {
                 state: TaskState.Crashed,
                 childProcess: null,

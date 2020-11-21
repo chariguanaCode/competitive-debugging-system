@@ -6,7 +6,7 @@ import { Assessment, BugReport, Close, PlayArrow } from '@material-ui/icons';
 import { ExecutionState, TaskState } from 'reduxState/models';
 import { useConfigActions, useTaskStatesActions } from 'reduxState/actions';
 import { useCurrentTaskState, useExecutionState } from 'reduxState/selectors';
-import { useRunTasks } from 'backend/main';
+import { useRunTests } from 'backend/main';
 import { ButtonWithTooltip } from 'components';
 
 export const TestListElement: React.FunctionComponent<TestListElementPropsModel> = ({ testObject, groupId }) => {
@@ -27,7 +27,7 @@ export const TestListElement: React.FunctionComponent<TestListElementPropsModel>
         selectLayout('outputs');
     };
 
-    const runTask = useRunTasks();
+    const runTests = useRunTests();
     const executionState = useExecutionState();
 
     return (
@@ -60,7 +60,7 @@ export const TestListElement: React.FunctionComponent<TestListElementPropsModel>
                             tooltipText="Run"
                             placement="bottom"
                             arrow
-                            onClick={() => runTask({ tests: [testObject.id] })}
+                            onClick={() => runTests({ [groupId]: [testObject.id] })}
                             classes={{ root: classes.Button }}
                             disabled={[ExecutionState.Compiling, ExecutionState.Running].includes(executionState.state)}
                         >
