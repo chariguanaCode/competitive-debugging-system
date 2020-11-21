@@ -23,7 +23,13 @@ export const compileCpp = async (sourcePath: string, binaryPath: string) => {
     }
 };
 
-export const executeTest = (binaryPath: string, stdinPath: string, stdoutPath: string, stderrPath: string) => {
+export const executeTest = (
+    binaryPath: string,
+    stdinPath: string,
+    stdoutPath: string,
+    stderrPath: string,
+    timeout?: number
+) => {
     const stdinStream = fs.createReadStream(stdinPath);
     const stdoutStream = fs.createWriteStream(stdoutPath);
     const stderrStream = fs.createWriteStream(stderrPath);
@@ -34,6 +40,11 @@ export const executeTest = (binaryPath: string, stdinPath: string, stdoutPath: s
         encoding: 'buffer',
     });
 
+    if (timeout) {
+        setTimeout(() => {
+            child.kill();
+        }, timeout);
+    }
     stdinStream.pipe(child.stdin);
     child.stdout.pipe(stdoutStream);
     child.stderr.pipe(stderrStream);

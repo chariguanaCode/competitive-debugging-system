@@ -5,8 +5,9 @@ import { Button, useTheme } from '@material-ui/core';
 import { ArrowDropDown as ArrowDropDownIcon, ArrowDropUp as ArrowDropUpIcon, PlayArrow } from '@material-ui/icons';
 import { ExecutionState, TaskState } from 'reduxState/models';
 import { ButtonWithTooltip } from 'components';
-import { useRunTasks } from 'backend/main';
-import { useExecutionState } from 'reduxState/selectors';
+import { useRunTests } from 'backend/main';
+import { useExecutionState, useConfig } from 'reduxState/selectors';
+import { ConfigActions } from 'reduxState/actions';
 
 export const GroupListElement: React.FunctionComponent<GroupListElementPropsModel> = ({
     isExpanded,
@@ -15,8 +16,8 @@ export const GroupListElement: React.FunctionComponent<GroupListElementPropsMode
 }) => {
     const classes = useStyles();
     const theme = useTheme();
-
-    const runTask = useRunTasks();
+    const runTests = useRunTests();
+    const config = useConfig();
     const executionState = useExecutionState();
 
     return (
@@ -38,7 +39,7 @@ export const GroupListElement: React.FunctionComponent<GroupListElementPropsMode
                         tooltipText="Run group"
                         placement="bottom"
                         arrow
-                        onClick={() => runTask({ groups: [groupObject.id] })}
+                        onClick={() => runTests({ [groupObject.id]: Object.keys(config.tests.groups[groupObject.id].tests) })}
                         classes={{ root: classes.Button }}
                         disabled={[ExecutionState.Compiling, ExecutionState.Running].includes(executionState.state)}
                     >

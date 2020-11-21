@@ -144,16 +144,21 @@ export const configReducer = handleActions<ConfigModel, ConfigActionPayload>(
             let newGroups: TestGroupsModel['groups'] = {};
             for (let groupId in payload) {
                 if (groupId in state.tests.groups) {
-                    newGroups[groupId] = { tests: {}, name: '' };
+                    newGroups[groupId] = { tests: {}, name: '', timeLimit: '', maximumRunningTime: '' };
                     newGroups[groupId].tests =
                         Object.keys(newGroups[groupId]).length > 0
                             ? Object.assign({}, state.tests.groups[groupId].tests, payload[groupId].tests)
                             : state.tests.groups[groupId].tests;
-                    if ('name' in payload[groupId]) {
-                        newGroups[groupId].name = payload[groupId].name;
-                    } else {
-                        newGroups[groupId].name = state.tests.groups[groupId].name;
-                    }
+                    for (const property of ['name', 'timeLimit', 'maximumRunningTime'] as [
+                        'name',
+                        'timeLimit',
+                        'maximumRunningTime'
+                    ])
+                        if (property in payload[groupId]) {
+                            newGroups[groupId][property] = payload[groupId][property];
+                        } else {
+                            newGroups[groupId][property] = state.tests.groups[groupId][property];
+                        }
                 } else {
                     newGroups[groupId] = payload[groupId];
                 }

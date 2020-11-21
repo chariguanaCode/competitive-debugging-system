@@ -21,6 +21,8 @@ export interface TestGroupsModel {
     groups: {
         [key: string]: {
             name: string;
+            timeLimit: string;
+            maximumRunningTime: string;
             tests: { [key: string]: TestModel };
         };
     };

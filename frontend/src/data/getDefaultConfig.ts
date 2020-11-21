@@ -35,6 +35,8 @@ const getDefaultConfig = () => {
                 '1': {
                     name: 'Tests Group 1',
                     tests: {},
+                    timeLimit: '-1',
+                    maximumRunningTime: '-1',
                 },
             },
             nextGroupId: '2',
