@@ -191,6 +191,10 @@ export const useLoadProject = () => {
         setAllTrackedObjects(newTrackedObjects);
 
         resetAllTestsStates(true, newConfig);
+
+        const defaultTestsOutputDirectory = remote.getGlobal('paths').testsOutputs;
+        const projectTestsOutputDirectory = defaultTestsOutputDirectory + '/' + newConfig.projectInfo.uuid + '/';
+        await asyncFileActions.createDirectory(projectTestsOutputDirectory).catch((err) => {});
     };
 };
 /*

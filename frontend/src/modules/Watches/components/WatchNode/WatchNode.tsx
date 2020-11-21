@@ -54,7 +54,7 @@ function WatchNode({ node, style, setBracketState }: Props): ReactElement {
 
     const expandable = () => {
         if (node.type === 'array' || node.type === 'struct' || node.type === 'pair' || node.type === 'watchblock') {
-            return node.children.length - 1 !== 0;
+            return node.children.length !== 0;
         }
         return false;
     };
@@ -112,7 +112,7 @@ function WatchNode({ node, style, setBracketState }: Props): ReactElement {
 
             result.push(
                 <span key="4" onClick={toggleExpand} style={{ cursor: expandable() ? 'pointer' : 'auto' }}>
-                    {open && node.children.length - 1 ? (
+                    {open && node.children.length ? (
                         <>
                             <ArrowDropDown viewBox="4 4 13 13" fontSize="inherit" className={classes.bracketArrow} />{' '}
                             {colored({ [node.type]: bracketMap[node.type][0] }, '5')}
@@ -120,7 +120,7 @@ function WatchNode({ node, style, setBracketState }: Props): ReactElement {
                     ) : (
                         <>
                             <ArrowRight viewBox="4 4 13 13" fontSize="inherit" className={classes.bracketArrow} />{' '}
-                            {colored({ [node.type]: bracketMap[node.type][0] }, '5')} {node.children.length - 1}{' '}
+                            {colored({ [node.type]: bracketMap[node.type][0] }, '5')} {node.children.length}{' '}
                             {colored({ [node.type]: bracketMap[node.type][1] }, '6')}
                         </>
                     )}

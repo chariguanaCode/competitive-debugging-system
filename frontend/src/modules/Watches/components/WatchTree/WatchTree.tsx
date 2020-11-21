@@ -47,7 +47,7 @@ function WatchTree({ data }: Props): ReactElement {
                 element.type === 'watchblock'
             ) {
                 if (bracketState.current[id] === undefined) bracketState.current[id] = true;
-                if (bracketState.current[id]) {
+                if (bracketState.current[id] && element.children.length !== 0) {
                     depth += indentDepth;
                     for (let i = 0; i < element.children.length; i++) {
                         recurrentTraversal(element.children[i] as Watch, id);
