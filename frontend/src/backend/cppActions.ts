@@ -9,7 +9,8 @@ export const modifyCppSource = async (originalSourcePath: string, newSourcePath:
     const cppFolder = remote.getGlobal('paths').cppFiles;
     let source = await readFile(originalSourcePath);
 
-    source = `#include "${cppFolder}/universal_print_17.h"\n` + `#define DEBUG 1\n` + `#define CDS_DEBUG 1\n` + `\n` + source;
+    source =
+        `#include "${cppFolder}/universal_print_17.h"\n` + `#define DEBUG 1\n` + `#define CDS_DEBUG 1\n` + `#line 1\n` + source;
 
     await saveFile(newSourcePath, source);
 };
@@ -25,6 +26,7 @@ export const compileCpp = async (sourcePath: string, binaryPath: string) => {
 
 export const executeTest = (
     binaryPath: string,
+    workingDirectory: string,
     stdinPath: string,
     stdoutPath: string,
     stderrPath: string,
@@ -38,6 +40,7 @@ export const executeTest = (
         //shell: true
         stdio: 'pipe',
         encoding: 'buffer',
+        cwd: workingDirectory,
     });
 
     if (timeout) {
@@ -56,7 +59,6 @@ export const executeTest = (
         stderrStream.on('error', reject);
 
         child.on('close', (code: number, signal: string) => {
-            console.log('Test finished!');
             if (code === 0) {
                 resolve();
             } else {

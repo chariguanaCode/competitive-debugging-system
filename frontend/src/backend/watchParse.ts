@@ -47,14 +47,15 @@ export type ConvertResult = (
       }
 ) & {
     call_id: string;
-    name?: string;
+    name: string;
     pointer?: true;
 };
 
 const convertContents = (
     contents: string[],
     start: number,
-    call_id: string
+    call_id: string,
+    name: string
 ): { result: ConvertResult; end: number; valueString: string } => {
     let val_end = start,
         valueString = '',
@@ -65,12 +66,12 @@ const convertContents = (
         case array_start:
             result = {
                 call_id,
+                name,
                 type: 'array' as 'array',
                 children: [] as Array<ConvertResult>,
             };
             while (contents[val_end + 1] !== array_end) {
-                let val = convertContents(contents, val_end + 1, call_id);
-                val.result.name = `${idCounter++}`;
+                let val = convertContents(contents, val_end + 1, call_id, `${idCounter++}`);
                 result.children.push(val.result);
                 val_end = val.end;
                 valueString += `${val.valueString},`;
@@ -85,19 +86,19 @@ const convertContents = (
         case struct_start:
             result = {
                 call_id,
+                name,
                 type: 'struct' as 'struct',
                 children: [] as Array<ConvertResult>,
             };
 
             while (contents[val_end + 1] !== struct_end) {
-                const name = convertContents(contents, val_end + 1, call_id) as {
+                const name = convertContents(contents, val_end + 1, call_id, '') as {
                     result: { type: 'string'; value: string };
                     end: number;
                 };
                 val_end = name.end;
 
-                const val = convertContents(contents, val_end + 1, call_id);
-                val.result.name = name.result.value as string;
+                const val = convertContents(contents, val_end + 1, call_id, name.result.value);
 
                 result.children.push(val.result);
                 val_end = val.end;
@@ -110,17 +111,16 @@ const convertContents = (
             };
 
         case pair_start:
-            let first = convertContents(contents, start + 1, call_id);
-            first.result.name = 'first';
+            let first = convertContents(contents, start + 1, call_id, 'first');
             val_end = first.end;
             valueString += `"first": ${first.valueString},`;
-            let second = convertContents(contents, val_end + 1, call_id);
-            second.result.name = 'second';
+            let second = convertContents(contents, val_end + 1, call_id, 'second');
             val_end = second.end;
             valueString += `"second": ${first.valueString}`;
             return {
                 result: {
                     call_id,
+                    name,
                     type: 'pair' as 'pair',
                     children: [first.result, second.result],
                 },
@@ -129,7 +129,7 @@ const convertContents = (
             };
 
         case pointer_start:
-            const val = convertContents(contents, start + 1, call_id);
+            const val = convertContents(contents, start + 1, call_id, name);
             return {
                 result: {
                     ...val.result,
@@ -156,6 +156,7 @@ const convertContents = (
             return {
                 result: {
                     call_id,
+                    name,
                     type,
                     value: contents[start + 1],
                 },
@@ -196,7 +197,7 @@ export const useParseWatchblocks = () => {
         const data = dataString.slice(cupl_start_index, cupl_end_index + 1).split(divisor);
 
         let loc = 1;
-        let name: string, line: string, config: any, call_id, cds_id;
+        let name: string, line: string, config: any, call_id: string, cds_id: string | undefined;
         let topOfStack: Watchblock;
 
         switch (data[loc]) {
@@ -209,9 +210,8 @@ export const useParseWatchblocks = () => {
                 while (data[loc] !== watch_end) {
                     switch (data[loc]) {
                         case variable_start:
-                            const { result, end, valueString } = convertContents(data, loc + 3, call_id);
+                            const { result, end, valueString } = convertContents(data, loc + 3, call_id, data[loc + 1]);
                             variables.push({
-                                name: data[loc + 1],
                                 data_type: data[loc + 2],
                                 variable_id: variables.length,
                                 ...result,
@@ -252,6 +252,7 @@ export const useParseWatchblocks = () => {
                         ...variable,
                         line,
                         config,
+                        cds_id,
                     });
                 });
                 break;

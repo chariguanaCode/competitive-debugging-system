@@ -8,6 +8,12 @@ const useStyles = makeStyles((theme) => ({
     bracketArrow: {
         color: theme.palette.watchblocks.bracketArrow,
     },
+    actionIndicator: {
+        width: 8.555,
+        height: 8.555,
+        margin: '0px 4.277px',
+        display: 'inline-block',
+    },
 }));
 
 export default useStyles;

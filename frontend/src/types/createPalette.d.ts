@@ -1,24 +1,31 @@
 import * as createPalette from '@material-ui/core/styles/createPalette';
-import { TaskState } from '../utils/GlobalStateContext';
+import { ExecutionState, TaskState } from 'reduxState/models';
 
 declare module '@material-ui/core/styles/createPalette' {
     interface WatchBlockOptions {
-        line?: string;
-        name?: string;
-        data_type?: string;
+        line: string;
+        name: string;
+        data_type: string;
 
-        array?: string;
-        pair?: string;
-        struct?: string;
-        watchblock?: string;
+        array: string;
+        pair: string;
+        struct: string;
+        watchblock: string;
 
-        string?: string;
-        bitset?: string;
-        number?: string;
-        pointer?: string;
+        string: string;
+        bitset: string;
+        number: string;
+        pointer: string;
 
-        selected?: string;
-        bracketArrow?: string;
+        selected: string;
+        bracketArrow: string;
+
+        noCdsId: string;
+        noActions: string;
+        hasActions: string;
+
+        dialogCode: string;
+        dialogTrackedObject: string;
     }
 
     interface HeaderOptions {
@@ -61,6 +68,10 @@ declare module '@material-ui/core/styles/createPalette' {
         [key in TaskState]: string;
     };
 
+    type ExecutionStateOptions = {
+        [key in ExecutionState]: string;
+    };
+
     interface ScrollbarOptions {
         thumb: string;
         thumbHover: string;
@@ -74,6 +85,7 @@ declare module '@material-ui/core/styles/createPalette' {
         fileManager: FileManagerOptions;
         contentLayout: ContentLayoutOptions;
         taskState: TaskStateOptions;
+        executionState: ExecutionStateOptions;
         scrollbar: ScrollbarOptions;
     }
 
@@ -85,6 +97,7 @@ declare module '@material-ui/core/styles/createPalette' {
         fileManager: FileManagerOptions;
         contentLayout: ContentLayoutOptions;
         taskState: TaskStateOptions;
+        executionState: ExecutionStateOptions;
         scrollbar: ScrollbarOptions;
     }
 }

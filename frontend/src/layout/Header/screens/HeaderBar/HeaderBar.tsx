@@ -1,32 +1,37 @@
-import React, { useState, memo } from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Button, Menu, MenuItem, ListItemText, ListItemIcon } from '@material-ui/core';
+import React, { memo, ReactNode } from 'react';
+import { AppBar, Toolbar, IconButton, Typography, Fab, CircularProgress, useTheme, Tooltip } from '@material-ui/core';
+import { ToggleButtonGroup } from '@material-ui/lab';
 import {
-    Apps,
-    Settings,
-    PlayArrow,
-    Refresh,
-    ViewQuilt,
-    BugReport,
-    Assessment,
-    ViewList,
-    Add,
-    FastForward,
+    Apps as AppsIcon,
+    Settings as SettingsIcon,
+    PlayArrow as PlayArrowIcon,
+    Refresh as RefreshIcon,
+    BugReport as BugReportIcon,
+    Assessment as AssessmentIcon,
+    ViewList as ViewListIcon,
+    Add as AddIcon,
+    FastForward as FastForwardIcon,
+    Done as DoneIcon,
+    Error as ErrorIcon,
+    Build as BuildIcon,
+    Help as HelpIcon,
+    DoneAll as DoneAllIcon,
 } from '@material-ui/icons';
 import { ReactComponent as Logo } from 'assets/cds_logo.svg';
-import { ReactComponent as LoadingIcon } from 'assets/icons/loading.svg';
 import { useRunTests } from 'backend/main';
 import { useLoadProject, useSaveProject } from 'backend/projectManagement';
 import { useConfig, useProjectFile, useExecutionState, useLayoutSelection, useCurrentTaskState } from 'reduxState/selectors';
 import { ExecutionState } from 'reduxState/models';
+import { useConfigActions } from 'reduxState/actions';
 import useStyles from './HeaderBar.css';
 import { MainMenu } from 'modules/Menu/screens';
-import { useConfigActions } from 'reduxState/actions';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useCommonState } from 'utils';
-import { IconButtonWithTooltip } from 'components';
+import { IconButtonWithTooltip, ToggleButtonWithTooltip } from 'components';
 
 export const HeaderBar: React.FunctionComponent = memo(() => {
     const classes = useStyles();
+    const theme = useTheme();
     const [menuState, setMenuState, __setMenuState, _setMenuState] = useCommonState<{
         open: boolean;
         defaultSelectedSector?: string;
@@ -59,13 +64,46 @@ export const HeaderBar: React.FunctionComponent = memo(() => {
         [projectFile, config]
     );
 
-    const [menuAnchor, setMenuAnchor] = useState<(EventTarget & HTMLButtonElement) | null>(null);
     const { selectLayout } = useConfigActions();
     const layoutSelection = useLayoutSelection();
 
     const addNewTab = () => {
         document.dispatchEvent(new Event('addNewTab'));
     };
+
+    const viewOptions = [
+        {
+            icon: BugReportIcon,
+            label: 'Debugging',
+            layout: 'debugging',
+            disabled: currentTaskState.id === '-1',
+        },
+        { icon: AssessmentIcon, label: 'Outputs', layout: 'outputs', disabled: currentTaskState.id === '-1' },
+        { icon: ViewListIcon, label: 'Tests', layout: 'tests', disabled: false },
+    ];
+
+    const executionStateIcons = [
+        <HelpIcon color="inherit" fontSize="small" />,
+        <DoneIcon color="inherit" fontSize="small" />,
+        <BuildIcon color="inherit" fontSize="small" />,
+        <ErrorIcon color="inherit" fontSize="small" />,
+        <SettingsIcon color="inherit" fontSize="small" />,
+        <DoneAllIcon color="inherit" fontSize="small" />,
+    ] as {
+        [key in ExecutionState]: ReactNode;
+    };
+    const executionStateLabels = [
+        'No project loaded',
+        'Project loaded successfully',
+        'Compiling...',
+        'Compilation error',
+        'Running...',
+        'All tests finished',
+    ] as {
+        [key in ExecutionState]: string;
+    };
+
+    const executionStateWorking = [ExecutionState.Compiling, ExecutionState.Running].includes(executionState.state);
 
     return (
         <>
@@ -77,54 +115,74 @@ export const HeaderBar: React.FunctionComponent = memo(() => {
                         }
                         color="inherit"
                     >
-                        <Apps color="inherit" />
+                        <AppsIcon color="inherit" />
                     </IconButton>
                     <Logo className={classes.logo} width={66} height={50} />
-                    <Button
-                        variant="text"
-                        color="secondary"
-                        className={classes.margin}
-                        startIcon={<ViewQuilt color="inherit" />}
-                        onClick={(event) => {
-                            setMenuAnchor(event.currentTarget);
-                        }}
+
+                    <ToggleButtonGroup
+                        size="small"
+                        exclusive
+                        value={layoutSelection}
+                        onChange={(evt, val) => val && selectLayout(val)}
                     >
-                        View
-                    </Button>
+                        {viewOptions.map(({ label, layout, disabled, icon }) => (
+                            <ToggleButtonWithTooltip
+                                key={label}
+                                value={layout}
+                                tooltipText={label + (disabled ? ' - no current test' : '')}
+                                disabled={disabled}
+                                arrow
+                            >
+                                {React.createElement(icon, { color: 'inherit', fontSize: 'small' })}
+                            </ToggleButtonWithTooltip>
+                        ))}
+                    </ToggleButtonGroup>
+
+                    <Tooltip title={executionStateLabels[executionState.state]} arrow>
+                        <div className={classes.executionStateContainer}>
+                            <Fab
+                                className={classes.executionStateIcon}
+                                style={{
+                                    color: theme.palette.getContrastText(theme.palette.executionState[executionState.state]),
+                                    backgroundColor: theme.palette.executionState[executionState.state],
+                                }}
+                            >
+                                <>{executionStateIcons[executionState.state]}</>
+                            </Fab>
+                            {executionStateWorking && (
+                                <CircularProgress
+                                    size={36}
+                                    className={classes.executionStateSpinner}
+                                    style={{ color: theme.palette.executionState[executionState.state] }}
+                                />
+                            )}
+                        </div>
+                    </Tooltip>
                     <Typography className={classes.margin} color="inherit">
                         {projectFile && config.projectInfo.name}
                         {projectFile && !projectFile.isSaved && ' *'}
-                    </Typography>
-                    <Typography className={classes.ExecutionStateContainer} color="inherit">
-                        {ExecutionState[executionState.state]}
-                        {ExecutionState[executionState.state] === 'Compiling' ? (
-                            <LoadingIcon height={'18px'} width={'18px'} style={{ marginLeft: '8px' }} />
-                        ) : null}
                     </Typography>
 
                     <div style={{ flexGrow: 1 }} />
 
                     <IconButtonWithTooltip color="inherit" tooltipText="Add new tab" onClick={addNewTab}>
-                        <Add color="inherit" />
+                        <AddIcon color="inherit" />
                     </IconButtonWithTooltip>
                     <IconButtonWithTooltip
                         color="inherit"
                         tooltipText="Rerun current test"
-                        disabled={
-                            currentTaskState.id === '-1' ||
-                            [ExecutionState.Compiling, ExecutionState.Running].includes(executionState.state)
-                        }
+                        disabled={currentTaskState.id === '-1' || executionStateWorking}
                         onClick={() => runTests({ [currentTaskState.groupId]: [currentTaskState.id] })}
                     >
-                        <PlayArrow color="inherit" />
+                        <PlayArrowIcon color="inherit" />
                     </IconButtonWithTooltip>
                     <IconButtonWithTooltip
                         color="inherit"
                         tooltipText="Run all tests"
-                        disabled={[ExecutionState.Compiling, ExecutionState.Running].includes(executionState.state)}
+                        disabled={executionStateWorking}
                         onClick={() => runTests()}
                     >
-                        <FastForward color="inherit" />
+                        <FastForwardIcon color="inherit" />
                     </IconButtonWithTooltip>
                     <IconButtonWithTooltip
                         color="inherit"
@@ -132,10 +190,10 @@ export const HeaderBar: React.FunctionComponent = memo(() => {
                         disabled={true}
                         onClick={() => loadProject('./cpp/testConfig.cdsp')} /*onClick={/*reloadProject}*/
                     >
-                        <Refresh color="inherit" />
+                        <RefreshIcon color="inherit" />
                     </IconButtonWithTooltip>
                     <IconButtonWithTooltip color="inherit" tooltipText="Settings - WIP" disabled={true}>
-                        <Settings color="inherit" />
+                        <SettingsIcon color="inherit" />
                     </IconButtonWithTooltip>
                 </Toolbar>
             </AppBar>
@@ -145,25 +203,6 @@ export const HeaderBar: React.FunctionComponent = memo(() => {
                 isAnyProjectOpen={!!projectFile}
                 handleClose={() => setMenuState('open', false)}
             />
-            <Menu anchorEl={menuAnchor} open={!!menuAnchor} onClose={() => setMenuAnchor(null)}>
-                {[
-                    { icon: <BugReport color="inherit" />, label: 'Debugging', layout: 'debugging' as 'debugging' },
-                    { icon: <Assessment color="inherit" />, label: 'Outputs', layout: 'outputs' as 'outputs' },
-                    { icon: <ViewList color="inherit" />, label: 'Tests', layout: 'tests' as 'tests' },
-                ].map((element) => (
-                    <MenuItem
-                        key={`SelectView-MenuItem-${element.label}`}
-                        selected={element.layout === layoutSelection}
-                        onClick={() => {
-                            setMenuAnchor(null);
-                            selectLayout(element.layout);
-                        }}
-                    >
-                        <ListItemIcon>{element.icon}</ListItemIcon>
-                        <ListItemText primary={element.label} />
-                    </MenuItem>
-                ))}
-            </Menu>
         </>
     );
 });

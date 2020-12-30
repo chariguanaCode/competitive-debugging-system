@@ -2,7 +2,12 @@ import React, { memo } from 'react';
 import useStyles from './TestListElement.css';
 import { Button, Tooltip, useTheme } from '@material-ui/core';
 import { TestListElementPropsModel, TestListElementStateModel } from './TestListElement.d';
-import { Assessment, BugReport, Close, PlayArrow } from '@material-ui/icons';
+import {
+    Assessment as AssessmentIcon,
+    BugReport as BugReportIcon,
+    Close as CloseIcon,
+    PlayArrow as PlayArrowIcon,
+} from '@material-ui/icons';
 import { ExecutionState, TaskState } from 'reduxState/models';
 import { useConfigActions, useTaskStatesActions } from 'reduxState/actions';
 import { useCurrentTaskState, useExecutionState } from 'reduxState/selectors';
@@ -52,7 +57,7 @@ export const TestListElement: React.FunctionComponent<TestListElementPropsModel>
                             onClick={() => {}}
                             classes={{ root: classes.Button }}
                         >
-                            <PlayArrow fontSize="small" />
+                            <CloseIcon fontSize="small" />
                         </ButtonWithTooltip>
                     )}
                     {testObject.state !== TaskState.Running && (
@@ -64,7 +69,7 @@ export const TestListElement: React.FunctionComponent<TestListElementPropsModel>
                             classes={{ root: classes.Button }}
                             disabled={[ExecutionState.Compiling, ExecutionState.Running].includes(executionState.state)}
                         >
-                            <PlayArrow fontSize="small" />
+                            <PlayArrowIcon fontSize="small" />
                         </ButtonWithTooltip>
                     )}
                     {testObject.state !== TaskState.Pending && testObject.state !== TaskState.Running && (
@@ -76,7 +81,7 @@ export const TestListElement: React.FunctionComponent<TestListElementPropsModel>
                                 onClick={() => viewTestOutput(testObject.id)}
                                 classes={{ root: classes.Button }}
                             >
-                                <Assessment fontSize="small" />
+                                <AssessmentIcon fontSize="small" />
                             </ButtonWithTooltip>
                             <ButtonWithTooltip
                                 tooltipText="Debug"
@@ -85,7 +90,7 @@ export const TestListElement: React.FunctionComponent<TestListElementPropsModel>
                                 onClick={() => debugTest(testObject.id)}
                                 classes={{ root: classes.Button }}
                             >
-                                <BugReport fontSize="small" />
+                                <BugReportIcon fontSize="small" />
                             </ButtonWithTooltip>
                         </>
                     )}

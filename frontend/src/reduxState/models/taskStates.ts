@@ -2,6 +2,7 @@ import { ConvertResult } from 'backend/watchParse';
 
 export type Watch = {
     call_id: string;
+    cds_id?: string;
     variable_id: number;
     line: string;
     data_type: string;
@@ -10,6 +11,7 @@ export type Watch = {
 
 export interface Watchblock {
     call_id: string;
+    cds_id?: string;
     children: Array<Watchblock | Watch>;
     type: 'watchblock';
     line: string;
@@ -31,7 +33,7 @@ export enum TaskState {
     WrongAnswer,
     Crashed,
     Killed,
-    OK
+    OK,
 }
 
 export interface Task {

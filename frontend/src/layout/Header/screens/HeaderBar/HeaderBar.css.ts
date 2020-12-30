@@ -8,6 +8,7 @@ const useStyles = makeStyles((theme) => ({
     },
     logo: {
         marginLeft: theme.spacing(2),
+        marginRight: theme.spacing(2),
         padding: '0px 8px',
         '& path': {
             fill: theme.palette.type === 'dark' ? theme.palette.primary.main : theme.palette.primary.contrastText,
@@ -18,11 +19,21 @@ const useStyles = makeStyles((theme) => ({
     margin: {
         marginLeft: theme.spacing(2),
     },
-    ExecutionStateContainer: {
+    executionStateContainer: {
         marginLeft: theme.spacing(2),
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center'
+        position: 'relative',
+    },
+    executionStateIcon: {
+        height: 32,
+        minHeight: 32,
+        width: 32,
+        transition: theme.transitions.create(['color', 'background-color']),
+    },
+    executionStateSpinner: {
+        position: 'absolute',
+        top: -2,
+        left: -2,
+        transition: theme.transitions.create('color'),
     },
     '@keyframes appbar-grow': {
         '0%': {

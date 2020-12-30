@@ -2,7 +2,7 @@ import { useDispatch } from 'react-redux';
 import { useMemo } from 'react';
 import { bindActionCreators } from 'redux';
 import { createAction, Action } from 'redux-actions';
-import { ConfigModel, ProjectInfoModel, TestModel, LayoutModel, TrackedObject, TestGroupsModel } from '../models';
+import { ConfigModel, ProjectInfoModel, LayoutModel, TrackedObject, TestGroupsModel, WatchIdActionsModel } from '../models';
 
 export enum ConfigActions {
     SET_CONFIG = 'SET_CONFIG',
@@ -19,6 +19,7 @@ export enum ConfigActions {
     INCREASE_NEXT_TEST_ID = 'INCREASE_NEXT_TEST_ID',
     SET_NEXT_GROUP_ID = 'SET_NEXT_GROUP_ID',
     SET_NEXT_TEST_ID = 'SET_NEXT_TEST_ID',
+    SET_WATCH_ID_ACTIONS = 'SET_WATCH_ID_ACTIONS',
 }
 
 const actions = {
@@ -38,6 +39,7 @@ const actions = {
     increaseNextTestId: createAction<number>(ConfigActions.INCREASE_NEXT_TEST_ID),
     setNextGroupId: createAction<TestGroupsModel['nextGroupId']>(ConfigActions.SET_NEXT_GROUP_ID),
     setNextTestId: createAction<TestGroupsModel['nextTestId']>(ConfigActions.SET_NEXT_TEST_ID),
+    setWatchIdActions: createAction<{ cds_id: string; value: WatchIdActionsModel[string] }>(ConfigActions.SET_WATCH_ID_ACTIONS),
 };
 
 export type ConfigActionPayload = typeof actions[keyof typeof actions] extends (...args: any[]) => Action<infer R> ? R : never;

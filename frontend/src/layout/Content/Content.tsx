@@ -1,25 +1,29 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Fab } from '@material-ui/core';
-import { Add, AddBox } from '@material-ui/icons';
+import { AddBox } from '@material-ui/icons';
 import { Layout, Model, TabNode } from 'flexlayout-react';
 import 'flexlayout-react/style/dark.css';
 import useStyles from './Content.css';
 import { Tasks, Watches, Outputs, TestsManagement, AddTabDialog, TrackedObject, TasksProgressBar } from 'modules';
-import { useAddTrackedObjectDialogActions, useConfigActions } from 'reduxState/actions';
+import { useConfigActions } from 'reduxState/actions';
 import { ContextMenu } from 'components';
 
 import { useLayoutSelection, useLayouts } from 'reduxState/selectors';
+import AddTrackedObjectDialog from 'modules/AddTrackedObjectDialog';
 
 const Content: React.FunctionComponent = () => {
     const classes = useStyles();
 
-    const { openAddTrackedObjectDialog } = useAddTrackedObjectDialogActions();
     const [addTabOpen, setAddTabOpen] = useState(false);
+    const [addTrackedObjectOpen, setAddTrackedObjectOpen] = useState(false);
     useEffect(() => {
-        const addTab = () => setAddTabOpen(true);
-        document.addEventListener('addNewTab', addTab);
+        const openAddTab = () => setAddTabOpen(true);
+        document.addEventListener('addNewTab', openAddTab);
+
+        const openAddTrackedObject = () => setAddTrackedObjectOpen(true);
+        document.addEventListener('addNewTrackedObject', openAddTrackedObject);
         return () => {
-            document.removeEventListener('addNewTab', addTab);
+            document.removeEventListener('addNewTab', openAddTab);
+            document.removeEventListener('addNewTrackedObject', openAddTrackedObject);
         };
     }, []);
 
@@ -59,11 +63,12 @@ const Content: React.FunctionComponent = () => {
     return (
         <ContextMenu
             className={classes.root}
-            items={[{ label: 'Add Tracked Object', onClick: () => openAddTrackedObjectDialog(), icon: <AddBox /> }]}
+            items={[{ label: 'Add Tracked Object', onClick: () => setAddTrackedObjectOpen(true), icon: <AddBox /> }]}
         >
             <div className={classes.layoutWrapper}>
                 <Layout model={model} factory={factory} onModelChange={setModel} ref={layoutRef} />
                 <AddTabDialog open={addTabOpen} onClose={addTab} />
+                <AddTrackedObjectDialog open={addTrackedObjectOpen} onClose={() => setAddTrackedObjectOpen(false)} />
             </div>
             <TasksProgressBar />
         </ContextMenu>

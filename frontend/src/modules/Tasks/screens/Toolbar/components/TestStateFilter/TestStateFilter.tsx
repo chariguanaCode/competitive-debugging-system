@@ -47,7 +47,7 @@ export const TestStateFilter: React.FunctionComponent<TestStateFilterPropsModel>
         TaskState.Killed,
     ];
 
-    const testStateSelectRef = useRef<HTMLButtonElement>(null);
+    const testStateSelectRef = useRef<HTMLDivElement>(null);
     return (
         <>
             <FormControl>
@@ -59,7 +59,7 @@ export const TestStateFilter: React.FunctionComponent<TestStateFilterPropsModel>
                     readOnly
                     className={dialogOpen ? 'Mui-focused' : undefined}
                     inputComponent={({ className }) => (
-                        <button className={clsx(className, classes.selectWrapper)} ref={testStateSelectRef}>
+                        <div className={clsx(className, classes.selectWrapper)} ref={testStateSelectRef}>
                             {testStateOrder
                                 .filter((value) => filter.has(value))
                                 .map((value) => (
@@ -75,7 +75,7 @@ export const TestStateFilter: React.FunctionComponent<TestStateFilterPropsModel>
                             <Button className={clsx(classes.selectArrow)} classes={{ root: classes.Button }}>
                                 <ArrowDropDown />
                             </Button>
-                        </button>
+                        </div>
                     )}
                 />
             </FormControl>

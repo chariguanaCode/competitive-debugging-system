@@ -74,7 +74,6 @@ export default function Daemons(): ReactElement {
                     }
                 }
             }
-            console.log(deletedTests, groupsToResetIds)
             groupsToResetIds.length && resetGivenGroupsTestsStates(groupsToResetIds);
             deletedTests.length && deleteGivenTestsStates(deletedTests);
         },
@@ -118,11 +117,11 @@ export default function Daemons(): ReactElement {
     };
 
     // output parsing
+    // and forcing reloading of trackedObjects on watchesIdsActions changes
     useEffect(() => {
         if (![TaskState.Pending, TaskState.Running, undefined].includes(currentTaskProgress)) {
-            const inputBasename = getFileBasename(config.tests.groups[currentTask.groupId].tests[currentTask.id].inputPath);
             readFileStream(
-                projectTestsOutputDirectory + inputBasename + '.out',
+                projectTestsOutputDirectory + currentTask.id + '.out',
                 false,
                 (data: string) => setCurrentTaskStdout(data),
                 setCurrentTaskStdoutSize,
@@ -130,7 +129,7 @@ export default function Daemons(): ReactElement {
                 () => {}
             );
             readFileStream(
-                projectTestsOutputDirectory + inputBasename + '.err',
+                projectTestsOutputDirectory + currentTask.id + '.err',
                 true,
                 (data: string) => parseWatchblocks(data),
                 setCurrentTaskWatchblocksSize,
@@ -148,6 +147,7 @@ export default function Daemons(): ReactElement {
         setCurrentTaskStdoutSize,
         setCurrentTaskWatchblocks,
         setCurrentTaskWatchblocksSize,
+        config.watchesIdsActions,
     ]);
 
     // trackedObjects

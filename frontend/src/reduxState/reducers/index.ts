@@ -7,7 +7,6 @@ import cdsConfig from './cdsConfig';
 import fileManager from './fileManager';
 import watchActionsHistory from './watchActionsHistory';
 import trackedObjects from './trackedObjects';
-import addTrackedObjectDialog from './addTrackedObjectDialog';
 
 export default combineReducers({
     projectFile,
@@ -18,5 +17,4 @@ export default combineReducers({
     fileManager,
     watchActionsHistory,
     trackedObjects,
-    addTrackedObjectDialog,
 });
