@@ -25,6 +25,7 @@ declare module '@material-ui/core/styles/createPalette' {
         hasActions: string;
 
         dialogCode: string;
+        dialogCodeComment: string;
         dialogTrackedObject: string;
     }
 

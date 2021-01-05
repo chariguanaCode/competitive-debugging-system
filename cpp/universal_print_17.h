@@ -5,18 +5,18 @@
  *      Name:       Kajetan Lewandowski
  *      Nickname:   LegwanXDL
  *
- *      Name:       Adam Jeli�ski
+ *      Name:       Adam Jeliński
  *      Nickname:   charodziej
  *
- *  Description:    A library for Competitive Debugging System
+ *  Description:    A library for the Competitive Debugging System
  *
  *  Created:        22.12.2019
- *  Last updated:   14.08.2020
+ *  Last updated:   05.01.2021
  *
- *  Version: 2.1
+ *  Version: 2.2
  *
  *  universal-print-in-cpp-for-cds
- *  Universal print in C++ for Competitive Debugging System
+ *  Universal print in C++ for the Competitive Debugging System
  *
  *  g++ -std=c++17 -o template.o template.cpp
  *  ./template.o
@@ -27,7 +27,6 @@
   *                                     Libraries
   * ============================================================================= **/
 
-#define TODO /**/
 #include <iostream>
 #include <queue>
 #include <stack>
@@ -241,8 +240,6 @@ namespace cupl {
     class main_wrapper {
         public:
             main_wrapper() {
-                setvbuf(stdout, nullptr, _IOLBF, 0);
-                setvbuf(stderr, nullptr, _IOLBF, 0);
                 //print_cds(cupl_start);
                 watchblock_open("main", 0);
             };
@@ -264,6 +261,7 @@ namespace cupl {
     int watchblock_close(string name){
         print_cds(cupl_start, watchblock_end, cupl_end);
         cerr<<endl;
+        return 0;
     }
 
     void print_watch_opening_information(int line){

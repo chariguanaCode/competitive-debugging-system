@@ -46,6 +46,7 @@ export const lightTheme = createMuiTheme({
             hasActions: lightBlue[400],
 
             dialogCode: grey[200],
+            dialogCodeComment: grey[500],
             dialogTrackedObject: orange[400],
         },
         header: {
@@ -133,6 +134,7 @@ export const darkTheme = createMuiTheme({
             hasActions: lightBlue[400],
 
             dialogCode: grey[900],
+            dialogCodeComment: grey[400],
             dialogTrackedObject: orange[400],
         },
         header: {

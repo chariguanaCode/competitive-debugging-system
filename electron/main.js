@@ -2,8 +2,15 @@ const { app, BrowserWindow, session, dialog } = require('electron');
 const path = require('path');
 const url = require('url');
 const { autoUpdater } = require('electron-updater');
+const ProgressBar = require('electron-progressbar');
+const electronLogger = require('electron-log');
+autoUpdater.logger = electronLogger;
+autoUpdater.logger.transports.file.level = 'info';
 
 let mainWindow;
+let updateProgressBar;
+
+autoUpdater.autoDownload = false;
 
 const createWindow = async () => {
     if (process.env.ELECTRON_START_URL) {
@@ -77,12 +84,30 @@ autoUpdater.on('update-available', async (info) => {
     });
 
     if (response === 0) {
+        updateProgressBar = new ProgressBar({
+            indeterminate: false,
+            text: 'Downloading update...',
+            title: 'Downloading update...',
+            closeOnComplete: true,
+        });
+
+        updateProgressBar.on('completed', () => {
+            updateProgressBar.detail = 'Download finished.';
+        });
         autoUpdater.downloadUpdate();
     }
 });
 
+autoUpdater.on('download-progress', (info) => {
+    updateProgressBar.value = info.percent;
+    updateProgressBar.detail = `Downloaded ${info.percent.toFixed(2)}% (${info.transferred} / ${info.total}). Download speed: ${
+        info.bytesPerSecond / 1000
+    } kB/s`;
+});
+
 autoUpdater.on('update-downloaded', async (info) => {
     // workaround for https://github.com/electron-userland/electron-builder/issues/4046
+    updateProgressBar.setCompleted();
     if (process.env.DESKTOPINTEGRATION === 'AppImageLauncher') {
         process.env.APPIMAGE = process.env.ARGV0;
     }
@@ -118,4 +143,66 @@ app.on('activate', function () {
     if (mainWindow === null) {
         createWindow();
     }
+});
+
+// workaround for 'download-progress' event not triggering https://gist.github.com/the3moon/0e9325228f6334dabac6dadd7a3fc0b9
+// issue https://github.com/electron-userland/electron-builder/issues/2521
+let diffDown = {
+    percent: 0,
+    bytesPerSecond: 0,
+    total: 0,
+    transferred: 0,
+};
+let diffDownHelper = {
+    startTime: 0,
+    lastTime: 0,
+    lastSize: 0,
+};
+electronLogger.hooks.push((msg, transport) => {
+    if (transport !== electronLogger.transports.console) {
+        return msg;
+    }
+
+    let match = /Full: ([\d\,\.]+) ([GMKB]+), To download: ([\d\,\.]+) ([GMKB]+)/.exec(msg.data[0]);
+    if (match) {
+        let multiplier = 1;
+        if (match[4] == 'KB') multiplier *= 1024;
+        if (match[4] == 'MB') multiplier *= 1024 * 1024;
+        if (match[4] == 'GB') multiplier *= 1024 * 1024 * 1024;
+
+        diffDown = {
+            percent: 0,
+            bytesPerSecond: 0,
+            total: Number(match[3].split(',').join('')) * multiplier,
+            transferred: 0,
+        };
+        diffDownHelper = {
+            startTime: Date.now(),
+            lastTime: Date.now(),
+            lastSize: 0,
+        };
+        return msg;
+    }
+
+    match = /download range: bytes=(\d+)-(\d+)/.exec(msg.data[0]);
+    if (match) {
+        const currentSize = Number(match[2]) - Number(match[1]);
+        const currentTime = Date.now();
+        const deltaTime = currentTime - diffDownHelper.startTime;
+
+        diffDown.transferred += diffDownHelper.lastSize;
+        diffDown.bytesPerSecond = Math.floor((diffDown.transferred * 1000) / deltaTime);
+        diffDown.percent = (diffDown.transferred * 100) / diffDown.total;
+
+        diffDownHelper.lastSize = currentSize;
+        diffDownHelper.lastTime = currentTime;
+
+        updateProgressBar.value = diffDown.percent;
+        updateProgressBar.detail = `Downloaded ${diffDown.percent.toFixed(2)}% (${Math.floor(
+            diffDown.transferred / 1000
+        )} / ${Math.floor(diffDown.total / 1000)} kB). Download speed: ${Math.floor(diffDown.bytesPerSecond / 1000)} kB/s`;
+
+        return msg;
+    }
+    return msg;
 });

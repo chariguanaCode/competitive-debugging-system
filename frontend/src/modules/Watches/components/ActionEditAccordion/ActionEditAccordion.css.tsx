@@ -7,6 +7,10 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: theme.palette.watchblocks.dialogCode,
         padding: theme.spacing(1),
     },
+    codeComment: {
+        fontStyle: 'italic',
+        color: theme.palette.watchblocks.dialogCodeComment,
+    },
     detailsContainer: {
         display: 'flex',
         flexDirection: 'column',

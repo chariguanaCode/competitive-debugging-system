@@ -5,7 +5,7 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(2),
         backgroundColor: theme.palette.background.default,
         minWidth: 'calc(max(500px, 20vw))',
-        maxWidth: '50vw',
+        maxWidth: '80vw',
         maxHeight: 'calc(100vh - 114px)',
         overflow: 'auto',
     },

@@ -15,7 +15,7 @@ import {
     Select,
 } from '@material-ui/core';
 import { Close as CloseIcon, ExpandMore as ExpandMoreIcon, Add as AddIcon } from '@material-ui/icons';
-import { WatchActionArguments, WatchActionOrganizedArguments, WatchActionType } from 'reduxState/models';
+import { WatchActionArguments, WatchActionType } from 'reduxState/models';
 import { colored } from '../ColoredText';
 import { useTrackedObjectConfig } from 'reduxState/selectors';
 import { ButtonWithTooltip } from 'components';
@@ -55,6 +55,16 @@ export const ActionEditAccordion: React.FunctionComponent<Props> = ({
     const [newTarget, setNewTarget] = useState({ name: target, type: trackedObjects.find((a) => a.name === target)?.type });
     const [newAction, setNewAction] = useState(action);
 
+    useEffect(() => {
+        setNewTarget({ name: target, type: trackedObjects.find((a) => a.name === target)?.type });
+        setNewAction(action);
+    }, [target, action]);
+
+    useEffect(() => {
+        beginPopperAnimation();
+        endPopperAnimation();
+    }, [newTarget, newAction]);
+
     const cancelEdits = () => {
         setNewTarget({ name: target, type: trackedObjects.find((a) => a.name === target)?.type });
         setNewAction(action);
@@ -74,11 +84,6 @@ export const ActionEditAccordion: React.FunctionComponent<Props> = ({
         setNewAction(action);
         setEditMode(false);
     };
-
-    useEffect(() => {
-        setNewTarget({ name: target, type: trackedObjects.find((a) => a.name === target)?.type });
-        setNewAction(action);
-    }, [target, action]);
 
     const addNewTrackedObject = (evt: React.MouseEvent<HTMLButtonElement>) => {
         evt.currentTarget.blur();
@@ -141,26 +146,32 @@ export const ActionEditAccordion: React.FunctionComponent<Props> = ({
                                     onChange={(event) => setNewAction(event.target.value as WatchActionType)}
                                 >
                                     {newTarget.type &&
-                                        Object.entries(WatchActionOrganizedArguments[newTarget.type]).map(([action, args]) => (
-                                            <MenuItem
-                                                key={action}
-                                                value={action}
-                                                disabled={args.length > callIdOverview.names.length}
-                                            >
-                                                {action}
-                                            </MenuItem>
-                                        ))}
+                                        Object.entries(WatchActionArguments)
+                                            .filter(([action, args]) => action.indexOf(newTarget.type || '') !== -1)
+                                            .map(([action, args]) => (
+                                                <MenuItem
+                                                    key={action}
+                                                    value={action}
+                                                    disabled={args.length > callIdOverview.names.length}
+                                                >
+                                                    {action}
+                                                </MenuItem>
+                                            ))}
                                 </Select>
                             </FormControl>
                         </div>
                     </Collapse>
                     {newAction && (
                         <Paper className={classes.code}>
-                            {WatchActionArguments[newAction].map((argument, index) => (
-                                <div key={index}>
-                                    {colored({ array: argument })} = {colored({ name: callIdOverview.names[index] })}
-                                </div>
-                            ))}
+                            {WatchActionArguments[newAction].length > 0 ? (
+                                WatchActionArguments[newAction].map((argument, index) => (
+                                    <div key={index}>
+                                        {colored({ array: argument })} = {colored({ name: callIdOverview.names[index] })}
+                                    </div>
+                                ))
+                            ) : (
+                                <span className={classes.codeComment}>No arguments</span>
+                            )}
                         </Paper>
                     )}
                 </div>

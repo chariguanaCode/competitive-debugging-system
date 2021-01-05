@@ -40,8 +40,8 @@ export const WatchActionDialog: React.FunctionComponent<WatchActionDialogPropsMo
     };
 
     const executePopperAnimation = () => {
+        popperRef.current?.update();
         if (popperAnimationStatus.current) {
-            popperRef.current?.update();
             requestAnimationFrame(executePopperAnimation);
         }
     };
