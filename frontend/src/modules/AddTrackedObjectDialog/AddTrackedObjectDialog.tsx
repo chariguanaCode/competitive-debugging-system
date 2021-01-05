@@ -12,14 +12,16 @@ import {
     Select,
     MenuItem,
 } from '@material-ui/core';
-import { useAddTrackedObjectDialog } from 'reduxState/selectors';
-import { useAddTrackedObjectDialogActions, useTrackedObjectsActions, useConfigActions } from 'reduxState/actions';
+import { useTrackedObjectsActions, useConfigActions } from 'reduxState/actions';
 import { TrackedObject } from 'reduxState/models';
 
-export const AddTrackedObjectDialog = () => {
+interface Props {
+    open: boolean;
+    onClose: () => void;
+}
+
+export const AddTrackedObjectDialog = ({ open, onClose }: Props) => {
     const classes = useStyles();
-    const open = useAddTrackedObjectDialog();
-    const { closeAddTrackedObjectDialog } = useAddTrackedObjectDialogActions();
 
     const [type, setType] = useState('' as TrackedObject['type']);
     const [name, setName] = useState('');
@@ -29,7 +31,7 @@ export const AddTrackedObjectDialog = () => {
     const { addTrackedObject } = useConfigActions();
 
     return (
-        <Dialog open={open} onClose={closeAddTrackedObjectDialog} fullWidth>
+        <Dialog open={open} onClose={onClose} fullWidth>
             <DialogTitle>Add tracked object</DialogTitle>
             <DialogContent className={classes.dialogContent} dividers>
                 <TextField
@@ -47,12 +49,10 @@ export const AddTrackedObjectDialog = () => {
                 </FormControl>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => closeAddTrackedObjectDialog()} color="primary">
-                    Cancel
-                </Button>
+                <Button onClick={() => onClose()}>Cancel</Button>
                 <Button
                     onClick={() => {
-                        closeAddTrackedObjectDialog();
+                        onClose();
                         switch (type) {
                             case 'array_1d':
                                 setSingleTrackedObject(name, { type, value: [] as string[], color: [] as string[] });
@@ -66,7 +66,7 @@ export const AddTrackedObjectDialog = () => {
                     color="primary"
                     disabled={!type.length || !name.length}
                 >
-                    Add tracked object
+                    Add
                 </Button>
             </DialogActions>
         </Dialog>

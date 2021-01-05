@@ -15,7 +15,7 @@ import {
     indigo,
     red,
 } from '@material-ui/core/colors';
-import { TaskState } from 'reduxState/models';
+import { ExecutionState, TaskState } from 'reduxState/models';
 
 export const lightTheme = createMuiTheme({
     palette: {
@@ -40,6 +40,14 @@ export const lightTheme = createMuiTheme({
 
             selected: grey[200],
             bracketArrow: grey[600],
+
+            noCdsId: grey[600],
+            noActions: orange[400],
+            hasActions: lightBlue[400],
+
+            dialogCode: grey[200],
+            dialogCodeComment: grey[500],
+            dialogTrackedObject: orange[400],
         },
         header: {
             background: amber[500],
@@ -83,6 +91,14 @@ export const lightTheme = createMuiTheme({
             [TaskState.Killed]: grey[400],
             [TaskState.OK]: teal[400],
         },
+        executionState: {
+            [ExecutionState.NoProject]: grey[800],
+            [ExecutionState.ProjectLoaded]: teal[400],
+            [ExecutionState.Compiling]: grey[800],
+            [ExecutionState.CompilationError]: red[400],
+            [ExecutionState.Running]: lightBlue[400],
+            [ExecutionState.Finished]: lightGreen[400],
+        },
         scrollbar: {
             thumb: grey[200],
             thumbHover: grey[300],
@@ -112,6 +128,14 @@ export const darkTheme = createMuiTheme({
 
             selected: grey[800],
             bracketArrow: grey[500],
+
+            noCdsId: grey[700],
+            noActions: orange[400],
+            hasActions: lightBlue[400],
+
+            dialogCode: grey[900],
+            dialogCodeComment: grey[400],
+            dialogTrackedObject: orange[400],
         },
         header: {
             background: grey[800],
@@ -154,6 +178,14 @@ export const darkTheme = createMuiTheme({
             [TaskState.Crashed]: purple[400],
             [TaskState.Killed]: grey[400],
             [TaskState.OK]: teal[400],
+        },
+        executionState: {
+            [ExecutionState.NoProject]: '#ffffff',
+            [ExecutionState.ProjectLoaded]: teal[400],
+            [ExecutionState.Compiling]: '#ffffff',
+            [ExecutionState.CompilationError]: red[400],
+            [ExecutionState.Running]: lightBlue[400],
+            [ExecutionState.Finished]: lightGreen[400],
         },
         scrollbar: {
             thumb: grey[800],

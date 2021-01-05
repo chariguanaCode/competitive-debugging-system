@@ -13,6 +13,8 @@ import {
     InputLabel,
 } from '@material-ui/core';
 import { TrackingOptions } from './screens';
+import { ButtonWithTooltip } from 'components';
+import { Add as AddIcon } from '@material-ui/icons';
 
 interface Props {
     open: boolean;
@@ -25,6 +27,11 @@ export const AddTabDialog = ({ open, onClose }: Props) => {
     const [name, setName] = useState('');
 
     const [config, setConfig] = useState({ object: '' });
+
+    const addNewTrackedObject = (evt: React.MouseEvent<HTMLButtonElement>) => {
+        evt.currentTarget.blur();
+        document.dispatchEvent(new Event('addNewTrackedObject'));
+    };
 
     return (
         <Dialog onClose={() => onClose(null)} open={open} fullWidth>
@@ -51,16 +58,25 @@ export const AddTabDialog = ({ open, onClose }: Props) => {
                     </FormControl>
                 </div>
                 {type === 'trackedObject' && (
-                    <TrackingOptions
-                        selectedObject={config.object}
-                        setSelectedObject={(newObject) => setConfig({ object: newObject })}
-                    />
+                    <div className={classes.dialogContent}>
+                        <TrackingOptions
+                            selectedObject={config.object}
+                            setSelectedObject={(newObject) => setConfig({ object: newObject })}
+                        />
+                        <ButtonWithTooltip
+                            tooltipText="Add new tracked object"
+                            placement="bottom"
+                            arrow
+                            onClick={addNewTrackedObject}
+                            classes={{ root: classes.addTrackedObjectButton }}
+                        >
+                            <AddIcon fontSize="small" />
+                        </ButtonWithTooltip>
+                    </div>
                 )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => onClose(null)} color="primary">
-                    Cancel
-                </Button>
+                <Button onClick={() => onClose(null)}>Cancel</Button>
                 <Button
                     onClick={() => onClose({ type: 'tab', name, component: type, config: type === 'trackedObject' && config })}
                     color="primary"

@@ -1,4 +1,5 @@
 import { TrackedObject } from './trackedObjects';
+import { WatchActionType } from './watchActionsHistory';
 
 export interface ProjectInfoModel {
     files: Array<string>;
@@ -30,13 +31,11 @@ export interface TestGroupsModel {
     nextGroupId: string;
 }
 
-export interface watchIdActionsModel {
-    [key: string]: [
-        {
-            target: string;
-            action: string;
-        }
-    ];
+export interface WatchIdActionsModel {
+    [key: string]: Array<{
+        target: string;
+        action: WatchActionType;
+    }>;
 }
 
 type LayoutElement = any;
@@ -69,7 +68,7 @@ export interface ConfigModel {
         };
     };
     tests: TestGroupsModel;
-    watchesIdsActions: watchIdActionsModel;
+    watchesIdsActions: WatchIdActionsModel;
     layouts: {
         debugging: LayoutModel;
         outputs: LayoutModel;

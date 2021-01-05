@@ -74,7 +74,6 @@ export default function Daemons(): ReactElement {
                     }
                 }
             }
-            console.log(deletedTests, groupsToResetIds)
             groupsToResetIds.length && resetGivenGroupsTestsStates(groupsToResetIds);
             deletedTests.length && deleteGivenTestsStates(deletedTests);
         },
@@ -118,11 +117,11 @@ export default function Daemons(): ReactElement {
     };
 
     // output parsing
+    // and forcing reloading of trackedObjects on watchesIdsActions changes
     useEffect(() => {
         if (![TaskState.Pending, TaskState.Running, undefined].includes(currentTaskProgress)) {
-            const inputBasename = getFileBasename(config.tests.groups[currentTask.groupId].tests[currentTask.id].inputPath);
             readFileStream(
-                projectTestsOutputDirectory + inputBasename + '.out',
+                projectTestsOutputDirectory + currentTask.id + '.out',
                 false,
                 (data: string) => setCurrentTaskStdout(data),
                 setCurrentTaskStdoutSize,
@@ -130,7 +129,7 @@ export default function Daemons(): ReactElement {
                 () => {}
             );
             readFileStream(
-                projectTestsOutputDirectory + inputBasename + '.err',
+                projectTestsOutputDirectory + currentTask.id + '.err',
                 true,
                 (data: string) => parseWatchblocks(data),
                 setCurrentTaskWatchblocksSize,
@@ -148,6 +147,7 @@ export default function Daemons(): ReactElement {
         setCurrentTaskStdoutSize,
         setCurrentTaskWatchblocks,
         setCurrentTaskWatchblocksSize,
+        config.watchesIdsActions,
     ]);
 
     // trackedObjects
@@ -202,7 +202,7 @@ export default function Daemons(): ReactElement {
 
         // going back in history from the destination point until all values are set
         while (notFinished > 0 && loc !== startLocation) {
-            for (let i = 0; i < actionsHistory[loc].actions.length && notFinished > 0; i++) {
+            for (let i = actionsHistory[loc].actions.length - 1; i >= 0 && notFinished > 0; i--) {
                 const currAction = actionsHistory[loc].actions[i];
                 /* // buggy optimization
                 let shouldSkip = false as boolean;
@@ -297,6 +297,12 @@ export default function Daemons(): ReactElement {
                                 case OneDimensionArrayActionType.set_cell_color:
                                     newTrackedObjects[key].color[currAction.payload[0]] = currAction.payload[1];
                                     break;
+                                case OneDimensionArrayActionType.clear_whole:
+                                    newTrackedObjects[key].value = [];
+                                    break;
+                                case OneDimensionArrayActionType.clear_whole_color:
+                                    newTrackedObjects[key].color = [];
+                                    break;
                             }
                         }
                         break;
@@ -337,6 +343,12 @@ export default function Daemons(): ReactElement {
                                     (newTrackedObjects[key].color[currAction.payload[0]] as Array<string>)[
                                         currAction.payload[1]
                                     ] = currAction.payload[2];
+                                    break;
+                                case TwoDimensionArrayActionType.clear_whole:
+                                    newTrackedObjects[key].value = [];
+                                    break;
+                                case TwoDimensionArrayActionType.clear_whole_color:
+                                    newTrackedObjects[key].color = [];
                                     break;
                             }
                         }

@@ -19,7 +19,6 @@ export const readFileStream = (
 
         contentStream.on('error', (err: any) => {});
         contentStream.on('data', (data: Buffer) => {
-            const oldBuffer = buffer;
             buffer += stringFromUintArray(data);
 
             if (sendSingleLines) {

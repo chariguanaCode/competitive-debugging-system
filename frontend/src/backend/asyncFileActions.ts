@@ -33,6 +33,11 @@ export const getFileBasename = (filePath: string) => {
     return path.basename(parsedPath);
 };
 
+export const getFileDirname = (filePath: string) => {
+    const parsedPath = parsePath(filePath);
+    return path.dirname(parsedPath);
+};
+
 export const saveFile = (filePath: string, content: any) =>
     new Promise((resolve, reject) => {
         fs.writeFile(filePath, content, (err: any) => {

@@ -36,7 +36,6 @@ export default function App(): ReactElement {
                     <Daemons />
 
                     <FileManagerContainer useFileManager={useFileManager} useFileManagerActions={useFileManagerActions} />
-                    <AddTrackedObjectDialog />
 
                     <Header />
                     <Content />

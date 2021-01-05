@@ -1,49 +1,23 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useState } from 'react';
 import useStyles from './WatchNode.css';
-import { useTheme } from '@material-ui/core';
-import { WatchBlockOptions } from '@material-ui/core/styles/createPalette';
-import { WatchNodeData } from 'reduxState/models';
-import { useWatchHistoryLocation } from 'reduxState/selectors';
-import { useWatchActionsHistoryActions } from 'reduxState/actions';
+import { WatchNodePropsModel } from './WatchNode.d';
+import { Tooltip, useTheme } from '@material-ui/core';
 import { ArrowDropDown, ArrowRight } from '@material-ui/icons';
+import WatchActionDialog from '../WatchActionDialog';
+import { colored } from '../ColoredText';
 
-interface Props {
-    node: WatchNodeData;
-    style: React.CSSProperties;
-    setBracketState: (id: string, value: boolean) => void;
-}
-
-interface ColoredProps {
-    type: keyof WatchBlockOptions;
-    children: ReactElement[];
-}
-
-function Colored({ type, children }: ColoredProps): ReactElement {
-    const theme = useTheme();
-    return (
-        <span
-            style={{
-                color: theme.palette.watchblocks[type],
-            }}
-        >
-            {children}
-        </span>
-    );
-}
-
-function WatchNode({ node, style, setBracketState }: Props): ReactElement {
-    const { setWatchHistoryLocation } = useWatchActionsHistoryActions();
+function WatchNode({
+    node,
+    selected,
+    actions,
+    callIdOverview,
+    style,
+    setBracketState,
+    setWatchHistoryLocation,
+}: WatchNodePropsModel): ReactElement {
     const classes = useStyles();
     const theme = useTheme();
-
-    const colored = (val: { [key in keyof WatchBlockOptions]: any }, key?: string) => {
-        const [type, content] = Object.entries(val)[0] as [keyof WatchBlockOptions, any];
-        return (
-            <Colored key={key} type={type}>
-                {content}
-            </Colored>
-        );
-    };
+    const [actionDialogAnchor, setActionDialogAnchor] = useState<null | (HTMLDivElement & EventTarget)>(null);
 
     const bracketMap = {
         watchblock: ['{', '}'],
@@ -52,14 +26,10 @@ function WatchNode({ node, style, setBracketState }: Props): ReactElement {
         pair: ['(', ')'],
     };
 
-    const expandable = () => {
-        if (node.type === 'array' || node.type === 'struct' || node.type === 'pair' || node.type === 'watchblock') {
-            return node.children.length !== 0;
-        }
-        return false;
-    };
+    const expandable =
+        (node.type === 'array' || node.type === 'struct' || node.type === 'pair' || node.type === 'watchblock') &&
+        node.children.length !== 0;
 
-    const selected = useWatchHistoryLocation() === node.call_id;
     const selectable = node.call_id !== undefined;
     const selectTracking = () => {
         setWatchHistoryLocation(node.call_id);
@@ -82,19 +52,56 @@ function WatchNode({ node, style, setBracketState }: Props): ReactElement {
         if (line !== undefined) {
             if (node.type === 'watchblock' || node.variable_id === 0) {
                 result.push(
-                    <span key="1">
-                        {colored({ line })}: {colored({ name })}
-                        {' = '}
-                    </span>
-                );
-            } else {
-                result.push(
-                    <span key="1">
-                        {colored({ name })}
-                        {' = '}
+                    <span key="-1">
+                        {colored({ line })}
+                        {':'}
                     </span>
                 );
             }
+            result.push(
+                <React.Fragment key="0">
+                    <Tooltip
+                        title={
+                            node.cds_id
+                                ? actions.length > 0
+                                    ? `${actions.length} action${actions.length > 1 ? 's' : ''} assigned`
+                                    : 'No actions assgined'
+                                : 'No cupl::id, unable to add actions'
+                        }
+                    >
+                        <div
+                            className={classes.actionIndicator}
+                            style={{
+                                backgroundColor: node.cds_id
+                                    ? actions.length > 0
+                                        ? theme.palette.watchblocks.hasActions
+                                        : theme.palette.watchblocks.noActions
+                                    : theme.palette.watchblocks.noCdsId,
+                                cursor: node.cds_id ? 'pointer' : 'auto',
+                            }}
+                            onClick={(evt) => {
+                                evt.stopPropagation();
+                                setActionDialogAnchor(evt.currentTarget);
+                            }}
+                        />
+                    </Tooltip>
+                    {node.cds_id && actionDialogAnchor && (
+                        <WatchActionDialog
+                            actions={actions}
+                            callIdOverview={callIdOverview}
+                            cds_id={node.cds_id}
+                            anchor={actionDialogAnchor}
+                            onClose={() => setActionDialogAnchor(null)}
+                        />
+                    )}
+                </React.Fragment>
+            );
+            result.push(
+                <span key="1">
+                    {colored({ name })}
+                    {' = '}
+                </span>
+            );
         } else {
             result.push(<React.Fragment key="1">{colored({ array: name })} : </React.Fragment>);
         }
@@ -111,7 +118,7 @@ function WatchNode({ node, style, setBracketState }: Props): ReactElement {
             };
 
             result.push(
-                <span key="4" onClick={toggleExpand} style={{ cursor: expandable() ? 'pointer' : 'auto' }}>
+                <span key="4" onClick={toggleExpand} style={{ cursor: expandable ? 'pointer' : 'auto' }}>
                     {open && node.children.length ? (
                         <>
                             <ArrowDropDown viewBox="4 4 13 13" fontSize="inherit" className={classes.bracketArrow} />{' '}

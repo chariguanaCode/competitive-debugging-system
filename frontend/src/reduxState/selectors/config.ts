@@ -12,3 +12,11 @@ export const useLayouts = () => {
 export const useLayoutSelection = () => {
     return useSelector((state: RootState) => state.config.layoutSelection);
 };
+
+export const useWatchIdActions = () => {
+    return useSelector((state: RootState) => state.config.watchesIdsActions);
+};
+
+export const useTrackedObjectConfig = () => {
+    return useSelector((state: RootState) => state.config.trackedObjects);
+};

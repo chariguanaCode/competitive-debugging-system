@@ -1,6 +1,14 @@
 import { handleActions } from 'redux-actions';
 import { ConfigActions, ConfigActionPayload } from '../actions';
-import { ConfigModel, TestModel, ProjectInfoModel, LayoutModel, TrackedObject, TestGroupsModel } from '../models';
+import {
+    ConfigModel,
+    TestModel,
+    ProjectInfoModel,
+    LayoutModel,
+    TrackedObject,
+    TestGroupsModel,
+    WatchIdActionsModel,
+} from '../models';
 import getDefaultConfig from 'data/getDefaultConfig';
 
 export const configReducer = handleActions<ConfigModel, ConfigActionPayload>(
@@ -192,6 +200,16 @@ export const configReducer = handleActions<ConfigModel, ConfigActionPayload>(
             ...state,
             trackedObjects: [...state.trackedObjects, action.payload as { name: string; type: TrackedObject['type'] }],
         }),
+        [ConfigActions.SET_WATCH_ID_ACTIONS]: (state, action) => {
+            const payload = action.payload as { cds_id: string; value: WatchIdActionsModel[string] };
+            return {
+                ...state,
+                watchesIdsActions: {
+                    ...state.watchesIdsActions,
+                    [payload.cds_id]: payload.value,
+                },
+            };
+        },
     },
     getDefaultConfig()
 );

@@ -1,5 +1,6 @@
 export enum ExecutionState {
     NoProject,
+    ProjectLoaded,
     Compiling,
     CompilationError,
     Running,
@@ -9,4 +10,5 @@ export enum ExecutionState {
 export interface ExecutionStateModel {
     state: ExecutionState;
     details: string;
+    sourceHash: string;
 }

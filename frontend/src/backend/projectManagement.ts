@@ -2,7 +2,7 @@ import useCompilationAndExecution from './cppCompilationAndExecution';
 import * as fileChangeTracking from './fileChangeTracking';
 import * as syncFileActions from './syncFileActions';
 import * as asyncFileActions from './asyncFileActions';
-import { ConfigModel, AllTasksModel, Task, TaskState, ProjectFileModel, TrackedObjectsModel } from 'reduxState/models';
+import { ConfigModel, Task, TaskState, ProjectFileModel, TrackedObjectsModel, ExecutionState } from 'reduxState/models';
 import { useConfig, useAllTasksState, useCdsConfig, useProjectFile } from 'reduxState/selectors';
 import {
     useConfigActions,
@@ -10,7 +10,7 @@ import {
     useProjectFileActions,
     useCdsConfigActions,
     useTrackedObjectsActions,
-    ConfigActions,
+    useExecutionStateActions,
 } from 'reduxState/actions';
 import { getTimeMark } from 'utils/tools';
 import { getDefaultConfig } from 'data';
@@ -129,6 +129,7 @@ export const useLoadProject = () => {
     const { setProjectFile } = useProjectFileActions();
     const { pushProjectToProjectsHistory } = useCdsConfigActions();
     const { setAllTrackedObjects } = useTrackedObjectsActions();
+    const { setExecutionState } = useExecutionStateActions();
     const resetAllTestsStates = useResetAllTestsStates();
 
     return async (sourceFilePath: string) => {
@@ -195,6 +196,8 @@ export const useLoadProject = () => {
         const defaultTestsOutputDirectory = remote.getGlobal('paths').testsOutputs;
         const projectTestsOutputDirectory = defaultTestsOutputDirectory + '/' + newConfig.projectInfo.uuid + '/';
         await asyncFileActions.createDirectory(projectTestsOutputDirectory).catch((err) => {});
+
+        setExecutionState({ state: ExecutionState.ProjectLoaded, details: '', sourceHash: '' });
     };
 };
 /*
