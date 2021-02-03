@@ -65,7 +65,7 @@ function WatchNode({
                             node.cds_id
                                 ? actions.length > 0
                                     ? `${actions.length} action${actions.length > 1 ? 's' : ''} assigned`
-                                    : 'No actions assgined'
+                                    : 'No actions assigned'
                                 : 'No cupl::id, unable to add actions'
                         }
                     >

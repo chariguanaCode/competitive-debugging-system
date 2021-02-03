@@ -2,8 +2,17 @@ import useCompilationAndExecution from './cppCompilationAndExecution';
 import * as fileChangeTracking from './fileChangeTracking';
 import * as syncFileActions from './syncFileActions';
 import * as asyncFileActions from './asyncFileActions';
-import { ConfigModel, Task, TaskState, ProjectFileModel, TrackedObjectsModel, ExecutionState } from 'reduxState/models';
-import { useConfig, useAllTasksState, useCdsConfig, useProjectFile } from 'reduxState/selectors';
+import {
+    ConfigModel,
+    Task,
+    TaskState,
+    ProjectFileModel,
+    TrackedObjectsModel,
+    ExecutionState,
+    Watchblock,
+    Watch,
+} from 'reduxState/models';
+import { useConfig, useAllTasksState, useCdsConfig, useProjectFile, useCurrentTaskState } from 'reduxState/selectors';
 import {
     useConfigActions,
     useTaskStatesActions,
@@ -131,6 +140,7 @@ export const useLoadProject = () => {
     const { setAllTrackedObjects } = useTrackedObjectsActions();
     const { setExecutionState } = useExecutionStateActions();
     const resetAllTestsStates = useResetAllTestsStates();
+    const { setCurrentTaskId, setCurrentTaskStdout, setCurrentTaskWatchblocks } = useTaskStatesActions();
 
     return async (sourceFilePath: string) => {
         let path = asyncFileActions.parsePath(sourceFilePath, false);
@@ -168,16 +178,6 @@ export const useLoadProject = () => {
         if (hasSaveLocation) pushProjectToProjectsHistory(directory + filename + '.cdsp');
         console.log(newConfig, dividedPath);
 
-        setConfig(newConfig);
-        setProjectFile({
-            path: directory + filename + '.temp.cdsp',
-            directory: directory,
-            filename: filename,
-            isSaved: hasSaveLocation,
-            hasSaveLocation: hasSaveLocation,
-            savedFileHash: newConfigMD5,
-        });
-
         const newTrackedObjects = {} as TrackedObjectsModel;
         for (const { name, type } of newConfig.trackedObjects) {
             switch (type) {
@@ -193,9 +193,23 @@ export const useLoadProject = () => {
 
         resetAllTestsStates(true, newConfig);
 
+        setCurrentTaskId({ id: '-1', groupId: '-1' });
+        setCurrentTaskStdout('');
+        setCurrentTaskWatchblocks({ children: [] as Array<Watchblock | Watch> } as Watchblock);
+
         const defaultTestsOutputDirectory = remote.getGlobal('paths').testsOutputs;
         const projectTestsOutputDirectory = defaultTestsOutputDirectory + '/' + newConfig.projectInfo.uuid + '/';
         await asyncFileActions.createDirectory(projectTestsOutputDirectory).catch((err) => {});
+
+        setProjectFile({
+            path: directory + filename + '.temp.cdsp',
+            directory: directory,
+            filename: filename,
+            isSaved: hasSaveLocation,
+            hasSaveLocation: hasSaveLocation,
+            savedFileHash: newConfigMD5,
+        });
+        setConfig(newConfig);
 
         setExecutionState({ state: ExecutionState.ProjectLoaded, details: '', sourceHash: '' });
     };
